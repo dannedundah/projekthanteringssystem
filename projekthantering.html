@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projekthantering</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Projekthantering</h1>
+        <form id="project-form">
+            <input type="text" id="project-input" placeholder="Projektets namn" required>
+            <input type="text" id="customer-name" placeholder="Kundnamn" required>
+            <input type="text" id="customer-phone" placeholder="Telefonnummer" required>
+            <input type="text" id="project-address" placeholder="Adress" required>
+            <textarea id="project-description" placeholder="Projektbeskrivning" required></textarea>
+            <select id="project-status" required>
+                <option value="Ny">Ny</option>
+                <option value="Planerad">Planerad</option>
+                <option value="Solceller klart">Solceller klart</option>
+                <option value="Elektriker klar">Elektriker klar</option>
+                <option value="Drifsatt">Drifsatt</option>
+            </select>
+            <button type="submit">Lägg till projekt</button>
+        </form>
+        <ul id="project-list"></ul>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
