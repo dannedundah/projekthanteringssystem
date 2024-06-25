@@ -12,6 +12,17 @@
         <button onclick="navigateTo('projekthantering.html')">Projekthantering</button>
         <button onclick="navigateTo('schema.html')">Schema</button>
     </div>
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Kontrollera inloggningsstatus
+            if (localStorage.getItem('loggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
