@@ -12,30 +12,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const projectAddress = document.getElementById('project-address').value.trim();
         const projectDescription = document.getElementById('project-description').value.trim();
         const projectStatus = document.getElementById('project-status').value.trim();
-        const projectImage = document.getElementById('project-image').files[0];
+        const projectImages = document.getElementById('project-images').files;
 
-        if (projectImage) {
-            const storageRef = ref(storage, 'project_images/' + projectImage.name);
-            await uploadBytes(storageRef, projectImage);
+        const imageUrls = [];
+
+        for (const file of projectImages) {
+            const storageRef = ref(storage, 'project_images/' + file.name);
+            await uploadBytes(storageRef, file);
             const imageUrl = await getDownloadURL(storageRef);
+            imageUrls.push(imageUrl);
+        }
 
-            const project = {
-                name: projectName,
-                customerName: customerName,
-                customerPhone: customerPhone,
-                address: projectAddress,
-                description: projectDescription,
-                status: projectStatus,
-                imageUrl: imageUrl
-            };
+        const project = {
+            name: projectName,
+            customerName: customerName,
+            customerPhone: customerPhone,
+            address: projectAddress,
+            description: projectDescription,
+            status: projectStatus,
+            images: imageUrls
+        };
 
-            try {
-                await addDoc(collection(db, 'projects'), project);
-                alert('Projektet har lagts till!');
-                window.location.href = 'projektlista.html';
-            } catch (error) {
-                console.error('Error adding project: ', error);
-            }
+        try {
+            await addDoc(collection(db, 'projects'), project);
+            alert('Projektet har lagts till!');
+            window.location.href = 'projektlista.html';
+        } catch (error) {
+            console.error('Error adding project: ', error);
         }
     });
 });
