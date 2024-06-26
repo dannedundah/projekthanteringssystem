@@ -57,8 +57,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (project.status === 'Fakturerad') {
                 billedProjects.appendChild(li);
             } else {
-                // Om statusen är något annat än 'Planerad' eller 'Fakturerad', logga det
-                console.log(`Project ${project.name} has an unknown status: ${project.status}`);
+                // Om statusen är något annat, lägg till den i en default-mapp
+                const defaultFolder = document.getElementById('default-projects');
+                if (!defaultFolder) {
+                    const newFolder = document.createElement('div');
+                    newFolder.id = 'default-projects';
+                    newFolder.className = 'folder';
+                    newFolder.innerHTML = `
+                        <h3>Andra</h3>
+                        <ul id="default-project-list"></ul>
+                    `;
+                    document.querySelector('.sidebar').appendChild(newFolder);
+                }
+                document.getElementById('default-project-list').appendChild(li);
             }
         });
 
