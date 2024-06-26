@@ -1,5 +1,6 @@
 import { db, collection, getDocs, doc, updateDoc } from './firebase-config.js';
 
+// Definiera funktionerna först
 function allowDrop(event) {
     event.preventDefault();
 }
@@ -26,7 +27,7 @@ function navigateTo(page) {
     window.location.href = page;
 }
 
-// Gör funktionerna globala
+// Tilldela funktionerna till window-objektet
 window.allowDrop = allowDrop;
 window.drag = drag;
 window.drop = drop;
