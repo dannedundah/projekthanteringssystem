@@ -10,70 +10,27 @@
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h2>Projektträd</h2>
-            <div class="folder" id="new">
-                <h3 onclick="toggleFolder('new-projects')">Ny</h3>
-                <ul id="new-projects" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
+        <h1>Projekthanteringssystem</h1>
+        <div class="row">
+            <div class="column" style="flex: 1;">
+                <ul id="new-projects" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>Ny</h3>
+                </ul>
+                <ul id="planned-projects" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>Planerad</h3>
+                </ul>
+                <ul id="billed-projects" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>Fakturerad</h3>
+                </ul>
             </div>
-            <div class="folder" id="planned">
-                <h3 onclick="toggleFolder('planned-projects')">Planerad</h3>
-                <ul id="planned-projects" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
-            </div>
-            <div class="folder" id="billed">
-                <h3 onclick="toggleFolder('billed-projects')">Fakturerad</h3>
-                <ul id="billed-projects" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
+            <div class="column" style="flex: 3;">
+                <!-- Innehåll för projektdetaljer eller annat -->
             </div>
         </div>
-        <div class="main-content">
-            <h1>Projekthanteringssystem</h1>
-            <div class="button-container">
-                <h2 onclick="navigateTo('läggatillprojekt.html')" class="action-button">Lägg till nytt projekt</h2>
-                <h2 onclick="navigateTo('se-schema.html')" class="action-button">Se mitt schema</h2>
-            </div>
-            <div id="project-details" class="project-details"></div>
+        <div class="actions">
+            <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
+            <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
         </div>
     </div>
-    <script>
-        function toggleFolder(id) {
-            const folder = document.getElementById(id);
-            if (folder.style.display === 'none') {
-                folder.style.display = 'block';
-            } else {
-                folder.style.display = 'none';
-            }
-        }
-
-        function allowDrop(event) {
-            event.preventDefault();
-        }
-
-        function drag(event) {
-            event.dataTransfer.setData("text", event.target.id);
-        }
-
-        function drop(event) {
-            event.preventDefault();
-            const data = event.dataTransfer.getData("text");
-            const projectElement = document.getElementById(data);
-            const newCategory = event.target.closest('ul').id.split('-')[0];
-            event.target.appendChild(projectElement);
-            updateProjectCategory(projectElement.id, newCategory);
-        }
-
-        async function updateProjectCategory(projectId, newCategory) {
-            try {
-                const projectRef = doc(db, 'projects', projectId);
-                await updateDoc(projectRef, { status: newCategory });
-                console.log(`Project ${projectId} updated to ${newCategory}`);
-            } catch (error) {
-                console.error('Error updating project category:', error);
-            }
-        }
-
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-    </script>
 </body>
 </html>

@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function showProjectDetails(projectId) {
-    window.location.href = `projektdetalj.html?id=${projectId}`;
+    window.location.href = `projekt-detalj.html?id=${projectId}`;
 }
 
 function allowDrop(event) {
