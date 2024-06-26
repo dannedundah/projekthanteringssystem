@@ -1,6 +1,4 @@
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-const db = getFirestore();
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const projectDetails = document.getElementById('project-details');
@@ -29,26 +27,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         projectDetails.textContent = 'Ett fel uppstod vid hämtning av projektdata.';
     }
 });
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekthantering - Projektdetalj</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="projektdetalj.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Projektdetalj</h1>
-        <div id="project-details"></div>
-        <button onclick="navigateTo('projektlista.html')">Tillbaka</button>
-    </div>
-    <script>
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-    </script>
-</body>
-</html>
