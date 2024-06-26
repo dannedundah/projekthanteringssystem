@@ -12,15 +12,15 @@
     <div class="container">
         <div class="sidebar">
             <h2>Projektträd</h2>
-            <div class="folder orange-background" id="new" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="folder" id="new" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <h3>Ny</h3>
                 <ul id="new-projects"></ul>
             </div>
-            <div class="folder orange-background" id="planned" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="folder" id="planned" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <h3>Planerad</h3>
                 <ul id="planned-projects"></ul>
             </div>
-            <div class="folder orange-background" id="billed" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="folder" id="billed" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <h3>Fakturerad</h3>
                 <ul id="billed-projects"></ul>
             </div>
@@ -28,8 +28,8 @@
         <div class="main-content">
             <h1>Projekthanteringssystem</h1>
             <div class="button-container">
-                <h2 onclick="navigateTo('läggatillprojekt.html')" class="action-button orange-background">Lägg till nytt projekt</h2>
-                <h2 onclick="navigateTo('se-schema.html')" class="action-button orange-background">Se mitt schema</h2>
+                <h2 onclick="navigateTo('läggatillprojekt.html')" class="action-button">Lägg till nytt projekt</h2>
+                <h2 onclick="navigateTo('se-schema.html')" class="action-button">Se mitt schema</h2>
             </div>
             <div id="project-details" class="project-details"></div>
         </div>
