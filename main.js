@@ -39,7 +39,7 @@ function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
 }
 
-async function updateProjectStatus(projectId, newStatus) {
+export async function updateProjectStatus(projectId, newStatus) {
     try {
         const projectRef = doc(db, 'projects', projectId);
         await updateDoc(projectRef, { status: newStatus });

@@ -1,4 +1,5 @@
-import { db, doc, getDoc, updateDoc } from './firebase-config.js';
+import { db, doc, getDoc } from './firebase-config.js';
+import { updateProjectStatus } from './main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const projectDetails = document.getElementById('project-details');
@@ -30,13 +31,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-export async function updateProjectStatus(projectId, newStatus) {
-    try {
-        const projectRef = doc(db, 'projects', projectId);
-        await updateDoc(projectRef, { status: newStatus });
-        console.log(`Project ${projectId} updated to ${newStatus}`);
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error('Error updating project status:', error);
-    }
+window.updateProjectStatusHandler = function() {
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get('id');
+    const newStatus = document.getElementById('project-status').value;
+    updateProjectStatus(projectId, newStatus);
+}
+
+function navigateTo(page) {
+    window.location.href = page;
 }
