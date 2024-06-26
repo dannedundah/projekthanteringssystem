@@ -51,10 +51,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.id = project.id;
             li.ondragstart = drag;  // Använd funktionen drag
 
+            // Kontrollera status och tilldela till rätt mapp
             if (project.status === 'Planerad') {
                 plannedProjects.appendChild(li);
             } else if (project.status === 'Fakturerad') {
                 billedProjects.appendChild(li);
+            } else {
+                // Om statusen är något annat än 'Planerad' eller 'Fakturerad', logga det
+                console.log(`Project ${project.name} has an unknown status: ${project.status}`);
             }
         });
 
