@@ -12,7 +12,7 @@ function drag(event) {
 async function drop(event) {
     event.preventDefault();
     const projectId = event.dataTransfer.getData("text");
-    const newStatus = event.target.closest('.folder').id === 'planned' ? 'Planerad' : 'Fakturerad';
+    const newStatus = event.target.closest('.folder').id === 'planned' ? 'Planerad' : (event.target.closest('.folder').id === 'billed' ? 'Fakturerad' : 'Ny');
 
     try {
         const projectRef = doc(db, 'projects', projectId);
@@ -36,6 +36,7 @@ window.navigateTo = navigateTo;
 document.addEventListener('DOMContentLoaded', async () => {
     const plannedProjects = document.getElementById('planned-projects');
     const billedProjects = document.getElementById('billed-projects');
+    const newProjects = document.getElementById('new-projects');
 
     try {
         console.log('Fetching projects...');
@@ -56,20 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 plannedProjects.appendChild(li);
             } else if (project.status === 'Fakturerad') {
                 billedProjects.appendChild(li);
+            } else if (project.status === 'Ny') {
+                newProjects.appendChild(li);
             } else {
-                // Om statusen är något annat, lägg till den i en default-mapp
-                const defaultFolder = document.getElementById('default-projects');
-                if (!defaultFolder) {
-                    const newFolder = document.createElement('div');
-                    newFolder.id = 'default-projects';
-                    newFolder.className = 'folder';
-                    newFolder.innerHTML = `
-                        <h3>Andra</h3>
-                        <ul id="default-project-list"></ul>
-                    `;
-                    document.querySelector('.sidebar').appendChild(newFolder);
-                }
-                document.getElementById('default-project-list').appendChild(li);
+                // Om statusen är något annat, logga det
+                console.log(`Project ${project.name} has an unknown status: ${project.status}`);
             }
         });
 
