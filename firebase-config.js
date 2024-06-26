@@ -17,19 +17,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to add a new project
-export async function addProject(project) {
-  try {
-    const docRef = await addDoc(collection(db, "projects"), project);
-    console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
-// Function to get all projects
-export async function getProjects() {
-  const querySnapshot = await getDocs(collection(db, "projects"));
-  const projects = querySnapshot.docs.map(doc => doc.data());
-  return projects;
-}
+export { db, collection, addDoc, getDocs };
