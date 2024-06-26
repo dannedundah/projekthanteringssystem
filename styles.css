@@ -5,7 +5,7 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: flex-start; /* Placera innehållet högst upp */
     height: 100vh;
 }
 
@@ -20,59 +20,77 @@ body {
     position: relative;
 }
 
-.row {
-    display: flex;
-    width: 100%;
+.sidebar {
+    width: 250px; /* Fast bredd för sidofältet */
+    margin-right: 20px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
 }
 
-.column {
-    display: flex;
-    flex-direction: column;
+.sidebar h2 {
+    text-align: left;
 }
 
-.project-category {
-    background-color: #ff7f00;
-    padding: 10px;
+.main-content {
+    flex: 1;
+    text-align: center; /* Centrera texten */
+    margin-left: 300px; /* Justera för att skapa mer plats till sidofältet */
+}
+
+h1 {
+    margin-top: 0;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.action-button {
+    padding: 10px 20px;
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin: 0 10px;
+    cursor: pointer;
+    display: inline-block;
+    background-color: #ff7f00; /* Orange färg */
+    color: white;
 }
 
-.project-category h3 {
+.action-button:hover {
+    background-color: #cc6600; /* Mörkare orange */
+}
+
+.folder {
+    margin-bottom: 20px;
+}
+
+.folder h3 {
     margin: 0;
+    background-color: #ff7f00; /* Orange färg */
+    padding: 5px;
+    border-radius: 3px;
     color: white;
+    cursor: pointer;
 }
 
 ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    background-color: white; /* Vit bakgrund */
 }
 
 li {
     margin: 5px 0;
     padding: 5px;
     border-radius: 3px;
-    background: white;
+    background: white; /* Vit bakgrund för att synas mot den orangea rubriken */
 }
 
-.actions {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.actions button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin: 0 10px;
-    cursor: pointer;
-    display: inline-block;
-    background-color: #ff7f00;
-    color: white;
-}
-
-.actions button:hover {
-    background-color: #cc6600;
+li[draggable="true"] {
+    cursor: move;
 }
 
 #project-details {

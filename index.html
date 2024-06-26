@@ -13,15 +13,15 @@
         <h1>Projekthanteringssystem</h1>
         <div class="row">
             <div class="column" style="flex: 1;">
-                <div class="project-category">
+                <div class="folder">
                     <h3>Ny</h3>
                     <ul id="new-projects" ondragover="allowDrop(event)" ondrop="drop(event)"></ul>
                 </div>
-                <div class="project-category">
+                <div class="folder">
                     <h3>Planerad</h3>
                     <ul id="planned-projects" ondragover="allowDrop(event)" ondrop="drop(event)"></ul>
                 </div>
-                <div class="project-category">
+                <div class="folder">
                     <h3>Fakturerad</h3>
                     <ul id="billed-projects" ondragover="allowDrop(event)" ondrop="drop(event)"></ul>
                 </div>
@@ -30,9 +30,9 @@
                 <div id="project-details"></div>
             </div>
         </div>
-        <div class="actions">
-            <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-            <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
+        <div class="button-container">
+            <button class="action-button" onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
+            <button class="action-button" onclick="navigateTo('se-schema.html')">Se mitt schema</button>
         </div>
     </div>
     <script>
