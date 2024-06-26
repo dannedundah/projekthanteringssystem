@@ -14,15 +14,15 @@
             <h2>Projektträd</h2>
             <div class="folder" id="new">
                 <h3 onclick="toggleFolder('new-projects')">Ny</h3>
-                <ul id="new-projects"></ul>
+                <ul id="new-projects" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
             </div>
             <div class="folder" id="planned">
                 <h3 onclick="toggleFolder('planned-projects')">Planerad</h3>
-                <ul id="planned-projects"></ul>
+                <ul id="planned-projects" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
             </div>
             <div class="folder" id="billed">
                 <h3 onclick="toggleFolder('billed-projects')">Fakturerad</h3>
-                <ul id="billed-projects"></ul>
+                <ul id="billed-projects" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
             </div>
         </div>
         <div class="main-content">
@@ -41,6 +41,33 @@
                 folder.style.display = 'block';
             } else {
                 folder.style.display = 'none';
+            }
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData("text");
+            const projectElement = document.getElementById(data);
+            const newCategory = event.target.closest('ul').id.split('-')[0];
+            event.target.appendChild(projectElement);
+            updateProjectCategory(projectElement.id, newCategory);
+        }
+
+        async function updateProjectCategory(projectId, newCategory) {
+            try {
+                const projectRef = doc(db, 'projects', projectId);
+                await updateDoc(projectRef, { status: newCategory });
+                console.log(`Project ${projectId} updated to ${newCategory}`);
+            } catch (error) {
+                console.error('Error updating project category:', error);
             }
         }
     </script>

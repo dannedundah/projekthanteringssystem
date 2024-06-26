@@ -95,6 +95,10 @@ li {
     background: white; /* Vit bakgrund för att synas mot den orangea rubriken */
 }
 
+li[draggable="true"] {
+    cursor: move;
+}
+
 #project-details {
     margin-top: 20px;
 }
