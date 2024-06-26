@@ -20,72 +20,32 @@ body {
     position: relative;
 }
 
-.sidebar {
-    width: 250px;
-    margin-right: 20px;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-}
-
-.sidebar h2 {
-    text-align: left;
-}
-
-.main-content {
-    flex: 1;
-    text-align: center;
-    margin-left: 300px;
-}
-
-h1 {
-    margin-top: 0;
-}
-
-.button-container {
+.row {
     display: flex;
-    justify-content: center;
-    margin-top: 20px;
+    width: 100%;
 }
 
-.action-button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin: 0 10px;
-    cursor: pointer;
-    display: inline-block;
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-category {
     background-color: #ff7f00;
-    color: white;
-}
-
-.action-button:hover {
-    background-color: #cc6600;
-}
-
-.folder {
-    margin-bottom: 20px;
     padding: 10px;
     border-radius: 5px;
+    margin-bottom: 10px;
 }
 
-.folder h3 {
+.project-category h3 {
     margin: 0;
-    background-color: #ff7f00;
-    padding: 5px;
-    border-radius: 3px;
     color: white;
-    cursor: pointer;
 }
 
 ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    display: none;
-}
-
-ul.show {
-    display: block;
 }
 
 li {
@@ -95,8 +55,24 @@ li {
     background: white;
 }
 
-li[draggable="true"] {
-    cursor: move;
+.actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.actions button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin: 0 10px;
+    cursor: pointer;
+    display: inline-block;
+    background-color: #ff7f00;
+    color: white;
+}
+
+.actions button:hover {
+    background-color: #cc6600;
 }
 
 #project-details {

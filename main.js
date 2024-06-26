@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         projects.forEach(project => {
             const li = document.createElement('li');
             li.id = project.id;
-            li.draggable = true;
-            li.ondragstart = drag;
             li.onclick = () => showProjectDetails(project.id);
             li.textContent = project.name;
 
@@ -38,31 +36,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
-}
-
-window.allowDrop = function(event) {
-    event.preventDefault();
-}
-
-window.drag = function(event) {
-    event.dataTransfer.setData("text", event.target.id);
-}
-
-window.drop = function(event) {
-    event.preventDefault();
-    const data = event.dataTransfer.getData("text");
-    const projectElement = document.getElementById(data);
-    const newCategory = event.target.closest('ul').id.split('-')[0];
-    event.target.appendChild(projectElement);
-    updateProjectCategory(projectElement.id, newCategory);
-}
-
-async function updateProjectCategory(projectId, newCategory) {
-    try {
-        const projectRef = doc(db, 'projects', projectId);
-        await updateDoc(projectRef, { status: newCategory });
-        console.log(`Project ${projectId} updated to ${newCategory}`);
-    } catch (error) {
-        console.error('Error updating project category:', error);
-    }
 }
