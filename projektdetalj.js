@@ -17,16 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>Telefonnummer:</strong> ${project.customerPhone}</p>
                 <p><strong>Adress:</strong> ${project.address}</p>
                 <p><strong>Beskrivning:</strong> ${project.description}</p>
-                <p><strong>Status:</strong> 
-                    <select id="project-status">
-                        <option value="Ny" ${project.status === 'Ny' ? 'selected' : ''}>Ny</option>
-                        <option value="Planerad" ${project.status === 'Planerad' ? 'selected' : ''}>Planerad</option>
-                        <option value="Fakturerad" ${project.status === 'Fakturerad' ? 'selected' : ''}>Fakturerad</option>
-                    </select>
-                </p>
+                <p><strong>Status:</strong> ${project.status}</p>
                 ${project.images ? project.images.map(url => `<img src="${url}" alt="Project Image">`).join('') : ''}
-                <button onclick="updateProjectStatus('${projectId}')">Uppdatera Status</button>
             `;
+            document.getElementById('project-status').value = project.status;
         } else {
             projectDetails.textContent = 'Projektet kunde inte hittas.';
         }
@@ -36,19 +30,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function navigateTo(page) {
-    window.location.href = page;
-}
-
-async function updateProjectStatus(projectId) {
-    const newStatus = document.getElementById('project-status').value;
+async function updateProjectStatus(projectId, newStatus) {
     try {
         const projectRef = doc(db, 'projects', projectId);
         await updateDoc(projectRef, { status: newStatus });
-        alert('Projektstatus uppdaterad!');
-        navigateTo('index.html');
+        console.log(`Project ${projectId} updated to ${newStatus}`);
+        window.location.href = 'index.html';
     } catch (error) {
         console.error('Error updating project status:', error);
-        alert('Ett fel uppstod vid uppdatering av projektstatus.');
     }
 }

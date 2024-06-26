@@ -12,7 +12,24 @@
     <div class="container">
         <h1>Projektdetalj</h1>
         <div id="project-details" class="project-details"></div>
+        <select id="project-status" onchange="updateProjectStatusHandler()">
+            <option value="Ny">Ny</option>
+            <option value="Planerad">Planerad</option>
+            <option value="Fakturerad">Fakturerad</option>
+        </select>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function updateProjectStatusHandler() {
+            const params = new URLSearchParams(window.location.search);
+            const projectId = params.get('id');
+            const newStatus = document.getElementById('project-status').value;
+            updateProjectStatus(projectId, newStatus);
+        }
+    </script>
 </body>
 </html>
