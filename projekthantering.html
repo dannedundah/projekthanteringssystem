@@ -6,16 +6,25 @@
     <title>Projekthantering</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="projekthantering.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Projekthantering</h1>
         <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-        <button onclick="navigateTo('redigeraprojekt.html')">Redigera befintligt projekt</button>
+        <button onclick="showEditProjectSection()">Redigera befintligt projekt</button>
+        
+        <div id="edit-project-section" style="display: none;">
+            <h2>Välj ett projekt att redigera</h2>
+            <ul id="project-list"></ul>
+        </div>
     </div>
     <script>
         function navigateTo(page) {
             window.location.href = page;
+        }
+        function showEditProjectSection() {
+            document.getElementById('edit-project-section').style.display = 'block';
         }
     </script>
 </body>
