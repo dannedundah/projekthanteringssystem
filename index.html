@@ -37,10 +37,10 @@
     <script>
         function toggleFolder(id) {
             const folder = document.getElementById(id);
-            if (folder.classList.contains('show')) {
-                folder.classList.remove('show');
+            if (folder.style.display === 'none') {
+                folder.style.display = 'block';
             } else {
-                folder.classList.add('show');
+                folder.style.display = 'none';
             }
         }
 
