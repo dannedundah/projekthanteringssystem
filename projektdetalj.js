@@ -1,14 +1,22 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const projectDetails = document.getElementById('project-details');
+    const uploadedImages = document.getElementById('uploaded-images');
+    const uploadImageButton = document.getElementById('upload-image-button');
+    const additionalImage = document.getElementById('additional-image');
     const params = new URLSearchParams(window.location.search);
     const projectName = params.get('name');
 
+    let currentProject;
+
     try {
         const querySnapshot = await getDocs(collection(db, "projects"));
-        const projects = querySnapshot.docs.map(doc => doc.data());
+        const projects = querySnapshot.docs.map(doc => {
+            return { id: doc.id, ...doc.data() };
+        });
         const project = projects.find(p => p.name === projectName);
+        currentProject = project;
 
         if (project) {
             projectDetails.innerHTML = `
@@ -20,6 +28,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>Status:</strong> ${project.status}</p>
                 <img src="${project.imageUrl}" alt="Projektbild" style="max-width: 100%;">
             `;
+            if (project.additionalImages) {
+                project.additionalImages.forEach(imageUrl => {
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.style.maxWidth = '100%';
+                    uploadedImages.appendChild(img);
+                });
+            }
         } else {
             projectDetails.textContent = 'Projektet kunde inte hittas.';
         }
@@ -27,4 +43,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching project details:', error);
         projectDetails.textContent = 'Ett fel uppstod vid hämtning av projektdata.';
     }
+
+    uploadImageButton.addEventListener('click', async () => {
+        const file = additionalImage.files[0];
+        if (file && currentProject) {
+            const storageRef = ref(storage, 'project_images/' + file.name);
+            await uploadBytes(storageRef, file);
+            const imageUrl = await getDownloadURL(storageRef);
+
+            if (!currentProject.additionalImages) {
+                currentProject.additionalImages = [];
+            }
+            currentProject.additionalImages.push(imageUrl);
+
+            try {
+                await updateProjectImages(currentProject.id, currentProject.additionalImages);
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.style.maxWidth = '100%';
+                uploadedImages.appendChild(img);
+            } catch (error) {
+                console.error('Error updating project images:', error);
+            }
+        }
+    });
 });
+
+async function updateProjectImages(projectId, images) {
+    const projectRef = doc(db, 'projects', projectId);
+    await updateDoc(projectRef, {
+        additionalImages: images
+    });
+}
