@@ -24,30 +24,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error fetching projects:', error);
     }
-
-    window.allowDrop = (event) => {
-        event.preventDefault();
-    };
-
-    window.drag = (event) => {
-        event.dataTransfer.setData("text", event.target.id);
-    };
-
-    window.drop = async (event) => {
-        event.preventDefault();
-        const projectId = event.dataTransfer.getData("text");
-        const newStatus = event.target.closest('.folder').id === 'planned' ? 'Planerad' : 'Fakturerad';
-
-        try {
-            const projectRef = doc(db, 'projects', projectId);
-            await updateDoc(projectRef, { status: newStatus });
-            location.reload();
-        } catch (error) {
-            console.error('Error updating project status:', error);
-        }
-    };
-
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
 });
+
+function allowDrop(event) {
+    event.preventDefault();
+}
+
+function drag(event) {
+    event.dataTransfer.setData("text", event.target.id);
+}
+
+async function drop(event) {
+    event.preventDefault();
+    const projectId = event.dataTransfer.getData("text");
+    const newStatus = event.target.closest('.folder').id === 'planned' ? 'Planerad' : 'Fakturerad';
+
+    try {
+        const projectRef = doc(db, 'projects', projectId);
+        await updateDoc(projectRef, { status: newStatus });
+        location.reload();
+    } catch (error) {
+        console.error('Error updating project status:', error);
+    }
+}
+
+function navigateTo(page) {
+    window.location.href = page;
+}
+
+window.allowDrop = allowDrop;
+window.drag = drag;
+window.drop = drop;
+window.navigateTo = navigateTo;
