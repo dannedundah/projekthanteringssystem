@@ -5,7 +5,7 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Ändra till flex-start för att placera innehåll högst upp */
     height: 100vh;
 }
 
@@ -15,15 +15,17 @@ body {
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     display: flex;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .sidebar {
-    flex: 1;
+    width: 250px; /* Fast bredd för sidofältet */
     margin-right: 20px;
 }
 
 .main-content {
-    flex: 3;
+    flex: 1;
 }
 
 h1 {
@@ -32,11 +34,12 @@ h1 {
 
 h2 {
     cursor: pointer;
+    margin: 0 20px; /* Lägg till marginal mellan rubrikerna */
 }
 
 .button-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     margin-top: 10px;
 }
 
