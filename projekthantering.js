@@ -1,4 +1,4 @@
-import { addDoc, collection } from './firebase-config.js';
+import { db, collection, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const projectForm = document.getElementById('project-form');
