@@ -5,7 +5,7 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Placera innehållet högst upp */
+    align-items: flex-start;
     height: 100vh;
 }
 
@@ -21,7 +21,7 @@ body {
 }
 
 .sidebar {
-    width: 250px; /* Fast bredd för sidofältet */
+    width: 250px;
     margin-right: 20px;
     position: absolute;
     top: 20px;
@@ -34,8 +34,8 @@ body {
 
 .main-content {
     flex: 1;
-    text-align: center; /* Centrera texten */
-    margin-left: 300px; /* Justera för att skapa mer plats till sidofältet */
+    text-align: center;
+    margin-left: 300px;
 }
 
 h1 {
@@ -54,12 +54,12 @@ h1 {
     margin: 0 10px;
     cursor: pointer;
     display: inline-block;
-    background-color: #ff7f00; /* Orange färg */
+    background-color: #ff7f00;
     color: white;
 }
 
 .action-button:hover {
-    background-color: #cc6600; /* Mörkare orange */
+    background-color: #cc6600;
 }
 
 .folder {
@@ -70,7 +70,7 @@ h1 {
 
 .folder h3 {
     margin: 0;
-    background-color: #ff7f00; /* Orange färg */
+    background-color: #ff7f00;
     padding: 5px;
     border-radius: 3px;
     color: white;
@@ -81,18 +81,18 @@ ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    display: none; /* Dölja alla mappar initialt */
+    display: none;
 }
 
 ul.show {
-    display: block; /* Visa mappinnehåll när det är öppet */
+    display: block;
 }
 
 li {
     margin: 5px 0;
     padding: 5px;
     border-radius: 3px;
-    background: white; /* Vit bakgrund för att synas mot den orangea rubriken */
+    background: white;
 }
 
 li[draggable="true"] {
