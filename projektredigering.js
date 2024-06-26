@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             projectStatusInput.value = project.status;
         } else {
             alert('Projektet kunde inte hittas.');
-            window.location.href = 'projektlista.html';
+            window.location.href = 'redigeraprojekt.html';
         }
     } catch (error) {
         console.error('Error fetching project:', error);
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await updateDoc(doc(db, 'projects', projectId), updatedProject);
             alert('Projektet har uppdaterats!');
-            window.location.href = 'projektlista.html';
+            window.location.href = 'redigeraprojekt.html';
         } catch (error) {
             console.error('Error updating project:', error);
             alert('Ett fel uppstod vid uppdatering av projektet.');

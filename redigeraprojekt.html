@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekthantering</title>
+    <title>Redigera Projekt</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="projektlista.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Projekthantering</h1>
-        <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-        <button onclick="navigateTo('redigeraprojekt.html')">Redigera befintligt projekt</button>
+        <h1>Redigera Projekt</h1>
+        <ul id="project-list"></ul>
+        <button onclick="navigateTo('projekthantering.html')">Tillbaka</button>
     </div>
     <script>
         function navigateTo(page) {
