@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageUrls = [];
 
         for (const file of projectImages) {
-            const storageRef = ref(storage, 'project_images/' + file.name);
-            await uploadBytes(storageRef, file);
-            const imageUrl = await getDownloadURL(storageRef);
+            const storageRef = ref(storage, `project_images/${file.name}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            const imageUrl = await getDownloadURL(snapshot.ref);
             imageUrls.push(imageUrl);
         }
 
