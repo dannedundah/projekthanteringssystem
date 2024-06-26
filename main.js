@@ -28,6 +28,7 @@ function navigateTo(page) {
 }
 
 function displayProjectDetails(project) {
+    console.log('Displaying project details:', project); // Log för felsökning
     const projectDetails = document.getElementById('project-details');
     projectDetails.innerHTML = `
         <h2>${project.name}</h2>
