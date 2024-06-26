@@ -12,16 +12,16 @@
     <div class="container">
         <div class="sidebar">
             <h2>Projektträd</h2>
-            <div class="folder" id="new" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <h3>Ny</h3>
+            <div class="folder" id="new">
+                <h3 onclick="toggleFolder('new-projects')">Ny</h3>
                 <ul id="new-projects"></ul>
             </div>
-            <div class="folder" id="planned" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <h3>Planerad</h3>
+            <div class="folder" id="planned">
+                <h3 onclick="toggleFolder('planned-projects')">Planerad</h3>
                 <ul id="planned-projects"></ul>
             </div>
-            <div class="folder" id="billed" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <h3>Fakturerad</h3>
+            <div class="folder" id="billed">
+                <h3 onclick="toggleFolder('billed-projects')">Fakturerad</h3>
                 <ul id="billed-projects"></ul>
             </div>
         </div>
@@ -34,5 +34,15 @@
             <div id="project-details" class="project-details"></div>
         </div>
     </div>
+    <script>
+        function toggleFolder(id) {
+            const folder = document.getElementById(id);
+            if (folder.style.display === 'none') {
+                folder.style.display = 'block';
+            } else {
+                folder.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
