@@ -40,15 +40,15 @@ function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
 }
 
-function allowDrop(event) {
+window.allowDrop = function(event) {
     event.preventDefault();
 }
 
-function drag(event) {
+window.drag = function(event) {
     event.dataTransfer.setData("text", event.target.id);
 }
 
-function drop(event) {
+window.drop = function(event) {
     event.preventDefault();
     const data = event.dataTransfer.getData("text");
     const projectElement = document.getElementById(data);
