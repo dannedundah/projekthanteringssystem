@@ -10,63 +10,56 @@ body {
 }
 
 .container {
-    display: flex;
     width: 90%;
     max-width: 1200px;
     background: #fff;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.actions button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #ff7f00;
+    color: white;
+    border-radius: 5px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.actions button:hover {
+    background-color: #cc6600;
+}
+
+.row {
+    display: flex;
+}
+
+.column {
+    flex: 1;
 }
 
 .sidebar {
     width: 250px;
     margin-right: 20px;
-    position: absolute;
-    top: 20px;
-    left: 20px;
 }
 
-.sidebar h2 {
-    text-align: left;
-}
-
-.main-content {
-    flex: 1;
-    text-align: center;
-    margin-left: 300px;
-}
-
-h1 {
-    margin-top: 0;
-}
-
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.action-button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin: 0 10px;
-    cursor: pointer;
-    display: inline-block;
-    background-color: #ff7f00;
-    color: white;
-}
-
-.action-button:hover {
-    background-color: #cc6600;
+.project-category {
+    margin-bottom: 20px;
 }
 
 .project-category h3 {
     margin: 0;
     background-color: #ff7f00;
-    padding: 5px;
-    border-radius: 3px;
+    padding: 10px;
+    border-radius: 5px;
     color: white;
     cursor: pointer;
 }
@@ -82,22 +75,17 @@ ul.show {
     display: block;
 }
 
-.project-list li {
+li {
     margin: 5px 0;
     padding: 5px;
     border-radius: 3px;
     background: white;
 }
 
-li[draggable="true"] {
-    cursor: move;
+.main-content {
+    flex: 3;
 }
 
 #project-details {
     margin-top: 20px;
-}
-
-#project-details img {
-    max-width: 100px;
-    margin: 5px;
 }

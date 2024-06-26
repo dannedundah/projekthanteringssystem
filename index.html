@@ -11,27 +11,27 @@
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
+        <div class="actions">
+            <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
+            <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
+        </div>
         <div class="row">
-            <div class="sidebar">
-                <div class="project-category">
-                    <h3 onclick="toggleVisibility('new-projects')">Ny</h3>
+            <div class="column sidebar">
+                <div class="project-category folder">
+                    <h3 onclick="toggleCategory('new-projects')">Ny</h3>
                     <ul id="new-projects" class="project-list"></ul>
                 </div>
-                <div class="project-category">
-                    <h3 onclick="toggleVisibility('planned-projects')">Planerad</h3>
+                <div class="project-category folder">
+                    <h3 onclick="toggleCategory('planned-projects')">Planerad</h3>
                     <ul id="planned-projects" class="project-list"></ul>
                 </div>
-                <div class="project-category">
-                    <h3 onclick="toggleVisibility('billed-projects')">Fakturerad</h3>
+                <div class="project-category folder">
+                    <h3 onclick="toggleCategory('billed-projects')">Fakturerad</h3>
                     <ul id="billed-projects" class="project-list"></ul>
                 </div>
             </div>
-            <div class="main-content">
+            <div class="column main-content">
                 <div id="project-details"></div>
-                <div class="actions">
-                    <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-                    <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
-                </div>
             </div>
         </div>
     </div>
@@ -39,14 +39,9 @@
         function navigateTo(page) {
             window.location.href = page;
         }
-
-        function toggleVisibility(id) {
-            const element = document.getElementById(id);
-            if (element.style.display === 'none') {
-                element.style.display = 'block';
-            } else {
-                element.style.display = 'none';
-            }
+        function toggleCategory(categoryId) {
+            const ul = document.getElementById(categoryId);
+            ul.classList.toggle('show');
         }
     </script>
 </body>
