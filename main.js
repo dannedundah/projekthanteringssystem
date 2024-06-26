@@ -38,10 +38,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const billedProjects = document.getElementById('billed-projects');
 
     try {
+        console.log('Fetching projects...');
         const querySnapshot = await getDocs(collection(db, "projects"));
         const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log('Projects:', projects);
 
         projects.forEach(project => {
+            console.log('Project:', project); // Logga projekten för felsökning
             const li = document.createElement('li');
             li.innerHTML = `<strong>${project.name}</strong>`;
             li.draggable = true;
@@ -54,6 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 billedProjects.appendChild(li);
             }
         });
+
+        // Logga om inga projekt hittades
+        if (projects.length === 0) {
+            console.log('No projects found');
+        }
     } catch (error) {
         console.error('Error fetching projects:', error);
     }
