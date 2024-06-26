@@ -4,15 +4,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const projectList = document.getElementById('project-list');
 
     try {
-        const querySnapshot = await getDocs(collection(db, 'projects'));
-        const projects = querySnapshot.docs.map(doc => doc.data());
+        const querySnapshot = await getDocs(collection(db, "projects"));
+        const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         projects.forEach(project => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="projektdetalj.html?name=${encodeURIComponent(project.name)}">${project.name}</a>`;
+            li.innerHTML = `
+                <strong>Projekt:</strong> ${project.name} <br>
+                <strong>Kund:</strong> ${project.customerName} <br>
+                <strong>Telefon:</strong> ${project.customerPhone} <br>
+                <strong>Adress:</strong> ${project.address} <br>
+                <strong>Beskrivning:</strong> ${project.description} <br>
+                <strong>Status:</strong> ${project.status} <br>
+                <button onclick="navigateToEdit('${project.id}')">Redigera</button>
+            `;
             projectList.appendChild(li);
         });
     } catch (error) {
-        console.error('Error fetching projects: ', error);
+        console.error('Error fetching projects:', error);
     }
 });
+
+function navigateToEdit(projectId) {
+    window.location.href = `projektredigering.html?id=${projectId}`;
+}
