@@ -1,14 +1,15 @@
 import { db, collection, getDocs, doc, updateDoc } from './firebase-config.js';
 
-function allowDrop(event) {
+// Gör funktionerna globala först
+window.allowDrop = (event) => {
     event.preventDefault();
-}
+};
 
-function drag(event) {
+window.drag = (event) => {
     event.dataTransfer.setData("text", event.target.id);
-}
+};
 
-async function drop(event) {
+window.drop = async (event) => {
     event.preventDefault();
     const projectId = event.dataTransfer.getData("text");
     const newStatus = event.target.closest('.folder').id === 'planned' ? 'Planerad' : 'Fakturerad';
@@ -20,17 +21,11 @@ async function drop(event) {
     } catch (error) {
         console.error('Error updating project status:', error);
     }
-}
+};
 
-function navigateTo(page) {
+window.navigateTo = (page) => {
     window.location.href = page;
-}
-
-// Gör funktionerna globala
-window.allowDrop = allowDrop;
-window.drag = drag;
-window.drop = drop;
-window.navigateTo = navigateTo;
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
     const plannedProjects = document.getElementById('planned-projects');
@@ -45,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.innerHTML = `<strong>${project.name}</strong>`;
             li.draggable = true;
             li.id = project.id;
-            li.ondragstart = drag;  // Här används funktionen drag
+            li.ondragstart = window.drag;  // Här används funktionen drag
 
             if (project.status === 'Planerad') {
                 plannedProjects.appendChild(li);
