@@ -12,6 +12,10 @@
     <div class="container">
         <div class="sidebar">
             <h2>Projektträd</h2>
+            <div class="folder" id="new" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h3>Ny</h3>
+                <ul id="new-projects"></ul>
+            </div>
             <div class="folder" id="planned" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <h3>Planerad</h3>
                 <ul id="planned-projects"></ul>
@@ -19,10 +23,6 @@
             <div class="folder" id="billed" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <h3>Fakturerad</h3>
                 <ul id="billed-projects"></ul>
-            </div>
-            <div class="folder" id="new" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <h3>Ny</h3>
-                <ul id="new-projects"></ul>
             </div>
         </div>
         <div class="main-content">

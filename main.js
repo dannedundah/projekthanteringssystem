@@ -34,9 +34,9 @@ window.drop = drop;
 window.navigateTo = navigateTo;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const newProjects = document.getElementById('new-projects');
     const plannedProjects = document.getElementById('planned-projects');
     const billedProjects = document.getElementById('billed-projects');
-    const newProjects = document.getElementById('new-projects');
 
     try {
         console.log('Fetching projects...');
@@ -53,12 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.ondragstart = drag;  // Använd funktionen drag
 
             // Kontrollera status och tilldela till rätt mapp
-            if (project.status === 'Planerad') {
+            if (project.status === 'Ny') {
+                newProjects.appendChild(li);
+            } else if (project.status === 'Planerad') {
                 plannedProjects.appendChild(li);
             } else if (project.status === 'Fakturerad') {
                 billedProjects.appendChild(li);
-            } else if (project.status === 'Ny') {
-                newProjects.appendChild(li);
             } else {
                 // Om statusen är något annat, logga det
                 console.log(`Project ${project.name} has an unknown status: ${project.status}`);
