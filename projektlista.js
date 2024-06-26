@@ -26,5 +26,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function navigateToEdit(projectId) {
-    window.location.href = `projektredigering.html?id=${projectId}`;
+    window.location.href = `redigeraprojekt.html?id=${projectId}`;
 }
