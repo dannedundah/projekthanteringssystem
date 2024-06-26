@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-async function updateProjectStatus(projectId, newStatus) {
+export async function updateProjectStatus(projectId, newStatus) {
     try {
         const projectRef = doc(db, 'projects', projectId);
         await updateDoc(projectRef, { status: newStatus });
