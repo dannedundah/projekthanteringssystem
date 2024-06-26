@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         projects.forEach(project => {
             const li = document.createElement('li');
             li.id = project.id;
-            li.draggable = true;
             li.onclick = () => showProjectDetails(project.id);
             li.textContent = project.name;
 
@@ -39,12 +38,12 @@ function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
 }
 
-async function updateProjectStatus(projectId, newStatus) {
-    try {
-        const projectRef = doc(db, 'projects', projectId);
-        await updateDoc(projectRef, { status: newStatus });
+function updateProjectStatus(projectId, newStatus) {
+    const projectRef = doc(db, 'projects', projectId);
+    updateDoc(projectRef, { status: newStatus }).then(() => {
         console.log(`Project ${projectId} updated to ${newStatus}`);
-    } catch (error) {
+        window.location.href = 'index.html';
+    }).catch((error) => {
         console.error('Error updating project status:', error);
-    }
+    });
 }

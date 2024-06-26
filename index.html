@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('loggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -16,21 +23,21 @@
             <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
         </div>
         <div class="row">
-            <div class="column sidebar">
-                <div class="project-category folder">
-                    <h3 onclick="toggleCategory('new-projects')">Ny</h3>
-                    <ul id="new-projects" class="project-list"></ul>
+            <div class="sidebar">
+                <div class="project-category">
+                    <h3 onclick="toggleFolder('new-projects')">Ny</h3>
+                    <ul id="new-projects"></ul>
                 </div>
-                <div class="project-category folder">
-                    <h3 onclick="toggleCategory('planned-projects')">Planerad</h3>
-                    <ul id="planned-projects" class="project-list"></ul>
+                <div class="project-category">
+                    <h3 onclick="toggleFolder('planned-projects')">Planerad</h3>
+                    <ul id="planned-projects"></ul>
                 </div>
-                <div class="project-category folder">
-                    <h3 onclick="toggleCategory('billed-projects')">Fakturerad</h3>
-                    <ul id="billed-projects" class="project-list"></ul>
+                <div class="project-category">
+                    <h3 onclick="toggleFolder('billed-projects')">Fakturerad</h3>
+                    <ul id="billed-projects"></ul>
                 </div>
             </div>
-            <div class="column main-content">
+            <div class="main-content">
                 <div id="project-details"></div>
             </div>
         </div>
@@ -39,9 +46,14 @@
         function navigateTo(page) {
             window.location.href = page;
         }
-        function toggleCategory(categoryId) {
-            const ul = document.getElementById(categoryId);
-            ul.classList.toggle('show');
+
+        function toggleFolder(id) {
+            const folder = document.getElementById(id);
+            if (folder.style.display === "none") {
+                folder.style.display = "block";
+            } else {
+                folder.style.display = "none";
+            }
         }
     </script>
 </body>

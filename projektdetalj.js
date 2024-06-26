@@ -35,21 +35,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-window.updateProjectStatusHandler = async (projectId) => {
+function updateProjectStatusHandler(projectId) {
     const newStatus = document.getElementById('project-status').value;
-    await updateProjectStatus(projectId, newStatus);
-    window.location.href = 'index.html';
-};
+    updateProjectStatus(projectId, newStatus);
+}
 
-async function updateProjectStatus(projectId, newStatus) {
-    try {
-        const projectRef = doc(db, 'projects', projectId);
-        await updateDoc(projectRef, { status: newStatus });
+function updateProjectStatus(projectId, newStatus) {
+    const projectRef = doc(db, 'projects', projectId);
+    updateDoc(projectRef, { status: newStatus }).then(() => {
         console.log(`Project ${projectId} updated to ${newStatus}`);
-    } catch (error) {
+        window.location.href = 'index.html';
+    }).catch((error) => {
         console.error('Error updating project status:', error);
-    }
-};
+    });
+}
 
 function navigateTo(page) {
     window.location.href = page;
