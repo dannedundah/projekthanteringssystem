@@ -1,4 +1,4 @@
-import { addProject } from './firebase-config.js';
+import { addDoc, collection } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const projectForm = document.getElementById('project-form');
@@ -15,8 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
             status: document.getElementById('project-status').value.trim()
         };
 
-        await addProject(project);
-        alert('Projektet har lagts till!');
-        window.location.href = 'projektlista.html';
+        try {
+            await addDoc(collection(db, 'projects'), project);
+            alert('Projektet har lagts till!');
+            window.location.href = 'projektlista.html';
+        } catch (error) {
+            console.error('Error adding project: ', error);
+        }
     });
 });
