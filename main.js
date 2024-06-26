@@ -26,6 +26,12 @@ function navigateTo(page) {
     window.location.href = page;
 }
 
+// Gör funktionerna globala
+window.allowDrop = allowDrop;
+window.drag = drag;
+window.drop = drop;
+window.navigateTo = navigateTo;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const plannedProjects = document.getElementById('planned-projects');
     const billedProjects = document.getElementById('billed-projects');
@@ -51,9 +57,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching projects:', error);
     }
 });
-
-// Gör funktionerna globala
-window.allowDrop = allowDrop;
-window.drag = drag;
-window.drop = drop;
-window.navigateTo = navigateTo;
