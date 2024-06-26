@@ -1,9 +1,9 @@
-import { db, collection, getDocs, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
+import { db, collection, getDocs, storage, ref, uploadBytes, getDownloadURL, doc, updateDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const projectDetails = document.getElementById('project-details');
     const uploadedImages = document.getElementById('uploaded-images');
-    const uploadImageButton = document.getElementById('upload-image-button');
+    const uploadForm = document.getElementById('upload-form');
     const additionalImage = document.getElementById('additional-image');
     const params = new URLSearchParams(window.location.search);
     const projectName = params.get('name');
@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         projectDetails.textContent = 'Ett fel uppstod vid hämtning av projektdata.';
     }
 
-    uploadImageButton.addEventListener('click', async () => {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const file = additionalImage.files[0];
         if (file && currentProject) {
             const storageRef = ref(storage, 'project_images/' + file.name);
