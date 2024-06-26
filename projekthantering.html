@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projekthantering</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="projekthantering.js"></script>
 </head>
 <body>
     <div class="container">
@@ -27,14 +29,10 @@
         <ul id="project-list"></ul>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
-    <script src="script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Kontrollera inloggningsstatus
-            if (localStorage.getItem('loggedIn') !== 'true') {
-                window.location.href = 'login.html';
-            }
-        });
+        function navigateTo(page) {
+            window.location.href = page;
+        }
     </script>
 </body>
 </html>

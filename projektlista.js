@@ -1,6 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+import { getProjects } from './firebase-config.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
     const projectList = document.getElementById('project-list');
-    const projects = JSON.parse(localStorage.getItem('projects')) || [];
+    const projects = await getProjects();
 
     projects.forEach(project => {
         const li = document.createElement('li');
