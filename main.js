@@ -27,6 +27,20 @@ function navigateTo(page) {
     window.location.href = page;
 }
 
+function displayProjectDetails(project) {
+    const projectDetails = document.getElementById('project-details');
+    projectDetails.innerHTML = `
+        <h2>${project.name}</h2>
+        <p><strong>Kundnamn:</strong> ${project.customerName}</p>
+        <p><strong>Telefonnummer:</strong> ${project.customerPhone}</p>
+        <p><strong>Adress:</strong> ${project.address}</p>
+        <p><strong>Beskrivning:</strong> ${project.description}</p>
+        <p><strong>Status:</strong> ${project.status}</p>
+        <p><strong>Bilder:</strong></p>
+        ${project.images ? project.images.map(img => `<img src="${img}" style="max-width:100px; margin:5px;">`).join('') : 'Inga bilder'}
+    `;
+}
+
 // Tilldela funktionerna till window-objektet
 window.allowDrop = allowDrop;
 window.drag = drag;
@@ -51,6 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.draggable = true;
             li.id = project.id;
             li.ondragstart = drag;  // Använd funktionen drag
+            li.onclick = () => displayProjectDetails(project); // Lägg till klickhändelse
 
             // Kontrollera status och tilldela till rätt mapp
             if (project.status === 'Ny') {
