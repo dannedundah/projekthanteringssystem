@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.id = project.id;
             li.draggable = true;
             li.ondragstart = drag;
+            li.onclick = () => showProjectDetails(project.id);
             li.textContent = project.name;
 
             switch (project.status) {
@@ -34,3 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching projects:', error);
     }
 });
+
+function showProjectDetails(projectId) {
+    window.location.href = `projektdetalj.html?id=${projectId}`;
+}

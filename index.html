@@ -37,10 +37,10 @@
     <script>
         function toggleFolder(id) {
             const folder = document.getElementById(id);
-            if (folder.style.display === 'none') {
-                folder.style.display = 'block';
+            if (folder.classList.contains('show')) {
+                folder.classList.remove('show');
             } else {
-                folder.style.display = 'none';
+                folder.classList.add('show');
             }
         }
 
@@ -69,6 +69,10 @@
             } catch (error) {
                 console.error('Error updating project category:', error);
             }
+        }
+
+        function navigateTo(page) {
+            window.location.href = page;
         }
     </script>
 </body>
