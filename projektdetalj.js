@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>Adress:</strong> ${project.address}</p>
                 <p><strong>Beskrivning:</strong> ${project.description}</p>
                 <p><strong>Status:</strong> ${project.status}</p>
+                <img src="${project.imageUrl}" alt="Projektbild" style="max-width: 100%;">
             `;
         } else {
             projectDetails.textContent = 'Projektet kunde inte hittas.';
