@@ -6,12 +6,33 @@
     <title>Redigera Projekt</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="projektlista.js"></script>
+    <script type="module" src="redigeraprojekt.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Redigera Projekt</h1>
-        <ul id="project-list"></ul>
+        <div id="project-list-container">
+            <h2>Välj ett projekt att redigera</h2>
+            <ul id="project-list"></ul>
+        </div>
+        <div id="edit-project-container" style="display: none;">
+            <h2>Redigera Projekt</h2>
+            <form id="edit-project-form">
+                <input type="text" id="project-input" placeholder="Projektets namn" required>
+                <input type="text" id="customer-name" placeholder="Kundnamn" required>
+                <input type="text" id="customer-phone" placeholder="Telefonnummer" required>
+                <input type="text" id="project-address" placeholder="Adress" required>
+                <textarea id="project-description" placeholder="Projektbeskrivning" required></textarea>
+                <select id="project-status" required>
+                    <option value="Ny">Ny</option>
+                    <option value="Planerad">Planerad</option>
+                    <option value="Solceller klart">Solceller klart</option>
+                    <option value="Elektriker klar">Elektriker klar</option>
+                    <option value="Drifsatt">Drifsatt</option>
+                </select>
+                <button type="submit">Uppdatera projekt</button>
+            </form>
+        </div>
         <button onclick="navigateTo('projekthantering.html')">Tillbaka</button>
     </div>
     <script>
