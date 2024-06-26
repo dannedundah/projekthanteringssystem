@@ -1,20 +1,32 @@
 import { db, collection, getDocs, doc, getDoc, updateDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectListContainer = document.getElementById('project-list-container');
     const projectList = document.getElementById('project-list');
-    const editProjectContainer = document.getElementById('edit-project-container');
-    const projectInput = document.getElementById('project-input');
-    const customerNameInput = document.getElementById('customer-name');
-    const customerPhoneInput = document.getElementById('customer-phone');
-    const projectAddressInput = document.getElementById('project-address');
-    const projectDescriptionInput = document.getElementById('project-description');
-    const projectStatusInput = document.getElementById('project-status');
-    const editProjectForm = document.getElementById('edit-project-form');
+    const projectListContainer = document.getElementById('edit-project-section');
+    const editProjectContainer = document.createElement('div');
+    editProjectContainer.style.display = 'none';
+    editProjectContainer.innerHTML = `
+        <h2>Redigera Projekt</h2>
+        <form id="edit-project-form">
+            <input type="text" id="project-input" placeholder="Projektets namn" required>
+            <input type="text" id="customer-name" placeholder="Kundnamn" required>
+            <input type="text" id="customer-phone" placeholder="Telefonnummer" required>
+            <input type="text" id="project-address" placeholder="Adress" required>
+            <textarea id="project-description" placeholder="Projektbeskrivning" required></textarea>
+            <select id="project-status" required>
+                <option value="Ny">Ny</option>
+                <option value="Planerad">Planerad</option>
+                <option value="Solceller klart">Solceller klart</option>
+                <option value="Elektriker klar">Elektriker klar</option>
+                <option value="Drifsatt">Drifsatt</option>
+            </select>
+            <button type="submit">Uppdatera projekt</button>
+        </form>
+    `;
+    document.body.appendChild(editProjectContainer);
 
     let currentProjectId = null;
 
-    // Hämta och visa listan över projekt
     try {
         const querySnapshot = await getDocs(collection(db, "projects"));
         const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -36,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching projects:', error);
     }
 
-    // Funktion för att redigera ett projekt
     window.editProject = async (projectId) => {
         currentProjectId = projectId;
         try {
@@ -45,12 +56,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (projectSnap.exists()) {
                 const project = projectSnap.data();
-                projectInput.value = project.name;
-                customerNameInput.value = project.customerName;
-                customerPhoneInput.value = project.customerPhone;
-                projectAddressInput.value = project.address;
-                projectDescriptionInput.value = project.description;
-                projectStatusInput.value = project.status;
+                document.getElementById('project-input').value = project.name;
+                document.getElementById('customer-name').value = project.customerName;
+                document.getElementById('customer-phone').value = project.customerPhone;
+                document.getElementById('project-address').value = project.address;
+                document.getElementById('project-description').value = project.description;
+                document.getElementById('project-status').value = project.status;
                 projectListContainer.style.display = 'none';
                 editProjectContainer.style.display = 'block';
             } else {
@@ -61,24 +72,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Uppdatera projektets data
-    editProjectForm.addEventListener('submit', async (e) => {
+    document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
         if (currentProjectId) {
             const updatedProject = {
-                name: projectInput.value.trim(),
-                customerName: customerNameInput.value.trim(),
-                customerPhone: customerPhoneInput.value.trim(),
-                address: projectAddressInput.value.trim(),
-                description: projectDescriptionInput.value.trim(),
-                status: projectStatusInput.value.trim()
+                name: document.getElementById('project-input').value.trim(),
+                customerName: document.getElementById('customer-name').value.trim(),
+                customerPhone: document.getElementById('customer-phone').value.trim(),
+                address: document.getElementById('project-address').value.trim(),
+                description: document.getElementById('project-description').value.trim(),
+                status: document.getElementById('project-status').value.trim()
             };
 
             try {
                 await updateDoc(doc(db, 'projects', currentProjectId), updatedProject);
                 alert('Projektet har uppdaterats!');
-                window.location.href = 'redigeraprojekt.html';
+                window.location.href = 'projekthantering.html';
             } catch (error) {
                 console.error('Error updating project:', error);
                 alert('Ett fel uppstod vid uppdatering av projektet.');
