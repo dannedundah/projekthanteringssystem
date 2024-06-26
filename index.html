@@ -12,25 +12,25 @@
     <div class="container">
         <h1>Projekthanteringssystem</h1>
         <div class="row">
-            <div class="column sidebar" style="flex: 1;">
-                <div class="project-category">
-                    <h3>Ny</h3>
-                    <ul id="new-projects" ondragover="allowDrop(event)" ondrop="drop(event)"></ul>
+            <div class="column sidebar">
+                <div class="folder">
+                    <h3 onclick="toggleFolder('new-projects')">Ny</h3>
+                    <ul id="new-projects" ondragover="allowDrop(event)" ondrop="drop(event)" class="show"></ul>
                 </div>
-                <div class="project-category">
-                    <h3>Planerad</h3>
-                    <ul id="planned-projects" ondragover="allowDrop(event)" ondrop="drop(event)"></ul>
+                <div class="folder">
+                    <h3 onclick="toggleFolder('planned-projects')">Planerad</h3>
+                    <ul id="planned-projects" ondragover="allowDrop(event)" ondrop="drop(event)" class="show"></ul>
                 </div>
-                <div class="project-category">
-                    <h3>Fakturerad</h3>
-                    <ul id="billed-projects" ondragover="allowDrop(event)" ondrop="drop(event)"></ul>
+                <div class="folder">
+                    <h3 onclick="toggleFolder('billed-projects')">Fakturerad</h3>
+                    <ul id="billed-projects" ondragover="allowDrop(event)" ondrop="drop(event)" class="show"></ul>
                 </div>
             </div>
-            <div class="column main-content" style="flex: 3;">
+            <div class="column main-content">
                 <div id="project-details"></div>
             </div>
         </div>
-        <div class="actions button-container">
+        <div class="button-container">
             <button class="action-button" onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
             <button class="action-button" onclick="navigateTo('se-schema.html')">Se mitt schema</button>
         </div>
@@ -38,6 +38,11 @@
     <script>
         function navigateTo(page) {
             window.location.href = page;
+        }
+
+        function toggleFolder(folderId) {
+            const folder = document.getElementById(folderId);
+            folder.classList.toggle('show');
         }
     </script>
 </body>
