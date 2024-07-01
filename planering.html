@@ -11,10 +11,9 @@
 <body>
     <div class="container">
         <h1>Planering</h1>
-        <div class="filter">
+        <form id="planning-form">
             <label for="employee-select">Välj anställd:</label>
-            <select id="employee-select">
-                <option value="">Välj anställd</option>
+            <select id="employee-select" multiple required>
                 <option value="Alireza">Alireza</option>
                 <option value="Andreas">Andreas</option>
                 <option value="Hampus">Hampus</option>
@@ -25,21 +24,24 @@
                 <option value="Reza">Reza</option>
                 <option value="Rickard">Rickard</option>
             </select>
-        </div>
-        <div class="filter">
+
             <label for="project-select">Välj projekt:</label>
-            <select id="project-select">
-                <option value="">Välj projekt</option>
-            </select>
-        </div>
-        <div id="project-details">
+            <select id="project-select" required></select>
+
             <label for="start-date">Startdatum:</label>
-            <input type="date" id="start-date">
+            <input type="date" id="start-date" required>
+
             <label for="end-date">Slutdatum:</label>
-            <input type="date" id="end-date">
-            <button onclick="assignProject()">Tilldela</button>
-        </div>
+            <input type="date" id="end-date" required>
+
+            <button type="submit">Lägg till planering</button>
+        </form>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
