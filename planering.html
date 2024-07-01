@@ -26,7 +26,19 @@
                 <option value="Rickard">Rickard</option>
             </select>
         </div>
-        <div id="projects"></div>
+        <div class="filter">
+            <label for="project-select">Välj projekt:</label>
+            <select id="project-select">
+                <option value="">Välj projekt</option>
+            </select>
+        </div>
+        <div id="project-details">
+            <label for="start-date">Startdatum:</label>
+            <input type="date" id="start-date">
+            <label for="end-date">Slutdatum:</label>
+            <input type="date" id="end-date">
+            <button onclick="assignProject()">Tilldela</button>
+        </div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>

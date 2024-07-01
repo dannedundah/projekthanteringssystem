@@ -2,55 +2,59 @@ import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
-    const projectsContainer = document.getElementById('projects');
+    const projectSelect = document.getElementById('project-select');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
 
     employeeSelect.addEventListener('change', () => {
         const selectedEmployee = employeeSelect.value;
         if (selectedEmployee) {
-            showProjects(selectedEmployee);
+            populateProjects();
         } else {
-            projectsContainer.innerHTML = '';
+            projectSelect.innerHTML = '<option value="">Välj projekt</option>';
+            startDateInput.value = '';
+            endDateInput.value = '';
         }
     });
 
-    async function showProjects(employeeName) {
+    projectSelect.addEventListener('change', () => {
+        const selectedProject = projectSelect.value;
+        if (selectedProject) {
+            // Additional actions can be performed here if needed
+        } else {
+            startDateInput.value = '';
+            endDateInput.value = '';
+        }
+    });
+
+    async function populateProjects() {
         try {
             const querySnapshot = await getDocs(collection(db, "projects"));
             const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            projectsContainer.innerHTML = '';
-            if (projects.length > 0) {
-                projects.forEach(project => {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <h3>${project.name}</h3>
-                        <p><strong>Kund:</strong> ${project.customerName}</p>
-                        <p><strong>Beskrivning:</strong> ${project.description}</p>
-                        <label for="start-date-${project.id}">Startdatum:</label>
-                        <input type="date" id="start-date-${project.id}">
-                        <label for="end-date-${project.id}">Slutdatum:</label>
-                        <input type="date" id="end-date-${project.id}">
-                        <button onclick="assignProject('${project.id}', '${employeeName}')">Tilldela</button>
-                    `;
-                    projectsContainer.appendChild(div);
-                });
-            } else {
-                projectsContainer.textContent = 'Inga projekt hittades.';
-            }
+            projectSelect.innerHTML = '<option value="">Välj projekt</option>';
+            projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                projectSelect.appendChild(option);
+            });
         } catch (error) {
             console.error('Error fetching projects:', error);
         }
     }
 
-    async function assignProject(projectId, employeeName) {
-        const startDate = document.getElementById(`start-date-${projectId}`).value;
-        const endDate = document.getElementById(`end-date-${projectId}`).value;
+    window.assignProject = async () => {
+        const selectedEmployee = employeeSelect.value;
+        const selectedProject = projectSelect.value;
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
 
-        if (startDate && endDate) {
+        if (selectedEmployee && selectedProject && startDate && endDate) {
             try {
                 await addDoc(collection(db, "schedules"), {
-                    projectId: projectId,
-                    name: employeeName,
+                    projectId: selectedProject,
+                    name: selectedEmployee,
                     startDate: startDate,
                     endDate: endDate
                 });
@@ -59,9 +63,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error('Error assigning project:', error);
             }
         } else {
-            alert('Vänligen fyll i både startdatum och slutdatum.');
+            alert('Vänligen fyll i alla fält.');
         }
-    }
+    };
 
     window.navigateTo = (page) => {
         window.location.href = page;
