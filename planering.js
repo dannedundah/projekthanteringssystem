@@ -23,7 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     planningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const employees = Array.from(document.getElementById('employee-select').selectedOptions).map(option => option.value);
+        const employees = Array.from(document.querySelectorAll('.employee-select'))
+            .map(select => select.value)
+            .filter(value => value);
+
         const projectId = document.getElementById('project-select').value;
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
