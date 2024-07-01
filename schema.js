@@ -1,31 +1,40 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const employeeDropdown = document.getElementById('employee-dropdown');
-    const scheduleContainer = document.getElementById('schedule-container');
+    const viewScheduleForm = document.getElementById('view-schedule-form');
+    const scheduleList = document.getElementById('schedule-list');
 
-    employeeDropdown.addEventListener('change', async (e) => {
-        const selectedEmployee = e.target.value;
-        scheduleContainer.innerHTML = '';
+    viewScheduleForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const employeeName = document.getElementById('employee-name').value.trim();
 
-        try {
-            const querySnapshot = await getDocs(collection(db, 'planning'));
-            const schedules = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (employeeName !== '') {
+            try {
+                const querySnapshot = await getDocs(collection(db, "planning"));
+                const schedules = querySnapshot.docs.map(doc => doc.data());
+                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
 
-            const filteredSchedules = schedules.filter(schedule => schedule.employees.includes(selectedEmployee));
-
-            filteredSchedules.forEach(schedule => {
-                const projectElement = document.createElement('div');
-                projectElement.innerHTML = `
-                    <p><strong>Projekt:</strong> ${schedule.projectId}</p>
-                    <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
-                    <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
-                `;
-                scheduleContainer.appendChild(projectElement);
-            });
-
-        } catch (error) {
-            console.error('Error fetching schedules:', error);
+                scheduleList.innerHTML = '';
+                if (employeeSchedules.length > 0) {
+                    employeeSchedules.forEach(schedule => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <p><strong>Projekt:</strong> ${schedule.projectId}</p>
+                            <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
+                            <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
+                        `;
+                        scheduleList.appendChild(div);
+                    });
+                } else {
+                    scheduleList.textContent = 'Inga scheman hittades för denna anställd.';
+                }
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+            }
         }
     });
+
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
 });

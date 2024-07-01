@@ -11,25 +11,24 @@
 <body>
     <div class="container">
         <h1>Schema</h1>
-        <label for="employee-dropdown">Välj anställd:</label>
-        <select id="employee-dropdown">
-            <option value="Alireza">Alireza</option>
-            <option value="Andreas">Andreas</option>
-            <option value="Hampus">Hampus</option>
-            <option value="Loa">Loa</option>
-            <option value="Marcus">Marcus</option>
-            <option value="Mustafa">Mustafa</option>
-            <option value="Noah">Noah</option>
-            <option value="Reza">Reza</option>
-            <option value="Rickard">Rickard</option>
-        </select>
-        <div id="schedule-container"></div>
+        <form id="view-schedule-form">
+            <label for="employee-name">Välj anställd:</label>
+            <select id="employee-name" required>
+                <option value="" disabled selected>Välj namn</option>
+                <option value="Marcus">Marcus</option>
+                <option value="Noah">Noah</option>
+                <option value="Hampus">Hampus</option>
+                <option value="Loa">Loa</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Reza">Reza</option>
+                <option value="Andreas">Andreas</option>
+                <option value="Rickard">Rickard</option>
+                <option value="Mustafa">Mustafa</option>
+            </select>
+            <button type="submit">Visa Schema</button>
+        </form>
+        <div id="schedule-list"></div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
-    <script>
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-    </script>
 </body>
 </html>
