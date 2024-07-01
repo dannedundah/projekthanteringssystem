@@ -1,50 +1,70 @@
-import { db, collection, getDocs, doc, updateDoc } from './firebase-config.js';
+import { db, collection, getDocs, updateDoc, doc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectSelect = document.getElementById('project-select');
     const employeeSelect = document.getElementById('employee-select');
-    const assignProjectForm = document.getElementById('assign-project-form');
+    const projectsContainer = document.getElementById('projects');
 
-    const projects = await getProjects();
-    projects.forEach(project => {
-        const option = document.createElement('option');
-        option.value = project.id;
-        option.textContent = project.name;
-        projectSelect.appendChild(option);
-    });
-
-    const employees = await getEmployees();
-    employees.forEach(employee => {
-        const option = document.createElement('option');
-        option.value = employee.id;
-        option.textContent = employee.name;
-        employeeSelect.appendChild(option);
-    });
-
-    assignProjectForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const projectId = projectSelect.value;
-        const employeeId = employeeSelect.value;
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-
-        try {
-            const projectRef = doc(db, 'projects', projectId);
-            await updateDoc(projectRef, { assignedTo: employeeId, startDate: startDate, endDate: endDate });
-            alert('Projekt tilldelat!');
-        } catch (error) {
-            console.error('Error assigning project:', error);
-            alert('Ett fel uppstod vid tilldelning av projektet.');
+    employeeSelect.addEventListener('change', () => {
+        const selectedEmployee = employeeSelect.value;
+        if (selectedEmployee) {
+            showProjects(selectedEmployee);
+        } else {
+            projectsContainer.innerHTML = '';
         }
     });
 
-    async function getProjects() {
-        const querySnapshot = await getDocs(collection(db, 'projects'));
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    async function showProjects(employeeName) {
+        try {
+            const querySnapshot = await getDocs(collection(db, "projects"));
+            const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            projectsContainer.innerHTML = '';
+            if (projects.length > 0) {
+                projects.forEach(project => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <h3>${project.name}</h3>
+                        <p><strong>Kund:</strong> ${project.customerName}</p>
+                        <p><strong>Beskrivning:</strong> ${project.description}</p>
+                        <label for="start-date-${project.id}">Startdatum:</label>
+                        <input type="date" id="start-date-${project.id}">
+                        <label for="end-date-${project.id}">Slutdatum:</label>
+                        <input type="date" id="end-date-${project.id}">
+                        <button onclick="assignProject('${project.id}', '${employeeName}')">Tilldela</button>
+                    `;
+                    projectsContainer.appendChild(div);
+                });
+            } else {
+                projectsContainer.textContent = 'Inga projekt hittades.';
+            }
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
     }
 
-    async function getEmployees() {
-        const querySnapshot = await getDocs(collection(db, 'employees'));
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    async function assignProject(projectId, employeeName) {
+        const startDate = document.getElementById(`start-date-${projectId}`).value;
+        const endDate = document.getElementById(`end-date-${projectId}`).value;
+
+        if (startDate && endDate) {
+            try {
+                const scheduleRef = doc(collection(db, "schedules"));
+                await updateDoc(scheduleRef, {
+                    projectId: projectId,
+                    name: employeeName,
+                    startDate: startDate,
+                    endDate: endDate
+                });
+                alert('Projekt tilldelat!');
+            } catch (error) {
+                console.error('Error assigning project:', error);
+            }
+        } else {
+            alert('Vänligen fyll i både startdatum och slutdatum.');
+        }
+    }
+
+    function navigateTo(page) {
+        window.location.href = page;
     }
 });

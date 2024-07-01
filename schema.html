@@ -5,63 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schema</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" src="firebase-config.js"></Här är de kompletta uppdaterade koderna för dina HTML- och JavaScript-filer, inklusive inloggningsuppdateringen och de nya schema- och planeringsmodulerna.
-
-### index.html
-```html
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekthanteringssystem</title>
-    <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="schema.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Projekthanteringssystem</h1>
-        <div class="actions">
-            <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-            <button onclick="navigateTo('schema.html')">Schema</button>
-            <button onclick="navigateTo('planering.html')">Planering</button>
+        <h1>Schema</h1>
+        <div class="filter">
+            <label for="employee-select">Välj anställd:</label>
+            <select id="employee-select">
+                <option value="">Välj anställd</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Andreas">Andreas</option>
+                <option value="Hampus">Hampus</option>
+                <option value="Loa">Loa</option>
+                <option value="Marcus">Marcus</option>
+                <option value="Mustafa">Mustafa</option>
+                <option value="Noah">Noah</option>
+                <option value="Reza">Reza</option>
+                <option value="Rickard">Rickard</option>
+            </select>
         </div>
-        <div class="row">
-            <div class="column" style="flex: 1;">
-                <div class="project-category">
-                    <h3 onclick="toggleVisibility('new-projects')">Ny</h3>
-                    <ul id="new-projects"></ul>
-                </div>
-                <div class="project-category">
-                    <h3 onclick="toggleVisibility('planned-projects')">Planerad</h3>
-                    <ul id="planned-projects"></ul>
-                </div>
-                <div class="project-category">
-                    <h3 onclick="toggleVisibility('billed-projects')">Fakturerad</h3>
-                    <ul id="billed-projects"></ul>
-                </div>
-            </div>
-            <div class="column" style="flex: 3;">
-                <div id="project-details"></div>
-            </div>
-        </div>
+        <div id="gant-chart"></div>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('loggedIn') !== 'true') {
-                window.location.href = 'login.html';
-            }
-        });
-
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-
-        function toggleVisibility(elementId) {
-            const element = document.getElementById(elementId);
-            element.style.display = element.style.display === 'none' ? 'block' : 'none';
-        }
-    </script>
 </body>
 </html>
