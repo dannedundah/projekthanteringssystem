@@ -7,37 +7,30 @@
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('loggedIn') !== 'true') {
-                window.location.href = 'login.html';
-            }
-        });
-    </script>
 </head>
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
         <div class="actions">
             <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-            <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
+            <button onclick="navigateTo('schema.html')">Se mitt schema</button>
         </div>
         <div class="row">
-            <div class="sidebar">
+            <div class="column" style="flex: 1;">
                 <div class="project-category">
-                    <h3 onclick="toggleFolder('new-projects')">Ny</h3>
+                    <h3 onclick="toggleVisibility('new-projects')">Ny</h3>
                     <ul id="new-projects"></ul>
                 </div>
                 <div class="project-category">
-                    <h3 onclick="toggleFolder('planned-projects')">Planerad</h3>
+                    <h3 onclick="toggleVisibility('planned-projects')">Planerad</h3>
                     <ul id="planned-projects"></ul>
                 </div>
                 <div class="project-category">
-                    <h3 onclick="toggleFolder('billed-projects')">Fakturerad</h3>
+                    <h3 onclick="toggleVisibility('billed-projects')">Fakturerad</h3>
                     <ul id="billed-projects"></ul>
                 </div>
             </div>
-            <div class="main-content">
+            <div class="column" style="flex: 3;">
                 <div id="project-details"></div>
             </div>
         </div>
@@ -47,14 +40,16 @@
             window.location.href = page;
         }
 
-        function toggleFolder(id) {
-            const folder = document.getElementById(id);
-            if (folder.style.display === "none") {
-                folder.style.display = "block";
-            } else {
-                folder.style.display = "none";
-            }
+        function toggleVisibility(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = element.style.display === 'none' ? 'block' : 'none';
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('loggedIn') !== 'true' && window.location.pathname !== '/login.html') {
+                window.location.href = 'login.html';
+            }
+        });
     </script>
 </body>
 </html>

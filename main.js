@@ -37,13 +37,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
 }
-
-function updateProjectStatus(projectId, newStatus) {
-    const projectRef = doc(db, 'projects', projectId);
-    updateDoc(projectRef, { status: newStatus }).then(() => {
-        console.log(`Project ${projectId} updated to ${newStatus}`);
-        window.location.href = 'index.html';
-    }).catch((error) => {
-        console.error('Error updating project status:', error);
-    });
-}

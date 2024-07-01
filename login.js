@@ -13,12 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const validPassword = 'energilagring';
 
         if (username === validUsername && password === validPassword) {
-            // Spara inloggningsstatus i lokal lagring
-            localStorage.setItem('loggedIn', 'true');
+            // Spara inloggningsstatus i session lagring
+            sessionStorage.setItem('loggedIn', 'true');
             // Omdirigera till huvudsidan
             window.location.href = 'index.html';
         } else {
             errorMessage.textContent = 'Fel användarnamn eller lösenord';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (sessionStorage.getItem('loggedIn') !== 'true' && window.location.pathname !== '/login.html') {
+            window.location.href = 'login.html';
         }
     });
 });

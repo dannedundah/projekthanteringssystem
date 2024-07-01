@@ -58,4 +58,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const project = projects.find(project => project.id === projectId);
         const newEmployeeId = employeeSelect.value;
 
-        if (project && newEmployeeId)
+        if (project && newEmployeeId) {
+            updateProjectAssignment(projectId, newEmployeeId);
+        }
+    };
+
+    ganttBody.ondragover = (event) => {
+        event.preventDefault();
+    };
+
+    async function updateProjectAssignment(projectId, newEmployeeId) {
+        try {
+            const projectRef = doc(db, 'projects', projectId);
+            await updateDoc(projectRef, { assignedTo: newEmployeeId });
+            console.log(`Project ${projectId} assigned to ${newEmployeeId}`);
+        } catch (error) {
+            console.error('Error updating project assignment:', error);
+        }
+    }
+});

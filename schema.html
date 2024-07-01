@@ -5,30 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schema</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="schema.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Schema</h1>
-
-        <h2>Lägg till Schema</h2>
-        <form id="add-schedule-form">
-            <input type="text" id="employee-name-add" placeholder="Anställds namn" required>
-            <input type="date" id="start-date" required>
-            <input type="date" id="end-date" required>
-            <select id="project-select" required></select>
-            <button type="submit">Lägg till</button>
-        </form>
-
-        <h2>Visa Schema</h2>
-        <form id="view-schedule-form">
-            <input type="text" id="employee-name-view" placeholder="Ange ditt namn" required>
-            <button type="submit">Visa Schema</button>
-        </form>
-
-        <div id="schedule-list"></div>
-        
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
+        <div>
+            <label for="employee-select">Välj anställd:</label>
+            <select id="employee-select"></select>
+        </div>
+        <div id="gantt-chart">
+            <div class="gantt-header">
+                <div class="gantt-column">Måndag</div>
+                <div class="gantt-column">Tisdag</div>
+                <div class="gantt-column">Onsdag</div>
+                <div class="gantt-column">Torsdag</div>
+                <div class="gantt-column">Fredag</div>
+            </div>
+            <div class="gantt-body" id="gantt-body"></div>
+        </div>
     </div>
-    <script src="script.js"></script>
 </body>
 </html>
