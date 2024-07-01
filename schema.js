@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function navigateTo(page) {
+    window.navigateTo = (page) => {
         window.location.href = page;
-    }
+    };
 });

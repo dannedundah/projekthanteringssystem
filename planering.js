@@ -1,4 +1,4 @@
-import { db, collection, getDocs, updateDoc, doc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const querySnapshot = await getDocs(collection(db, "projects"));
             const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
+
             projectsContainer.innerHTML = '';
             if (projects.length > 0) {
                 projects.forEach(project => {
@@ -48,8 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (startDate && endDate) {
             try {
-                const scheduleRef = doc(collection(db, "schedules"));
-                await updateDoc(scheduleRef, {
+                await addDoc(collection(db, "schedules"), {
                     projectId: projectId,
                     name: employeeName,
                     startDate: startDate,
@@ -64,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function navigateTo(page) {
+    window.navigateTo = (page) => {
         window.location.href = page;
-    }
+    };
 });
