@@ -13,7 +13,8 @@
         <h1>Projekthanteringssystem</h1>
         <div class="actions">
             <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-            <button onclick="navigateTo('schema.html')">Se mitt schema</button>
+            <button onclick="navigateTo('schema.html')">Schema</button>
+            <button onclick="navigateTo('planering.html')">Planering</button>
         </div>
         <div class="row">
             <div class="column" style="flex: 1;">
@@ -36,6 +37,12 @@
         </div>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('loggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        });
+
         function navigateTo(page) {
             window.location.href = page;
         }
@@ -44,12 +51,6 @@
             const element = document.getElementById(elementId);
             element.style.display = element.style.display === 'none' ? 'block' : 'none';
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('loggedIn') !== 'true' && window.location.pathname !== '/login.html') {
-                window.location.href = 'login.html';
-            }
-        });
     </script>
 </body>
 </html>

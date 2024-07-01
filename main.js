@@ -1,4 +1,4 @@
-import { db, collection, getDocs, updateDoc, doc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const newProjects = document.getElementById('new-projects');

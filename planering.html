@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planering</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="planering.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Planering</h1>
+        <form id="assign-project-form">
+            <label for="project-select">Projekt:</label>
+            <select id="project-select" required></select>
+            <label for="employee-select">Anställd:</label>
+            <select id="employee-select" required></select>
+            <label for="start-date">Startdatum:</label>
+            <input type="date" id="start-date" required>
+            <label for="end-date">Slutdatum:</label>
+            <input type="date" id="end-date" required>
+            <button type="submit">Tilldela projekt</button>
+        </form>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
+    </div>
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>
