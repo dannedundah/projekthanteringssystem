@@ -88,4 +88,20 @@ li {
 
 #project-details {
     margin-top: 20px;
-}
+    .gantt-chart {
+        position: relative;
+        width: 100%;
+        height: 200px; /* Adjust height as needed */
+        border: 1px solid #ccc;
+    }
+    
+    .gantt-bar {
+        position: absolute;
+        height: 30px;
+        background-color: #4CAF50;
+        color: white;
+        text-align: center;
+        line-height: 30px;
+        border-radius: 5px;
+    }
+    }
