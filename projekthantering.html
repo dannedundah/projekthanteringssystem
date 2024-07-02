@@ -11,21 +11,21 @@
 <body>
     <div class="container">
         <h1>Projekthantering</h1>
-        <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-        <button onclick="showEditProjectSection()">Redigera befintligt projekt</button>
-
-        <div id="edit-project-section" style="display: none;">
-            <h2>Välj ett projekt att redigera</h2>
-            <ul id="project-list"></ul>
-        </div>
+        <form id="project-form">
+            <input type="text" id="project-name" placeholder="Projektets namn" required>
+            <input type="text" id="customer-name" placeholder="Kundnamn" required>
+            <input type="text" id="customer-phone" placeholder="Telefonnummer" required>
+            <input type="text" id="project-address" placeholder="Adress" required>
+            <textarea id="project-description" placeholder="Projektbeskrivning" required></textarea>
+            <select id="project-status" required>
+                <option value="Ny">Ny</option>
+                <option value="Planerad">Planerad</option>
+                <option value="Fakturerad">Fakturerad</option>
+            </select>
+            <input type="file" id="project-files" accept="*/*" multiple>
+            <button type="submit">Lägg till projekt</button>
+        </form>
+        <div id="project-list"></div>
     </div>
-    <script>
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-        function showEditProjectSection() {
-            document.getElementById('edit-project-section').style.display = 'block';
-        }
-    </script>
 </body>
 </html>
