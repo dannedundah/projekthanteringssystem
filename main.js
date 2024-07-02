@@ -41,7 +41,7 @@ function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
 }
 
-function searchProjects() {
+window.searchProjects = function searchProjects() {
     const input = document.getElementById('search-input').value.toLowerCase();
     const newProjects = document.getElementById('new-projects');
     const plannedProjects = document.getElementById('planned-projects');
@@ -72,6 +72,4 @@ function searchProjects() {
             }
         }
     });
-}
-
-window.searchProjects = searchProjects;
+};
