@@ -15,16 +15,16 @@
             <div class="column" style="flex: 1;">
                 <input type="text" id="search-input" placeholder="Sök projekt..." onkeyup="searchProjects()">
                 <div class="project-category">
-                    <h3>Ny</h3>
-                    <ul id="new-projects"></ul>
+                    <h3 onclick="toggleCategory('new-projects')">Ny</h3>
+                    <ul id="new-projects" class="category-list"></ul>
                 </div>
                 <div class="project-category">
-                    <h3>Planerad</h3>
-                    <ul id="planned-projects"></ul>
+                    <h3 onclick="toggleCategory('planned-projects')">Planerad</h3>
+                    <ul id="planned-projects" class="category-list"></ul>
                 </div>
                 <div class="project-category">
-                    <h3>Fakturerad</h3>
-                    <ul id="billed-projects"></ul>
+                    <h3 onclick="toggleCategory('billed-projects')">Fakturerad</h3>
+                    <ul id="billed-projects" class="category-list"></ul>
                 </div>
             </div>
             <div class="column" style="flex: 3;">

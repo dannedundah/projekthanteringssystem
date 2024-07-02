@@ -1,4 +1,4 @@
-import { db, collection, getDocs, updateDoc, doc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const newProjects = document.getElementById('new-projects');
@@ -52,7 +52,7 @@ window.searchProjects = function searchProjects() {
     billedProjects.innerHTML = '';
 
     window.projects.forEach(project => {
-        if (project.name.toLowerCase().includes(input)) {
+        if (project.name.toLowerCase().includes(input) || project.address.toLowerCase().includes(input)) {
             const li = document.createElement('li');
             li.id = project.id;
             li.draggable = true;
@@ -72,4 +72,9 @@ window.searchProjects = function searchProjects() {
             }
         }
     });
+};
+
+window.toggleCategory = function toggleCategory(categoryId) {
+    const category = document.getElementById(categoryId);
+    category.classList.toggle('show');
 };
