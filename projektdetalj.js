@@ -17,14 +17,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>Telefonnummer:</strong> ${project.customerPhone}</p>
                 <p><strong>Adress:</strong> ${project.address}</p>
                 <p><strong>Beskrivning:</strong> ${project.description}</p>
-                <p><strong>Status:</strong> 
-                    <select id="project-status" onchange="updateProjectStatusHandler('${projectId}')">
-                        <option value="Ny" ${project.status === 'Ny' ? 'selected' : ''}>Ny</option>
-                        <option value="Planerad" ${project.status === 'Planerad' ? 'selected' : ''}>Planerad</option>
-                        <option value="Fakturerad" ${project.status === 'Fakturerad' ? 'selected' : ''}>Fakturerad</option>
-                    </select>
-                </p>
+                <p><strong>Status:</strong> ${project.status}</p>
                 ${project.images ? project.images.map(url => `<img src="${url}" alt="Project Image">`).join('') : ''}
+                <select id="project-status" onchange="updateProjectStatus('${projectId}')">
+                    <option value="Ny" ${project.status === 'Ny' ? 'selected' : ''}>Ny</option>
+                    <option value="Planerad" ${project.status === 'Planerad' ? 'selected' : ''}>Planerad</option>
+                    <option value="Fakturerad" ${project.status === 'Fakturerad' ? 'selected' : ''}>Fakturerad</option>
+                </select>
             `;
         } else {
             projectDetails.textContent = 'Projektet kunde inte hittas.';
@@ -35,21 +34,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function updateProjectStatusHandler(projectId) {
-    const newStatus = document.getElementById('project-status').value;
-    updateProjectStatus(projectId, newStatus);
-}
-
-function updateProjectStatus(projectId, newStatus) {
-    const projectRef = doc(db, 'projects', projectId);
-    updateDoc(projectRef, { status: newStatus }).then(() => {
-        console.log(`Project ${projectId} updated to ${newStatus}`);
-        window.location.href = 'index.html';
-    }).catch((error) => {
+async function updateProjectStatus(projectId) {
+    const status = document.getElementById('project-status').value;
+    try {
+        const projectRef = doc(db, 'projects', projectId);
+        await updateDoc(projectRef, { status: status });
+        alert('Projektstatus uppdaterad!');
+    } catch (error) {
         console.error('Error updating project status:', error);
-    });
+        alert('Ett fel uppstod vid uppdatering av projektstatus.');
+    }
 }
 
-function navigateTo(page) {
+window.navigateTo = (page) => {
     window.location.href = page;
-}
+};
