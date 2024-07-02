@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schema</title>
+    <title>Se mitt schema</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="schema.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Schema</h1>
+        <h1>Se mitt schema</h1>
         <form id="view-schedule-form">
-            <label for="employee-name">Välj anställd:</label>
-            <select id="employee-name" required>
-                <option value="" disabled selected>Välj namn</option>
+            <select id="employee-name">
+                <option value="">Välj namn</option>
                 <option value="Marcus">Marcus</option>
                 <option value="Noah">Noah</option>
                 <option value="Hampus">Hampus</option>
@@ -25,10 +24,9 @@
                 <option value="Rickard">Rickard</option>
                 <option value="Mustafa">Mustafa</option>
             </select>
-            <button type="submit">Visa Schema</button>
+            <button type="submit">Visa schema</button>
         </form>
-        <div id="gantt-chart-container"></div>
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
+        <div id="schedule-list"></div>
     </div>
 </body>
 </html>
