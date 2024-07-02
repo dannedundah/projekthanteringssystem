@@ -11,23 +11,19 @@
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
-        <div class="actions">
-            <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-            <button onclick="navigateTo('schema.html')">Schema</button>
-            <button onclick="navigateTo('planering.html')">Planering</button>
-        </div>
         <div class="row">
             <div class="column" style="flex: 1;">
+                <input type="text" id="search-input" placeholder="Sök projekt..." onkeyup="searchProjects()">
                 <div class="project-category">
-                    <h3 onclick="toggleVisibility('new-projects')">Ny</h3>
+                    <h3>Ny</h3>
                     <ul id="new-projects"></ul>
                 </div>
                 <div class="project-category">
-                    <h3 onclick="toggleVisibility('planned-projects')">Planerad</h3>
+                    <h3>Planerad</h3>
                     <ul id="planned-projects"></ul>
                 </div>
                 <div class="project-category">
-                    <h3 onclick="toggleVisibility('billed-projects')">Fakturerad</h3>
+                    <h3>Fakturerad</h3>
                     <ul id="billed-projects"></ul>
                 </div>
             </div>
@@ -35,21 +31,14 @@
                 <div id="project-details"></div>
             </div>
         </div>
+        <div class="actions">
+            <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
+            <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
+        </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('loggedIn') !== 'true') {
-                window.location.href = 'login.html';
-            }
-        });
-
         function navigateTo(page) {
             window.location.href = page;
-        }
-
-        function toggleVisibility(elementId) {
-            const element = document.getElementById(elementId);
-            element.style.display = element.style.display === 'none' ? 'block' : 'none';
         }
     </script>
 </body>
