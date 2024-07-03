@@ -3,10 +3,11 @@ import { db, collection, getDocs } from './firebase-config.js';
 document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleForm = document.getElementById('view-schedule-form');
     const scheduleList = document.getElementById('schedule-list');
+    const employeeDropdown = document.getElementById('employee-name');
 
     viewScheduleForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const employeeName = document.getElementById('employee-name').value.trim();
+        const employeeName = employeeDropdown.value.trim();
 
         if (employeeName !== '') {
             try {
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     employeeSchedules.forEach(schedule => {
                         const div = document.createElement('div');
                         div.innerHTML = `
-                            <p><strong>Kundadress:</strong> ${schedule.address}</p>
+                            <p><strong>Kundadress:</strong> ${schedule.projectAddress}</p>
                             <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
                             <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
                         `;
@@ -30,12 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Error fetching schedules:', error);
-                scheduleList.textContent = 'Ett fel uppstod vid hämtning av scheman.';
             }
         }
     });
-});
 
-function navigateTo(page) {
-    window.location.href = page;
-}
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
+});
