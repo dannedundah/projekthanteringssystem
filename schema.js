@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const div = document.createElement('div');
                     div.innerHTML = `
                         <p><strong>Anställd:</strong> ${schedule.name}</p>
-                        <p><strong>Projekt:</strong> ${schedule.projectAddress}</p>
+                        <p><strong>Projektadress:</strong> ${schedule.projectAddress}</p>
                         <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
                         <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
                         <hr>
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 employeeSchedules.forEach(schedule => {
                     const div = document.createElement('div');
                     div.innerHTML = `
-                        <p><strong>Projekt:</strong> ${schedule.projectAddress}</p>
+                        <p><strong>Projektadress:</strong> ${schedule.projectAddress}</p>
                         <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
                         <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
                         <hr>
