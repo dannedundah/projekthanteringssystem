@@ -1,8 +1,6 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectList = document.getElementById('project-list');
-
     console.log('Fetching projects...');
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
@@ -10,9 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Projects:', projects);
 
         projects.forEach(project => {
-            const li = document.createElement('li');
-            li.textContent = project.name;
-            projectList.appendChild(li);
+            console.log('Project:', project);
         });
     } catch (error) {
         console.error('Error fetching projects:', error);
