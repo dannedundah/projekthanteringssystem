@@ -5,7 +5,7 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Placera innehållet högst upp */
+    align-items: flex-start;
     height: 100vh;
 }
 
@@ -23,33 +23,16 @@ h1 {
     text-align: center;
 }
 
-form {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-select, button {
-    padding: 10px;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-#schedule-list {
-    margin-top: 20px;
-}
-
-#schedule-list div {
-    background-color: #e0e0e0;
-    margin-bottom: 10px;
-    padding: 10px;
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    background-color: #ff7f00;
+    color: white;
+    border: none;
     border-radius: 5px;
 }
 
-hr {
-    border: 1px solid #ddd;
+button:hover {
+    background-color: #cc6600;
 }
