@@ -17,13 +17,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>Telefonnummer:</strong> ${project.customerPhone}</p>
                 <p><strong>Adress:</strong> ${project.address}</p>
                 <p><strong>Beskrivning:</strong> ${project.description}</p>
-                <p><strong>Status:</strong> ${project.status}</p>
+                <p><strong>Status:</strong> 
+                    <select id="project-status">
+                        <option value="Ny" ${project.status === "Ny" ? "selected" : ""}>Ny</option>
+                        <option value="Planerad" ${project.status === "Planerad" ? "selected" : ""}>Planerad</option>
+                        <option value="Fakturerad" ${project.status === "Fakturerad" ? "selected" : ""}>Fakturerad</option>
+                    </select>
+                </p>
                 ${project.images ? project.images.map(url => `<img src="${url}" alt="Project Image">`).join('') : ''}
-                <select id="project-status" onchange="updateProjectStatus('${projectId}')">
-                    <option value="Ny" ${project.status === 'Ny' ? 'selected' : ''}>Ny</option>
-                    <option value="Planerad" ${project.status === 'Planerad' ? 'selected' : ''}>Planerad</option>
-                    <option value="Fakturerad" ${project.status === 'Fakturerad' ? 'selected' : ''}>Fakturerad</option>
-                </select>
+                <button onclick="updateProjectStatus('${projectId}')">Uppdatera Status</button>
             `;
         } else {
             projectDetails.textContent = 'Projektet kunde inte hittas.';
@@ -34,18 +36,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+function navigateTo(page) {
+    window.location.href = page;
+}
+
 async function updateProjectStatus(projectId) {
-    const status = document.getElementById('project-status').value;
+    const newStatus = document.getElementById('project-status').value;
     try {
         const projectRef = doc(db, 'projects', projectId);
-        await updateDoc(projectRef, { status: status });
-        alert('Projektstatus uppdaterad!');
+        await updateDoc(projectRef, { status: newStatus });
+        alert('Projektstatus har uppdaterats!');
     } catch (error) {
         console.error('Error updating project status:', error);
         alert('Ett fel uppstod vid uppdatering av projektstatus.');
     }
 }
-
-window.navigateTo = (page) => {
-    window.location.href = page;
-};
