@@ -1,79 +1,41 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const employeeNameSelect = document.getElementById('employee-name');
-    const showScheduleButton = document.getElementById('show-schedule');
-    const scheduleContainer = document.getElementById('schedule-container');
+    const viewScheduleForm = document.getElementById('view-schedule-form');
+    const scheduleList = document.getElementById('schedule-list');
 
-    if (showScheduleButton) {
-        showScheduleButton.addEventListener('click', () => {
-            showSchedule();
-        });
-    }
+    viewScheduleForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const employeeName = document.getElementById('employee-name').value.trim();
 
-    async function showSchedule() {
-        const employeeName = employeeNameSelect.value;
-        if (employeeName === '') return;
+        if (employeeName !== '') {
+            try {
+                const querySnapshot = await getDocs(collection(db, "schedules"));
+                const schedules = querySnapshot.docs.map(doc => doc.data());
+                const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
 
-        try {
-            const querySnapshot = await getDocs(collection(db, "schedules"));
-            const schedules = querySnapshot.docs.map(doc => doc.data());
-            const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName || employeeName === '');
-
-            scheduleContainer.innerHTML = '';
-            if (employeeSchedules.length > 0) {
-                const table = createGanttTable(employeeSchedules);
-                scheduleContainer.appendChild(table);
-            } else {
-                scheduleContainer.textContent = 'Inga scheman hittades för denna anställd.';
-            }
-        } catch (error) {
-            console.error('Error fetching schedules:', error);
-        }
-    }
-
-    function createGanttTable(schedules) {
-        const table = document.createElement('table');
-        const headerRow = table.insertRow();
-
-        const nameHeader = headerRow.insertCell();
-        nameHeader.textContent = 'Namn:';
-
-        const dates = getDatesForWeek();
-        dates.forEach(date => {
-            const cell = headerRow.insertCell();
-            cell.textContent = date.toISOString().split('T')[0];
-        });
-
-        const employeeNames = ['Alireza', 'Andreas', 'Hampus', 'Loa', 'Marcus', 'Mustafa', 'Noah', 'Reza', 'Rickard'];
-        employeeNames.forEach(name => {
-            const row = table.insertRow();
-            const nameCell = row.insertCell();
-            nameCell.textContent = name;
-
-            dates.forEach(date => {
-                const cell = row.insertCell();
-                const schedule = schedules.find(schedule => schedule.name === name && new Date(schedule.startDate) <= date && new Date(schedule.endDate) >= date);
-                if (schedule) {
-                    cell.textContent = schedule.projectId;
-                    cell.style.backgroundColor = 'green'; // Customize as needed
+                scheduleList.innerHTML = '';
+                if (employeeSchedules.length > 0) {
+                    employeeSchedules.forEach(schedule => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <p><strong>Kundadress:</strong> ${schedule.address}</p>
+                            <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
+                            <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
+                        `;
+                        scheduleList.appendChild(div);
+                    });
+                } else {
+                    scheduleList.textContent = 'Inga scheman hittades för denna anställd.';
                 }
-            });
-        });
-
-        return table;
-    }
-
-    function getDatesForWeek() {
-        const today = new Date();
-        const startOfWeek = today.getDate() - today.getDay() + 1;
-        const dates = [];
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(today.setDate(startOfWeek + i));
-            dates.push(date);
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+                scheduleList.textContent = 'Ett fel uppstod vid hämtning av scheman.';
+            }
         }
-        return dates;
-    }
-
-    window.showSchedule = showSchedule;
+    });
 });
+
+function navigateTo(page) {
+    window.location.href = page;
+}
