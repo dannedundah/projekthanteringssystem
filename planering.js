@@ -1,8 +1,8 @@
 import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const planningForm = document.getElementById('planning-form');
-    const projectSelect = document.getElementById('project');
+    const projectSelect = document.getElementById('project-select');
+    const employeeSelects = document.querySelectorAll('.employee-select');
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
@@ -18,41 +18,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching projects:', error);
     }
 
-    planningForm.addEventListener('submit', async (e) => {
+    document.getElementById('planning-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const selectedProject = projectSelect.value;
+        const selectedEmployees = Array.from(employeeSelects).map(select => select.value);
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
-        const employees = [
-            document.getElementById('employee1').value,
-            document.getElementById('employee2').value,
-            document.getElementById('employee3').value
-        ].filter(employee => employee !== "");
-
-        if (!selectedProject || !startDate || !endDate || employees.length === 0) {
-            alert('Vänligen fyll i alla fält.');
-            return;
-        }
-
-        const planning = {
-            project: selectedProject,
-            startDate,
-            endDate,
-            employees
-        };
 
         try {
-            await addDoc(collection(db, 'planning'), planning);
+            await addDoc(collection(db, 'planning'), {
+                projectId: selectedProject,
+                employees: selectedEmployees,
+                startDate,
+                endDate
+            });
             alert('Planeringen har lagts till!');
-            window.location.href = 'index.html';
         } catch (error) {
             console.error('Error adding planning:', error);
-            alert('Ett fel uppstod vid tillägg av planeringen.');
+            alert('Ett fel uppstod vid tillägg av planering.');
         }
     });
 });
-
-function navigateTo(page) {
-    window.location.href = page;
-}
