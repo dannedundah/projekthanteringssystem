@@ -1,12 +1,15 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const scheduleContainer = document.getElementById('schedule-container');
     const employeeNameSelect = document.getElementById('employee-name');
+    const showScheduleButton = document.getElementById('show-schedule');
+    const scheduleContainer = document.getElementById('schedule-container');
 
-    employeeNameSelect.addEventListener('change', () => {
-        showSchedule();
-    });
+    if (showScheduleButton) {
+        showScheduleButton.addEventListener('click', () => {
+            showSchedule();
+        });
+    }
 
     async function showSchedule() {
         const employeeName = employeeNameSelect.value;
@@ -71,4 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return dates;
     }
+
+    window.showSchedule = showSchedule;
 });
