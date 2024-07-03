@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Se mitt schema</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Mitt Schema</title>
+    <link rel="stylesheet" href="style.css">
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="se-schema.js"></script>
 </head>
@@ -12,18 +12,17 @@
     <div class="container">
         <h1>Mitt Schema</h1>
         <form id="view-schedule-form">
-            <label for="employee-name">Anställds namn:</label>
-            <select id="employee-name" required>
-                <option value="">Välj namn</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Noah">Noah</option>
+            <label for="employee-name">Välj namn:</label>
+            <select id="employee-name">
+                <option value="" selected>Välj namn</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Andreas">Andreas</option>
                 <option value="Hampus">Hampus</option>
                 <option value="Loa">Loa</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Reza">Reza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Rickard">Rickard</option>
+                <option value="Marcus">Marcus</option>
                 <option value="Mustafa">Mustafa</option>
+                <option value="Noah">Noah</option>
+                <option value="Rickard">Rickard</option>
             </select>
             <button type="submit">Visa Schema</button>
         </form>
