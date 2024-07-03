@@ -1,3 +1,4 @@
+// se-schema.js
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Error fetching schedules:', error);
+                scheduleList.textContent = 'Fel vid hämtning av scheman.';
             }
         }
     });
