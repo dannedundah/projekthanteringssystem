@@ -18,9 +18,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching projects:', error);
     }
 });
-
-function navigateTo(page) {
-    window.location.href = page;
-}
-
-window.navigateTo = navigateTo;  // Lägg till denna rad för att göra funktionen globalt tillgänglig

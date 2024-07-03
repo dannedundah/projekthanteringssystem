@@ -16,5 +16,11 @@
         <button onclick="navigateTo('planering.html')">Planering</button>
         <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
     </div>
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        window.navigateTo = navigateTo;
+    </script>
 </body>
 </html>
