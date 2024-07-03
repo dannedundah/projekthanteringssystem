@@ -1,43 +1,70 @@
-import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const viewScheduleForm = document.getElementById('view-schedule-form');
     const scheduleList = document.getElementById('schedule-list');
 
+    // Render all schedules on page load
+    await renderAllSchedules();
+
     viewScheduleForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const employeeName = document.getElementById('employee-name').value.trim();
+        const employeeName = document.getElementById('employee-name').value;
 
-        if (employeeName !== '') {
-            try {
-                const querySnapshot = await getDocs(collection(db, "planning"));
-                const schedules = querySnapshot.docs.map(doc => doc.data());
-                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
-
-                scheduleList.innerHTML = '';
-                if (employeeSchedules.length > 0) {
-                    for (const schedule of employeeSchedules) {
-                        const projectDoc = await getDoc(doc(db, 'projects', schedule.project));
-                        const project = projectDoc.data();
-
-                        const div = document.createElement('div');
-                        div.innerHTML = `
-                            <p><strong>Kundadress:</strong> ${project.address}</p>
-                            <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
-                            <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
-                        `;
-                        scheduleList.appendChild(div);
-                    }
-                } else {
-                    scheduleList.textContent = 'Inga scheman hittades för denna anställd.';
-                }
-            } catch (error) {
-                console.error('Error fetching schedules:', error);
-            }
+        if (employeeName) {
+            await renderEmployeeSchedule(employeeName);
+        } else {
+            await renderAllSchedules();
         }
     });
 
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
+    async function renderAllSchedules() {
+        scheduleList.innerHTML = '';
+        try {
+            const querySnapshot = await getDocs(collection(db, "schedules"));
+            const schedules = querySnapshot.docs.map(doc => doc.data());
+            if (schedules.length > 0) {
+                schedules.forEach(schedule => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <p><strong>Anställd:</strong> ${schedule.name}</p>
+                        <p><strong>Projekt:</strong> ${schedule.projectAddress}</p>
+                        <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
+                        <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
+                        <hr>
+                    `;
+                    scheduleList.appendChild(div);
+                });
+            } else {
+                scheduleList.textContent = 'Inga scheman hittades.';
+            }
+        } catch (error) {
+            console.error('Error fetching schedules:', error);
+        }
+    }
+
+    async function renderEmployeeSchedule(employeeName) {
+        scheduleList.innerHTML = '';
+        try {
+            const querySnapshot = await getDocs(collection(db, "schedules"));
+            const schedules = querySnapshot.docs.map(doc => doc.data());
+            const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
+            if (employeeSchedules.length > 0) {
+                employeeSchedules.forEach(schedule => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <p><strong>Projekt:</strong> ${schedule.projectAddress}</p>
+                        <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
+                        <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
+                        <hr>
+                    `;
+                    scheduleList.appendChild(div);
+                });
+            } else {
+                scheduleList.textContent = 'Inga scheman hittades för denna anställd.';
+            }
+        } catch (error) {
+            console.error('Error fetching schedules:', error);
+        }
+    }
 });
