@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         projects.forEach(project => {
             const li = document.createElement('li');
             li.id = project.id;
-            li.draggable = true;
             li.onclick = () => showProjectDetails(project.id);
             li.textContent = project.name;
 
@@ -33,35 +32,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error fetching projects:', error);
     }
+
+    document.querySelectorAll('.project-category h3').forEach(header => {
+        header.onclick = () => {
+            const ul = header.nextElementSibling;
+            ul.classList.toggle('show');
+        };
+    });
 });
 
 function showProjectDetails(projectId) {
     window.location.href = `projekt-detalj.html?id=${projectId}`;
-}
-
-function searchProjects() {
-    const input = document.getElementById('search-input');
-    const filter = input.value.toLowerCase();
-    const projectLists = document.getElementsByClassName('project-list');
-
-    for (let i = 0; i < projectLists.length; i++) {
-        const items = projectLists[i].getElementsByTagName('li');
-        for (let j = 0; j < items.length; j++) {
-            const txtValue = items[j].textContent || items[j].innerText;
-            if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                items[j].style.display = '';
-            } else {
-                items[j].style.display = 'none';
-            }
-        }
-    }
-}
-
-function toggleVisibility(listId) {
-    const list = document.getElementById(listId);
-    if (list.style.display === 'none') {
-        list.style.display = 'block';
-    } else {
-        list.style.display = 'none';
-    }
 }
