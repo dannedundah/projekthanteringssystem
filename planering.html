@@ -12,50 +12,55 @@
     <div class="container">
         <h1>Planering</h1>
         <form id="planning-form">
-            <select id="project-select">
+            <label for="employee1">Anställd 1:</label>
+            <select id="employee1" required>
+                <option value="">Välj namn</option>
+                <option value="Marcus">Marcus</option>
+                <option value="Noah">Noah</option>
+                <option value="Hampus">Hampus</option>
+                <option value="Loa">Loa</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Reza">Reza</option>
+                <option value="Andreas">Andreas</option>
+                <option value="Rickard">Rickard</option>
+                <option value="Mustafa">Mustafa</option>
+            </select>
+            <label for="employee2">Anställd 2:</label>
+            <select id="employee2" required>
+                <option value="">Välj namn</option>
+                <option value="Marcus">Marcus</option>
+                <option value="Noah">Noah</option>
+                <option value="Hampus">Hampus</option>
+                <option value="Loa">Loa</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Reza">Reza</option>
+                <option value="Andreas">Andreas</option>
+                <option value="Rickard">Rickard</option>
+                <option value="Mustafa">Mustafa</option>
+            </select>
+            <label for="employee3">Anställd 3:</label>
+            <select id="employee3" required>
+                <option value="">Välj namn</option>
+                <option value="Marcus">Marcus</option>
+                <option value="Noah">Noah</option>
+                <option value="Hampus">Hampus</option>
+                <option value="Loa">Loa</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Reza">Reza</option>
+                <option value="Andreas">Andreas</option>
+                <option value="Rickard">Rickard</option>
+                <option value="Mustafa">Mustafa</option>
+            </select>
+            <label for="project">Projekt:</label>
+            <select id="project" required>
                 <option value="">Välj projekt</option>
             </select>
-            <select id="employee-select-1">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
-            <select id="employee-select-2">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
-            <select id="employee-select-3">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
+            <label for="start-date">Startdatum:</label>
             <input type="date" id="start-date" required>
+            <label for="end-date">Slutdatum:</label>
             <input type="date" id="end-date" required>
             <button type="submit">Lägg till planering</button>
         </form>
-        <div id="planning-list"></div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>

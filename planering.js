@@ -1,12 +1,13 @@
 import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectSelect = document.getElementById('project-select');
+    const planningForm = document.getElementById('planning-form');
+    const projectSelect = document.getElementById('project');
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
         const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
+
         projects.forEach(project => {
             const option = document.createElement('option');
             option.value = project.id;
@@ -17,32 +18,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching projects:', error);
     }
 
-    document.getElementById('planning-form').addEventListener('submit', async (e) => {
+    planningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const projectId = document.getElementById('project-select').value;
-        const employee1 = document.getElementById('employee-select-1').value;
-        const employee2 = document.getElementById('employee-select-2').value;
-        const employee3 = document.getElementById('employee-select-3').value;
+        const selectedProject = projectSelect.value;
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
+        const employees = [
+            document.getElementById('employee1').value,
+            document.getElementById('employee2').value,
+            document.getElementById('employee3').value
+        ].filter(employee => employee !== "");
 
-        if (!projectId || (!employee1 && !employee2 && !employee3) || !startDate || !endDate) {
+        if (!selectedProject || !startDate || !endDate || employees.length === 0) {
             alert('Vänligen fyll i alla fält.');
             return;
         }
 
+        const planning = {
+            project: selectedProject,
+            startDate,
+            endDate,
+            employees
+        };
+
         try {
-            await addDoc(collection(db, 'planning'), {
-                projectId,
-                employees: [employee1, employee2, employee3].filter(Boolean),
-                startDate,
-                endDate
-            });
+            await addDoc(collection(db, 'planning'), planning);
             alert('Planeringen har lagts till!');
-            document.getElementById('planning-form').reset();
+            window.location.href = 'index.html';
         } catch (error) {
             console.error('Error adding planning:', error);
+            alert('Ett fel uppstod vid tillägg av planeringen.');
         }
     });
 });
+
+function navigateTo(page) {
+    window.location.href = page;
+}

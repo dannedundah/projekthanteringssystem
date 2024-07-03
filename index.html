@@ -17,30 +17,6 @@
             <button onclick="navigateTo('planering.html')">Planering</button>
             <button onclick="navigateTo('schema.html')">Se mitt schema</button>
         </div>
-        <div class="row">
-            <div class="column" style="flex: 1;">
-                <div class="project-category">
-                    <h3>Ny</h3>
-                    <ul id="new-projects" class="toggle-list"></ul>
-                </div>
-                <div class="project-category">
-                    <h3>Planerad</h3>
-                    <ul id="planned-projects" class="toggle-list"></ul>
-                </div>
-                <div class="project-category">
-                    <h3>Fakturerad</h3>
-                    <ul id="billed-projects" class="toggle-list"></ul>
-                </div>
-            </div>
-            <div class="column" style="flex: 3;">
-                <div id="project-details"></div>
-            </div>
-        </div>
     </div>
-    <script>
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-    </script>
 </body>
 </html>
