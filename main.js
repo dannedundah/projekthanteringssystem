@@ -6,10 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const querySnapshot = await getDocs(collection(db, 'projects'));
         const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log('Projects:', projects);
-
-        projects.forEach(project => {
-            console.log('Project:', project);
-        });
+        // Additional code to handle the fetched projects if needed
     } catch (error) {
         console.error('Error fetching projects:', error);
     }

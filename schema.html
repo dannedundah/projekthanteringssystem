@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schema</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="schema.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Mitt Schema</h1>
+        <h1>Schema</h1>
         <form id="view-schedule-form">
             <label for="employee-name">Välj namn:</label>
             <select id="employee-name">
@@ -22,12 +20,14 @@
                 <option value="Marcus">Marcus</option>
                 <option value="Mustafa">Mustafa</option>
                 <option value="Noah">Noah</option>
+                <option value="Reza">Reza</option>
                 <option value="Rickard">Rickard</option>
             </select>
             <button type="submit">Visa Schema</button>
         </form>
-        <div id="gantt-container"></div>
+        <div id="schedule-list"></div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+    <script type="module" src="schema.js"></script>
 </body>
 </html>

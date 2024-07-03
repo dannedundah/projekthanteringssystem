@@ -37,29 +37,33 @@ button:hover {
     background-color: #cc6600;
 }
 
-.form-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+form {
+    margin-bottom: 20px;
 }
 
-select {
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+select, button {
     padding: 10px;
-    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+#schedule-list {
     margin-top: 20px;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+#schedule-list div {
+    background-color: #e0e0e0;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-th {
-    background-color: #f2f2f2;
+hr {
+    border: 1px solid #ddd;
 }
