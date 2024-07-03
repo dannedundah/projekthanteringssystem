@@ -1,11 +1,12 @@
-import { db, collection, getDocs, addDoc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectSelect = document.getElementById('project');
+    const projectSelect = document.getElementById('project-select');
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
         const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log('Projects:', projects);
 
         projects.forEach(project => {
             const option = document.createElement('option');
@@ -21,26 +22,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('planning-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const project = document.getElementById('project').value;
-    const employee1 = document.getElementById('employee-1').value;
-    const employee2 = document.getElementById('employee-2').value;
-    const employee3 = document.getElementById('employee-3').value;
+    const project = document.getElementById('project-select').value;
+    const employee1 = document.getElementById('employee-select-1').value;
+    const employee2 = document.getElementById('employee-select-2').value;
+    const employee3 = document.getElementById('employee-select-3').value;
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
 
-    if (project && (employee1 || employee2 || employee3) && startDate && endDate) {
-        try {
-            await addDoc(collection(db, 'schedules'), {
-                project,
-                employees: [employee1, employee2, employee3].filter(Boolean),
-                startDate,
-                endDate
-            });
-            alert('Planeringen har lagts till.');
-        } catch (error) {
-            console.error('Error adding planning:', error);
-        }
-    } else {
-        alert('Vänligen fyll i alla fält.');
+    try {
+        const planning = {
+            project,
+            employees: [employee1, employee2, employee3],
+            startDate,
+            endDate
+        };
+
+        await addDoc(collection(db, 'planning'), planning);
+        alert('Planering tillagd!');
+        window.location.reload();
+    } catch (error) {
+        console.error('Error adding planning:', error);
     }
 });
