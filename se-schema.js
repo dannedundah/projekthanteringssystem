@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleForm = document.getElementById('view-schedule-form');
@@ -10,21 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (employeeName !== '') {
             try {
-                const querySnapshot = await getDocs(collection(db, "schedules"));
+                const querySnapshot = await getDocs(collection(db, "planning"));
                 const schedules = querySnapshot.docs.map(doc => doc.data());
-                const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
+                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
 
                 scheduleList.innerHTML = '';
                 if (employeeSchedules.length > 0) {
-                    employeeSchedules.forEach(schedule => {
+                    for (const schedule of employeeSchedules) {
+                        const projectDoc = await getDoc(doc(db, 'projects', schedule.project));
+                        const project = projectDoc.data();
+
                         const div = document.createElement('div');
                         div.innerHTML = `
-                            <p><strong>Projekt:</strong> ${schedule.projectId}</p>
+                            <p><strong>Kundadress:</strong> ${project.address}</p>
                             <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
                             <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
                         `;
                         scheduleList.appendChild(div);
-                    });
+                    }
                 } else {
                     scheduleList.textContent = 'Inga scheman hittades för denna anställd.';
                 }
