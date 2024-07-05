@@ -53,17 +53,27 @@ select, button {
     box-sizing: border-box;
 }
 
-#schedule-list {
+#gantt-chart {
     margin-top: 20px;
+    overflow-x: auto;
 }
 
-#schedule-list div {
-    background-color: #e0e0e0;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
+.gantt-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-hr {
+.gantt-table th, .gantt-table td {
     border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.gantt-table th {
+    background-color: #f4f4f4;
+}
+
+.gantt-table td {
+    height: 50px;
+    white-space: nowrap;
 }
