@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logga in</title>
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="login.js"></script>
 </head>
 <body>
     <div class="container">
@@ -15,15 +13,18 @@
             <input type="email" id="login-email" placeholder="E-post" required>
             <input type="password" id="login-password" placeholder="Lösenord" required>
             <button type="submit">Logga in</button>
+            <div id="login-error-message"></div>
         </form>
-        <div id="login-error-message"></div>
-        <h2>Registrera dig</h2>
+
+        <h1>Registrera</h1>
         <form id="register-form">
             <input type="email" id="register-email" placeholder="E-post" required>
             <input type="password" id="register-password" placeholder="Lösenord" required>
             <button type="submit">Registrera</button>
+            <div id="register-error-message"></div>
         </form>
-        <div id="register-error-message"></div>
     </div>
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="login.js"></script>
 </body>
 </html>
