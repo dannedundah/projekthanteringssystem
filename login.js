@@ -2,20 +2,21 @@ import { auth, signInWithEmailAndPassword } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        const email = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            console.log('User signed in:', userCredential.user);
-            // Redirect to the main page
-            window.location.href = 'projekthantering.html';
+            await signInWithEmailAndPassword(auth, email, password);
+            localStorage.setItem('loggedIn', 'true');
+            window.location.href = 'index.html';
         } catch (error) {
-            console.error('Error signing in:', error);
-            alert('Error signing in: ' + error.message);
+            console.error('Error logging in:', error);
+            errorMessage.textContent = 'Fel användarnamn eller lösenord';
         }
     });
 });
