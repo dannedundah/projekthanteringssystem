@@ -1,16 +1,17 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('view-schedule-form');
+    const viewScheduleForm = document.getElementById('view-schedule-form');
     const scheduleList = document.getElementById('schedule-list');
+    const employeeDropdown = document.getElementById('employee-name');
 
-    form.addEventListener('submit', async (e) => {
+    viewScheduleForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const employeeName = document.getElementById('employee-name').value;
+        const employeeName = employeeDropdown.value.trim();
 
-        if (employeeName) {
+        if (employeeName !== '') {
             try {
-                const querySnapshot = await getDocs(collection(db, 'schedules'));
+                const querySnapshot = await getDocs(collection(db, "schedules"));
                 const schedules = querySnapshot.docs.map(doc => doc.data());
                 const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
 
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     employeeSchedules.forEach(schedule => {
                         const div = document.createElement('div');
                         div.innerHTML = `
-                            <p><strong>Kundadress:</strong> ${schedule.address}</p>
+                            <p><strong>Kundadress:</strong> ${schedule.projectAddress}</p>
                             <p><strong>Startdatum:</strong> ${schedule.startDate}</p>
                             <p><strong>Slutdatum:</strong> ${schedule.endDate}</p>
                         `;
@@ -33,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-});
 
-function navigateTo(page) {
-    window.location.href = page;
-}
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
+});

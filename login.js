@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
 
         try {
             await signInWithEmailAndPassword(auth, email, password);

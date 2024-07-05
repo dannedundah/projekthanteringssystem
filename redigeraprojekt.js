@@ -2,53 +2,29 @@ import { db, collection, getDocs, doc, getDoc, updateDoc } from './firebase-conf
 
 document.addEventListener('DOMContentLoaded', async () => {
     const projectList = document.getElementById('project-list');
-    const projectListContainer = document.getElementById('edit-project-section');
-    const editProjectContainer = document.createElement('div');
-    editProjectContainer.style.display = 'none';
-    editProjectContainer.innerHTML = `
-        <h2>Redigera Projekt</h2>
-        <form id="edit-project-form">
-            <input type="text" id="project-input" placeholder="Projektets namn" required>
-            <input type="text" id="customer-name" placeholder="Kundnamn" required>
-            <input type="text" id="customer-phone" placeholder="Telefonnummer" required>
-            <input type="text" id="project-address" placeholder="Adress" required>
-            <textarea id="project-description" placeholder="Projektbeskrivning" required></textarea>
-            <select id="project-status" required>
-                <option value="Ny">Ny</option>
-                <option value="Planerad">Planerad</option>
-                <option value="Solceller klart">Solceller klart</option>
-                <option value="Elektriker klar">Elektriker klar</option>
-                <option value="Drifsatt">Drifsatt</option>
-            </select>
-            <button type="submit">Uppdatera projekt</button>
-        </form>
-    `;
-    document.body.appendChild(editProjectContainer);
+    const projectListContainer = document.getElementById('project-list-container');
+    const editProjectContainer = document.getElementById('edit-project-container');
+    const editProjectForm = document.getElementById('edit-project-form');
 
     let currentProjectId = null;
 
-    try {
-        const querySnapshot = await getDocs(collection(db, "projects"));
-        const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const fetchProjects = async () => {
+        projectList.innerHTML = '';
+        try {
+            const querySnapshot = await getDocs(collection(db, 'projects'));
+            const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            projects.forEach(project => {
+                const li = document.createElement('li');
+                li.textContent = `${project.name} - ${project.customerName}`;
+                li.addEventListener('click', () => editProject(project.id));
+                projectList.appendChild(li);
+            });
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    };
 
-        projects.forEach(project => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <strong>Projekt:</strong> ${project.name} <br>
-                <strong>Kund:</strong> ${project.customerName} <br>
-                <strong>Telefon:</strong> ${project.customerPhone} <br>
-                <strong>Adress:</strong> ${project.address} <br>
-                <strong>Beskrivning:</strong> ${project.description} <br>
-                <strong>Status:</strong> ${project.status} <br>
-                <button onclick="editProject('${project.id}')">Redigera</button>
-            `;
-            projectList.appendChild(li);
-        });
-    } catch (error) {
-        console.error('Error fetching projects:', error);
-    }
-
-    window.editProject = async (projectId) => {
+    const editProject = async (projectId) => {
         currentProjectId = projectId;
         try {
             const projectRef = doc(db, 'projects', projectId);
@@ -72,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
+    editProjectForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         if (currentProjectId) {
@@ -95,4 +71,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     });
+
+    fetchProjects();
 });
