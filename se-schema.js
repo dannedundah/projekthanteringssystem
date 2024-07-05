@@ -5,40 +5,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const ganttChart = document.getElementById('gantt-chart');
     const employeeDropdown = document.getElementById('employee-name');
 
-    // Render initial Gantt chart with all schedules
-    fetchAndRenderSchedules();
-
     viewScheduleForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const employeeName = employeeDropdown.value.trim();
-        fetchAndRenderSchedules(employeeName);
+
+        if (employeeName !== '') {
+            try {
+                const querySnapshot = await getDocs(collection(db, "schedules"));
+                const schedules = querySnapshot.docs.map(doc => doc.data());
+                const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
+
+                ganttChart.innerHTML = '';
+                if (employeeSchedules.length > 0) {
+                    renderGanttChart(employeeSchedules);
+                } else {
+                    ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
+                }
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+            }
+        } else {
+            try {
+                const querySnapshot = await getDocs(collection(db, "schedules"));
+                const schedules = querySnapshot.docs.map(doc => doc.data());
+
+                ganttChart.innerHTML = '';
+                if (schedules.length > 0) {
+                    renderGanttChart(schedules);
+                } else {
+                    ganttChart.textContent = 'Inga scheman hittades.';
+                }
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+            }
+        }
     });
 
-    async function fetchAndRenderSchedules(employeeName = '') {
-        try {
-            const querySnapshot = await getDocs(collection(db, "schedules"));
-            const schedules = querySnapshot.docs.map(doc => doc.data());
-            const filteredSchedules = employeeName ? schedules.filter(schedule => schedule.name === employeeName) : schedules;
-            renderGanttChart(filteredSchedules);
-        } catch (error) {
-            console.error('Error fetching schedules:', error);
-        }
-    }
-
     function renderGanttChart(schedules) {
-        ganttChart.innerHTML = '';
-
-        if (schedules.length === 0) {
-            ganttChart.textContent = 'Inga scheman hittades.';
-            return;
-        }
-
         const table = document.createElement('table');
-        table.className = 'gantt-table';
+        table.classList.add('gantt-table');
 
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = `
-            <th>Anställd</th>
             <th>Projekt</th>
             <th>Startdatum</th>
             <th>Slutdatum</th>
@@ -48,8 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schedules.forEach(schedule => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${schedule.name}</td>
-                <td>${schedule.project}</td>
+                <td>${schedule.projectAddress}</td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
@@ -58,4 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ganttChart.appendChild(table);
     }
+
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
 });
