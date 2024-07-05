@@ -1,46 +1,44 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, doc, updateDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectSelect = document.getElementById('project-select');
+    const projectDropdown = document.getElementById('project');
+    const employeeDropdowns = document.querySelectorAll('.employee-dropdown');
+    const planningForm = document.getElementById('planning-form');
 
+    // Fetch projects
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
         const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log('Projects:', projects);
-
+        
         projects.forEach(project => {
             const option = document.createElement('option');
             option.value = project.id;
             option.textContent = project.name;
-            projectSelect.appendChild(option);
+            projectDropdown.appendChild(option);
         });
     } catch (error) {
         console.error('Error fetching projects:', error);
     }
-});
 
-document.getElementById('planning-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+    // Add planning
+    planningForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    const project = document.getElementById('project-select').value;
-    const employee1 = document.getElementById('employee-select-1').value;
-    const employee2 = document.getElementById('employee-select-2').value;
-    const employee3 = document.getElementById('employee-select-3').value;
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
+        const selectedProjectId = projectDropdown.value;
+        const selectedEmployees = Array.from(employeeDropdowns).map(dropdown => dropdown.value);
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
 
-    try {
-        const planning = {
-            project,
-            employees: [employee1, employee2, employee3],
-            startDate,
-            endDate
-        };
-
-        await addDoc(collection(db, 'planning'), planning);
-        alert('Planering tillagd!');
-        window.location.reload();
-    } catch (error) {
-        console.error('Error adding planning:', error);
-    }
+        try {
+            await addDoc(collection(db, 'planning'), {
+                projectId: selectedProjectId,
+                employees: selectedEmployees,
+                startDate,
+                endDate
+            });
+            alert('Planning added successfully!');
+        } catch (error) {
+            console.error('Error adding planning:', error);
+        }
+    });
 });
