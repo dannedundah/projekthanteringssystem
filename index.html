@@ -11,15 +11,10 @@
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
-        <button onclick="navigateTo('läggatillprojekt.html')">Lägg till nytt projekt</button>
-        <button onclick="navigateTo('planering.html')">Planering</button>
-        <button onclick="navigateTo('se-schema.html')">Se mitt schema</button>
-        <button onclick="navigateTo('status.html')">Status</button>
+        <button id="add-project-btn">Lägg till nytt projekt</button>
+        <button id="planning-btn">Planering</button>
+        <button id="view-schedule-btn">Se mitt schema</button>
+        <button id="status-btn">Status</button>
     </div>
-    <script>
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-    </script>
 </body>
 </html>
