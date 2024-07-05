@@ -1,21 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    const errorMessage = document.getElementById('error-message');
+import { auth, signInWithEmailAndPassword } from './firebase-config.js';
 
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+const loginForm = document.getElementById('login-form');
 
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-        const validUsername = 'delidel';
-        const validPassword = 'energilagring';
+    const email = loginForm['email'].value;
+    const password = loginForm['password'].value;
 
-        if (username === validUsername && password === validPassword) {
-            localStorage.setItem('loggedIn', 'true');
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            console.log('Logged in:', userCredential.user);
             window.location.href = 'index.html';
-        } else {
-            errorMessage.textContent = 'Fel användarnamn eller lösenord';
-        }
-    });
+        })
+        .catch((error) => {
+            console.error('Error logging in:', error);
+            alert('Fel e-post eller lösenord.');
+        });
 });
