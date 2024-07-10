@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             localStorage.setItem('loggedIn', 'true');
-            window.location.href = 'projekthantering.html';
+            window.location.href = 'index.html'; // Omdirigera till startsidan
         } catch (error) {
             console.error('Error logging in:', error);
             errorMessage.textContent = 'Fel användarnamn eller lösenord';

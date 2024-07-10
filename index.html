@@ -17,7 +17,27 @@
             <button type="submit">Logga in</button>
             <div id="error-message"></div>
         </form>
-        <button id="logout-btn">Logga ut</button>
+        <div id="navigation" style="display: none;">
+            <button id="add-project-btn">Lägg till nytt projekt</button>
+            <button id="planning-btn">Planering</button>
+            <button id="view-schedule-btn">Se mitt schema</button>
+            <button id="status-btn">Status</button>
+            <button id="logout-btn">Logga ut</button>
+        </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedIn = localStorage.getItem('loggedIn') === 'true';
+            document.getElementById('login-form').style.display = loggedIn ? 'none' : 'block';
+            document.getElementById('navigation').style.display = loggedIn ? 'block' : 'none';
+
+            if (loggedIn) {
+                document.getElementById('add-project-btn').addEventListener('click', () => navigateTo('läggatillprojekt.html'));
+                document.getElementById('planning-btn').addEventListener('click', () => navigateTo('planering.html'));
+                document.getElementById('view-schedule-btn').addEventListener('click', () => navigateTo('se-schema.html'));
+                document.getElementById('status-btn').addEventListener('click', () => navigateTo('status.html'));
+            }
+        });
+    </script>
 </body>
 </html>
