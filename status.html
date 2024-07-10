@@ -24,6 +24,12 @@
             <h3 onclick="toggleCategory('billed-projects')">Fakturerad</h3>
             <ul id="billed-projects" class="category-list"></ul>
         </div>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
