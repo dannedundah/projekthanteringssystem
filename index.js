@@ -16,11 +16,27 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('add-project-btn').addEventListener('click', () => navigateTo('läggatillprojekt.html'));
-    document.getElementById('planning-btn').addEventListener('click', () => navigateTo('planering.html'));
-    document.getElementById('view-schedule-btn').addEventListener('click', () => navigateTo('se-schema.html'));
-    document.getElementById('status-btn').addEventListener('click', () => navigateTo('status.html'));
-    document.getElementById('planning-total-btn').addEventListener('click', () => navigateTo('planeringtotal.html'));
+    const addProjectBtn = document.getElementById('add-project-btn');
+    const planningBtn = document.getElementById('planning-btn');
+    const viewScheduleBtn = document.getElementById('view-schedule-btn');
+    const statusBtn = document.getElementById('status-btn');
+    const planningTotalBtn = document.getElementById('planning-total-btn');
+
+    if (addProjectBtn) {
+        addProjectBtn.addEventListener('click', () => navigateTo('läggatillprojekt.html'));
+    }
+    if (planningBtn) {
+        planningBtn.addEventListener('click', () => navigateTo('planering.html'));
+    }
+    if (viewScheduleBtn) {
+        viewScheduleBtn.addEventListener('click', () => navigateTo('se-schema.html'));
+    }
+    if (statusBtn) {
+        statusBtn.addEventListener('click', () => navigateTo('status.html'));
+    }
+    if (planningTotalBtn) {
+        planningTotalBtn.addEventListener('click', () => navigateTo('planeringtotal.html'));
+    }
 
     // Auth state observer
     onAuthStateChanged(auth, (user) => {
