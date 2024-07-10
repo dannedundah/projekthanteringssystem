@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleBtn = document.getElementById('view-schedule-btn');
     const statusBtn = document.getElementById('status-btn');
     const planningTotalBtn = document.getElementById('planning-total-btn');
+    const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
         addProjectBtn.addEventListener('click', () => navigateTo('läggatillprojekt.html'));
@@ -37,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (planningTotalBtn) {
         planningTotalBtn.addEventListener('click', () => navigateTo('planeringtotal.html'));
     }
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
 
     // Auth state observer
     onAuthStateChanged(auth, (user) => {
@@ -51,4 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function navigateTo(page) {
     window.location.href = page;
+}
+
+async function logout() {
+    try {
+        await signOut(auth);
+        alert('Du har loggats ut.');
+        navigateTo('login.html'); // Redirect to login page after logout
+    } catch (error) {
+        console.error('Error logging out:', error);
+        alert('Ett fel uppstod vid utloggning.');
+    }
 }
