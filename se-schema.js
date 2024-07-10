@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schedules.forEach(schedule => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${schedule.projectAddress}</td>
+                <td><a href="projekt-detalj.html?id=${schedule.project}">${schedule.projectAddress}</a></td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
