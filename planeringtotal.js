@@ -6,11 +6,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
         const planningData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
+
         planningList.innerHTML = ''; // Clear any existing content
-        planningData.forEach(plan => {
+        planningData.forEach(async (plan) => {
+            const projectRef = doc(db, 'projects', plan.project);
+            const projectSnap = await getDoc(projectRef);
+            const projectData = projectSnap.exists() ? projectSnap.data() : { address: 'Ej specificerad' };
+            const projectAddress = projectData.address || 'Ej specificerad';
+            
             const li = document.createElement('li');
-            const projectAddress = plan.projectAddress ? plan.projectAddress : 'Ej specificerad';
             li.innerHTML = `
                 <strong>Adress:</strong> ${projectAddress} <br>
                 <strong>Startdatum:</strong> ${plan.startDate} <br>
