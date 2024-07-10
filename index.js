@@ -1,37 +1,36 @@
-import { auth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from './firebase-config.js';
+import { auth, signInWithEmailAndPassword } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const googleLoginBtn = document.getElementById('google-login-btn');
-    const mainContent = document.getElementById('main-content');
+    const loginForm = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
 
-    googleLoginBtn.addEventListener('click', async () => {
-        const provider = new GoogleAuthProvider();
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
         try {
-            await signInWithPopup(auth, provider);
+            await signInWithEmailAndPassword(auth, email, password);
+            localStorage.setItem('loggedIn', 'true');
+            window.location.href = 'projekthantering.html';
         } catch (error) {
-            console.error('Error logging in with Google:', error);
+            console.error('Error logging in:', error);
+            errorMessage.textContent = 'Fel användarnamn eller lösenord';
         }
     });
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            googleLoginBtn.style.display = 'none';
-            mainContent.style.display = 'block';
-            setupMainButtons();
-        } else {
-            googleLoginBtn.style.display = 'block';
-            mainContent.style.display = 'none';
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        try {
+            await auth.signOut();
+            localStorage.removeItem('loggedIn');
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Error logging out:', error);
         }
     });
 });
 
-function setupMainButtons() {
-    document.getElementById('add-project-btn').addEventListener('click', () => navigateTo('läggatillprojekt.html'));
-    document.getElementById('planning-btn').addEventListener('click', () => navigateTo('planering.html'));
-    document.getElementById('view-schedule-btn').addEventListener('click', () => navigateTo('se-schema.html'));
-    document.getElementById('status-btn').addEventListener('click', () => navigateTo('status.html'));
-}
-
-function navigateTo(page) {
+window.navigateTo = (page) => {
     window.location.href = page;
-}
+};
