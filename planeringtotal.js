@@ -8,9 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    let planningData = [];
+
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        const planningData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        planningData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         ganttTableBody.innerHTML = ''; // Clear any existing content
 
@@ -19,10 +21,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const projectSnap = await getDoc(projectRef);
             const projectData = projectSnap.exists() ? projectSnap.data() : { address: 'Ej specificerad' };
             const projectAddress = projectData.address || 'Ej specificerad';
-            
+
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${projectAddress}</td>
+                <td><a href="projekt-detalj.html?id=${plan.project}">${projectAddress}</a></td>
                 <td>${plan.startDate}</td>
                 <td>${plan.endDate}</td>
             `;
@@ -31,4 +33,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error fetching plannings:', error);
     }
+
+    window.searchProjects = () => {
+        const input = document.getElementById('search-input').value.toLowerCase();
+        const filteredPlanningData = planningData.filter(plan => plan.address.toLowerCase().includes(input));
+        ganttTableBody.innerHTML = '';
+
+        filteredPlanningData.forEach(plan => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><a href="projekt-detalj.html?id=${plan.project}">${plan.address}</td>
+                <td>${plan.startDate}</td>
+                <td>${plan.endDate}</td>
+            `;
+            ganttTableBody.appendChild(row);
+        });
+    };
+
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
 });
