@@ -3,6 +3,11 @@ import { db, collection, getDocs } from './firebase-config.js';
 document.addEventListener('DOMContentLoaded', async () => {
     const planningTotalContainer = document.getElementById('planning-total-container');
 
+    if (!planningTotalContainer) {
+        console.error('Element with ID planning-total-container not found.');
+        return;
+    }
+
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
         const plannings = querySnapshot.docs.map(doc => doc.data());
@@ -41,4 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         planningTotalContainer.appendChild(table);
     }
+
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
 });
