@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleForm = document.getElementById('view-schedule-form');
@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (employeeName !== '') {
                 const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
                 if (employeeSchedules.length > 0) {
-                    renderGanttChart(employeeSchedules);
+                    await renderGanttChart(employeeSchedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
                 }
             } else {
                 if (schedules.length > 0) {
-                    renderGanttChart(schedules);
+                    await renderGanttChart(schedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades.';
                 }
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function renderGanttChart(schedules) {
+    async function renderGanttChart(schedules) {
         const table = document.createElement('table');
         table.classList.add('gantt-table');
 
@@ -45,15 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         table.appendChild(headerRow);
 
-        schedules.forEach(schedule => {
+        for (const schedule of schedules) {
+            const projectRef = doc(db, 'projects', schedule.project);
+            const projectSnap = await getDoc(projectRef);
+            const project = projectSnap.data();
+
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${schedule.project}">${schedule.project}</a></td>
+                <td><a href="projekt-detalj.html?id=${schedule.project}">${project.address}</a></td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
             table.appendChild(row);
-        });
+        }
 
         ganttChart.appendChild(table);
     }
