@@ -3,6 +3,11 @@ import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 document.addEventListener('DOMContentLoaded', async () => {
     const ganttTableBody = document.getElementById('gantt-table-body');
 
+    if (!ganttTableBody) {
+        console.error('Element with ID gantt-table-body not found.');
+        return;
+    }
+
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
         const planningData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
