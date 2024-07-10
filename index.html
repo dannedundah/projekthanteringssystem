@@ -11,33 +11,11 @@
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
-        <form id="login-form">
-            <input type="email" id="login-email" placeholder="E-post" required>
-            <input type="password" id="login-password" placeholder="Lösenord" required>
-            <button type="submit">Logga in</button>
-            <div id="error-message"></div>
-        </form>
-        <div id="navigation" style="display: none;">
-            <button id="add-project-btn">Lägg till nytt projekt</button>
-            <button id="planning-btn">Planering</button>
-            <button id="view-schedule-btn">Se mitt schema</button>
-            <button id="status-btn">Status</button>
-            <button id="logout-btn">Logga ut</button>
-        </div>
+        <button id="add-project-btn">Lägg till nytt projekt</button>
+        <button id="planning-btn">Planering</button>
+        <button id="view-schedule-btn">Se mitt schema</button>
+        <button id="status-btn">Status</button>
+        <button id="planning-total-btn">Planering Total</button>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loggedIn = localStorage.getItem('loggedIn') === 'true';
-            document.getElementById('login-form').style.display = loggedIn ? 'none' : 'block';
-            document.getElementById('navigation').style.display = loggedIn ? 'block' : 'none';
-
-            if (loggedIn) {
-                document.getElementById('add-project-btn').addEventListener('click', () => navigateTo('läggatillprojekt.html'));
-                document.getElementById('planning-btn').addEventListener('click', () => navigateTo('planering.html'));
-                document.getElementById('view-schedule-btn').addEventListener('click', () => navigateTo('se-schema.html'));
-                document.getElementById('status-btn').addEventListener('click', () => navigateTo('status.html'));
-            }
-        });
-    </script>
 </body>
 </html>

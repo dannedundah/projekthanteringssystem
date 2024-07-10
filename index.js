@@ -1,36 +1,38 @@
-import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYqBOra2wDjyPweyBGnkVMANsvLOx9pps",
+  authDomain: "projekthanteringsystem.firebaseapp.com",
+  projectId: "projekthanteringsystem",
+  storageBucket: "projekthanteringsystem.appspot.com",
+  messagingSenderId: "87207954816",
+  appId: "1:87207954816:web:167659270c0d6eee901965",
+  measurementId: "G-8HMD30CFYS"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    const errorMessage = document.getElementById('error-message');
+    document.getElementById('add-project-btn').addEventListener('click', () => navigateTo('läggatillprojekt.html'));
+    document.getElementById('planning-btn').addEventListener('click', () => navigateTo('planering.html'));
+    document.getElementById('view-schedule-btn').addEventListener('click', () => navigateTo('se-schema.html'));
+    document.getElementById('status-btn').addEventListener('click', () => navigateTo('status.html'));
+    document.getElementById('planning-total-btn').addEventListener('click', () => navigateTo('planeringtotal.html'));
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            localStorage.setItem('loggedIn', 'true');
-            window.location.href = 'index.html'; // Omdirigera till startsidan
-        } catch (error) {
-            console.error('Error logging in:', error);
-            errorMessage.textContent = 'Fel användarnamn eller lösenord';
-        }
-    });
-
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        try {
-            await auth.signOut();
-            localStorage.removeItem('loggedIn');
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Error logging out:', error);
+    // Auth state observer
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log('User is signed in:', user);
+        } else {
+            console.log('No user is signed in.');
+            window.location.href = 'login.html';
         }
     });
 });
 
-window.navigateTo = (page) => {
+function navigateTo(page) {
     window.location.href = page;
-};
+}
