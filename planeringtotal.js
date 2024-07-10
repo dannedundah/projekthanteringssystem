@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const planningList = document.getElementById('planning-list');
