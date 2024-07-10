@@ -1,4 +1,4 @@
-import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+import { auth, signInWithPopup, GoogleAuthProvider } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
@@ -7,15 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
+        // Här kan du använda popup-metoden istället för e-post och lösenord
+        const provider = new GoogleAuthProvider();
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const result = await signInWithPopup(auth, provider);
+            // Inloggning lyckades
+            const user = result.user;
+            console.log('User signed in:', user);
             localStorage.setItem('loggedIn', 'true');
             window.location.href = 'index.html';
         } catch (error) {
-            console.error('Error logging in:', error);
+            console.error('Error signing in:', error);
             errorMessage.textContent = 'Fel användarnamn eller lösenord';
         }
     });
