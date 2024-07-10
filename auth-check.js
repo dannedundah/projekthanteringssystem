@@ -1,8 +1,11 @@
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-const auth = getAuth();
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = 'login.html';
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // User is not logged in, redirect to login page
+            window.location.href = 'login.html';
+        }
+    });
 });
