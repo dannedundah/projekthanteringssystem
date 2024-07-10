@@ -1,28 +1,44 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const planningList = document.getElementById('planning-list');
+    const planningTotalContainer = document.getElementById('planning-total-container');
 
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
         const plannings = querySnapshot.docs.map(doc => doc.data());
-        
-        planningList.innerHTML = '';
-        plannings.forEach(planning => {
-            const div = document.createElement('div');
-            div.classList.add('planning-item');
-            div.innerHTML = `
-                <p><strong>Adress:</strong> ${planning.projectAddress}</p>
-                <p><strong>Startdatum:</strong> ${planning.startDate}</p>
-                <p><strong>Slutdatum:</strong> ${planning.endDate}</p>
-            `;
-            planningList.appendChild(div);
-        });
+
+        planningTotalContainer.innerHTML = '';
+        if (plannings.length > 0) {
+            renderPlanningTotal(plannings);
+        } else {
+            planningTotalContainer.textContent = 'Inga planeringar hittades.';
+        }
     } catch (error) {
         console.error('Error fetching plannings:', error);
     }
-});
 
-function navigateTo(page) {
-    window.location.href = page;
-}
+    function renderPlanningTotal(plannings) {
+        const table = document.createElement('table');
+        table.classList.add('gantt-table');
+
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+            <th>Adress</th>
+            <th>Startdatum</th>
+            <th>Slutdatum</th>
+        `;
+        table.appendChild(headerRow);
+
+        plannings.forEach(planning => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${planning.projectAddress || 'Ej specificerad'}</td>
+                <td>${planning.startDate}</td>
+                <td>${planning.endDate}</td>
+            `;
+            table.appendChild(row);
+        });
+
+        planningTotalContainer.appendChild(table);
+    }
+});
