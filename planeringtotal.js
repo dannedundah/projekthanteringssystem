@@ -1,53 +1,24 @@
 import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const planningTotalContainer = document.getElementById('planning-total-container');
-
-    if (!planningTotalContainer) {
-        console.error('Element with ID planning-total-container not found.');
-        return;
-    }
+    const planningList = document.getElementById('planning-list');
 
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        const plannings = querySnapshot.docs.map(doc => doc.data());
-
-        planningTotalContainer.innerHTML = '';
-        if (plannings.length > 0) {
-            renderPlanningTotal(plannings);
-        } else {
-            planningTotalContainer.textContent = 'Inga planeringar hittades.';
-        }
+        const planningData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        planningList.innerHTML = ''; // Clear any existing content
+        planningData.forEach(plan => {
+            const li = document.createElement('li');
+            const projectAddress = plan.projectAddress ? plan.projectAddress : 'Ej specificerad';
+            li.innerHTML = `
+                <strong>Adress:</strong> ${projectAddress} <br>
+                <strong>Startdatum:</strong> ${plan.startDate} <br>
+                <strong>Slutdatum:</strong> ${plan.endDate} <br>
+            `;
+            planningList.appendChild(li);
+        });
     } catch (error) {
         console.error('Error fetching plannings:', error);
     }
-
-    function renderPlanningTotal(plannings) {
-        const table = document.createElement('table');
-        table.classList.add('gantt-table');
-
-        const headerRow = document.createElement('tr');
-        headerRow.innerHTML = `
-            <th>Adress</th>
-            <th>Startdatum</th>
-            <th>Slutdatum</th>
-        `;
-        table.appendChild(headerRow);
-
-        plannings.forEach(planning => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${planning.projectAddress || 'Ej specificerad'}</td>
-                <td>${planning.startDate}</td>
-                <td>${planning.endDate}</td>
-            `;
-            table.appendChild(row);
-        });
-
-        planningTotalContainer.appendChild(table);
-    }
-
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
 });
