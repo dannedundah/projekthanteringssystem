@@ -6,13 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log('User registered:', userCredential.user);
-            // Redirect to the main page or a login page
+            await createUserWithEmailAndPassword(auth, email, password);
             window.location.href = 'login.html';
         } catch (error) {
             console.error('Error registering:', error);
