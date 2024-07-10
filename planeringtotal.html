@@ -12,7 +12,16 @@
     <div class="container">
         <h1>Planering Total</h1>
         <div id="planning-total-container">
-            <ul id="planning-list"></ul>
+            <table id="gantt-table" class="gantt-table">
+                <thead>
+                    <tr>
+                        <th>Projekt</th>
+                        <th>Startdatum</th>
+                        <th>Slutdatum</th>
+                    </tr>
+                </thead>
+                <tbody id="gantt-table-body"></tbody>
+            </table>
         </div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
