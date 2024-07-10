@@ -10,9 +10,12 @@
     <div class="container">
         <h1>Logga in</h1>
         <form id="login-form">
-            <button type="submit">Logga in med Google</button>
+            <input type="email" id="login-email" placeholder="E-post" required>
+            <input type="password" id="login-password" placeholder="Lösenord" required>
+            <button type="submit">Logga in</button>
             <div id="error-message"></div>
         </form>
+        <p>Har du inget konto? <a href="register.html">Registrera dig här</a></p>
     </div>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="login.js"></script>

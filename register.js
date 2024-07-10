@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await createUserWithEmailAndPassword(auth, email, password);
+            alert('Registrering lyckades!');
             window.location.href = 'login.html';
         } catch (error) {
             console.error('Error registering:', error);
