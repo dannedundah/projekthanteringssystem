@@ -29,12 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (project && startDate && endDate) {
             try {
-                await addDoc(collection(db, 'schedules'), {
+                await addDoc(collection(db, 'planning'), {
                     project,
                     employees: [employee1, employee2, employee3],
                     startDate,
-                    endDate,
-                    projectAddress: projectSelect.options[projectSelect.selectedIndex].text // Assuming the project name is the address
+                    endDate
                 });
                 alert('Planering tillagd');
                 planningForm.reset();
