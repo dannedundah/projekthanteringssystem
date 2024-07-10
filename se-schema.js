@@ -9,35 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const employeeName = employeeDropdown.value.trim();
 
-        if (employeeName !== '') {
-            try {
-                const querySnapshot = await getDocs(collection(db, "schedules"));
-                const schedules = querySnapshot.docs.map(doc => doc.data());
-                const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
+        try {
+            const querySnapshot = await getDocs(collection(db, "planning"));
+            const schedules = querySnapshot.docs.map(doc => doc.data());
 
-                ganttChart.innerHTML = '';
+            ganttChart.innerHTML = '';
+            if (employeeName !== '') {
+                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
                 if (employeeSchedules.length > 0) {
                     renderGanttChart(employeeSchedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
                 }
-            } catch (error) {
-                console.error('Error fetching schedules:', error);
-            }
-        } else {
-            try {
-                const querySnapshot = await getDocs(collection(db, "schedules"));
-                const schedules = querySnapshot.docs.map(doc => doc.data());
-
-                ganttChart.innerHTML = '';
+            } else {
                 if (schedules.length > 0) {
                     renderGanttChart(schedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades.';
                 }
-            } catch (error) {
-                console.error('Error fetching schedules:', error);
             }
+        } catch (error) {
+            console.error('Error fetching schedules:', error);
         }
     });
 
