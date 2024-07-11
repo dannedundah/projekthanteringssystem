@@ -26,14 +26,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const employee3 = document.getElementById('employee-select-3').value;
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
+        const electricianDate = document.getElementById('electrician-date').value;
 
-        if (project && startDate && endDate) {
+        if (project && startDate && endDate && electricianDate) {
             try {
                 await addDoc(collection(db, 'planning'), {
                     project,
                     employees: [employee1, employee2, employee3],
                     startDate,
-                    endDate
+                    endDate,
+                    electricianDate
                 });
                 alert('Planering tillagd');
                 planningForm.reset();
