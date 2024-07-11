@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleBtn = document.getElementById('view-schedule-btn');
     const statusBtn = document.getElementById('status-btn');
     const planningTotalBtn = document.getElementById('planning-total-btn');
+    const timeReportingBtn = document.getElementById('time-reporting-btn'); // New button
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -37,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (planningTotalBtn) {
         planningTotalBtn.addEventListener('click', () => navigateTo('planeringtotal.html'));
+    }
+    if (timeReportingBtn) {
+        timeReportingBtn.addEventListener('click', () => navigateTo('tidrapportering.html')); // New event listener
     }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
