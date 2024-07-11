@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const employee1 = document.getElementById('employee-select-1').value;
         const employee2 = document.getElementById('employee-select-2').value;
         const employee3 = document.getElementById('employee-select-3').value;
+        const employee4 = document.getElementById('employee-select-4').value;
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
         const electricianDate = document.getElementById('electrician-date').value || null;
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 await addDoc(collection(db, 'planning'), {
                     project,
-                    employees: [employee1, employee2, employee3].filter(Boolean), // Remove empty values
+                    employees: [employee1, employee2, employee3, employee4].filter(Boolean), // Remove empty values
                     startDate,
                     endDate,
                     electricianDate

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const querySnapshot = await getDocs(collection(db, "planning"));
-            const schedules = querySnapshot.docs.map(doc => doc.data());
+            const schedules = querySnapshot.docs.map(doc => doc.data()).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
             ganttChart.innerHTML = '';
             if (employeeName !== '') {
