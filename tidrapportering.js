@@ -42,71 +42,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const hours = document.getElementById('hours').value;
             const date = document.getElementById('date').value;
 
-            const timeReport =To push your updated code to GitHub and ensure the necessary functionalities, including exporting timesheets to Excel, follow the steps below. This includes integrating the Excel export feature and ensuring everything is ready for deployment.
+            const timeReport = {
+                projectId: selectedProjectId,
+                employee,
+                timeType,
+                hours: parseFloat(hours),
+                date,
+            };
 
-### Step 1: Update Your Code
+            try {
+                await addDoc(collection(db, 'timeReports'), timeReport);
+                alert('Tidrapporten har sparats!');
+                timeReportForm.reset();
+                selectedProjectId = null;
+            } catch (error) {
+                console.error('Error adding time report:', error);
+                alert('Ett fel uppstod vid sparandet av tidrapporten.');
+            }
+        } else {
+            alert('Vänligen välj ett projekt.');
+        }
+    });
 
-Ensure all your files are up-to-date and include the new functionality.
+    exportBtn.addEventListener('click', async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, 'timeReports'));
+            const reports = querySnapshot.docs.map(doc => doc.data());
 
-### Full `tidrapportering.html` File
+            const ws_data = [
+                ["Projekt ID", "Anställd", "Typ av tid", "Antal timmar", "Datum"]
+            ];
 
-Add the `xlsx` library and the export button to the HTML file.
+            reports.forEach(report => {
+                ws_data.push([report.projectId, report.employee, report.timeType, report.hours, report.date]);
+            });
 
-```html
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tidrapportering</title>
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="tidrapportering.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Tidrapportering</h1>
-        <form id="time-report-form">
-            <label for="employee-select">Anställd:</label>
-            <select id="employee-select" required>
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Daniel">Daniel</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Tidrapporter");
 
-            <label for="project-search">Sök projekt:</label>
-            <input type="text" id="project-search" placeholder="Sök projekt">
-            <div id="search-results"></div>
+            XLSX.writeFile(wb, "Tidrapporter.xlsx");
+        } catch (error) {
+            console.error('Error exporting time reports:', error);
+        }
+    });
 
-            <label for="time-type">Typ av tid:</label>
-            <select id="time-type" required>
-                <option value="Normal tid">Normal tid</option>
-                <option value="Sjuk">Sjuk</option>
-                <option value="Semester">Semester</option>
-                <option value="VAB">VAB</option>
-                <option value="Obetald tjänstledighet">Obetald tjänstledighet</option>
-                <option value="Permission">Permission</option>
-            </select>
-
-            <label for="hours">Antal timmar:</label>
-            <input type="number" id="hours" step="0.1" required>
-
-            <label for="date">Datum:</label>
-            <input type="date" id="date" required>
-
-            <button type="submit">Rapportera tid</button>
-        </form>
-        <button id="export-btn">Exportera till Excel</button>
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
-    </div>
-</body>
-</html>
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
+});
