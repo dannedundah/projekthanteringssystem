@@ -1,18 +1,23 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const ganttChart = document.getElementById('gantt-chart');
 
     try {
         const querySnapshot = await getDocs(collection(db, "planning"));
-        const plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const plannings = await Promise.all(querySnapshot.docs.map(async (doc) => {
+            const data = doc.data();
+            const projectDoc = await getDoc(doc(db, "projects", data.project));
+            const projectData = projectDoc.exists() ? projectDoc.data() : {};
+            return { id: doc.id, ...data, projectAddress: projectData.address || 'Ej specificerad' };
+        }));
 
         renderGanttChart(plannings);
 
         window.searchProjects = () => {
             const input = document.getElementById('search-input').value.toLowerCase();
             const filteredPlannings = plannings.filter(planning => 
-                planning.project.toLowerCase().includes(input)
+                planning.projectAddress.toLowerCase().includes(input)
             );
             renderGanttChart(filteredPlannings);
         };
@@ -38,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         plannings.forEach(planning => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projektdetalj.html?id=${planning.project}">${planning.project}</a></td>
+                <td><a href="projektdetalj.html?id=${planning.project}">${planning.projectAddress}</a></td>
                 <td>${planning.startDate}</td>
                 <td>${planning.endDate}</td>
                 <td>${planning.electricianDate || 'Ej specificerad'}</td>
