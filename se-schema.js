@@ -9,35 +9,30 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const employeeName = employeeDropdown.value.trim();
 
-        if (employeeName !== '') {
-            try {
-                const querySnapshot = await getDocs(collection(db, "schedules"));
-                const schedules = querySnapshot.docs.map(doc => doc.data());
-                const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
+        try {
+            const querySnapshot = await getDocs(collection(db, "planning"));
+            let schedules = querySnapshot.docs.map(doc => doc.data());
 
-                ganttChart.innerHTML = '';
+            // Sort schedules by start date in descending order
+            schedules = schedules.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+            ganttChart.innerHTML = '';
+            if (employeeName !== '') {
+                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
                 if (employeeSchedules.length > 0) {
-                    renderGanttChart(employeeSchedules.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
+                    renderGanttChart(employeeSchedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
                 }
-            } catch (error) {
-                console.error('Error fetching schedules:', error);
-            }
-        } else {
-            try {
-                const querySnapshot = await getDocs(collection(db, "schedules"));
-                const schedules = querySnapshot.docs.map(doc => doc.data());
-
-                ganttChart.innerHTML = '';
+            } else {
                 if (schedules.length > 0) {
-                    renderGanttChart(schedules.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
+                    renderGanttChart(schedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades.';
                 }
-            } catch (error) {
-                console.error('Error fetching schedules:', error);
             }
+        } catch (error) {
+            console.error('Error fetching schedules:', error);
         }
     });
 
@@ -56,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schedules.forEach(schedule => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projektdetalj.html?id=${schedule.projectId}">${schedule.projectAddress}</a></td>
+                <td><a href="projekt-detalj.html?id=${schedule.project}">${schedule.projectAddress}</a></td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
