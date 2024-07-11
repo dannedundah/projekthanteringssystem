@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         querySnapshot.forEach(doc => {
             const option = document.createElement('option');
             option.value = doc.id;
-            option.textContent = doc.data().name;
+            option.textContent = doc.data().address; // Use the address instead of the project name
             projectSelect.appendChild(option);
         });
     } catch (error) {
@@ -26,13 +26,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const employee3 = document.getElementById('employee-select-3').value;
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
-        const electricianDate = document.getElementById('electrician-date').value;
+        const electricianDate = document.getElementById('electrician-date').value || null;
 
-        if (project && startDate && endDate && electricianDate) {
+        if (project && startDate && endDate) {
             try {
                 await addDoc(collection(db, 'planning'), {
                     project,
-                    employees: [employee1, employee2, employee3],
+                    employees: [employee1, employee2, employee3].filter(Boolean), // Remove empty values
                     startDate,
                     endDate,
                     electricianDate
