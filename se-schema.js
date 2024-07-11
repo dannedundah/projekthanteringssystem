@@ -11,10 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const querySnapshot = await getDocs(collection(db, "planning"));
-            let schedules = querySnapshot.docs.map(doc => doc.data());
-
-            // Sort schedules by start date in ascending order
-            schedules = schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            const schedules = querySnapshot.docs.map(doc => doc.data());
 
             ganttChart.innerHTML = '';
             if (employeeName !== '') {
@@ -49,8 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
         table.appendChild(headerRow);
 
         for (const schedule of schedules) {
-            const projectDoc = await getDoc(doc(db, "projects", schedule.project));
+            const projectDoc = await getDoc(doc(db, 'projects', schedule.project));
             const projectData = projectDoc.data();
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><a href="projekt-detalj.html?id=${schedule.project}">${projectData.address}</a></td>
