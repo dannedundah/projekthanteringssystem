@@ -16,14 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const querySnapshot = await getDocs(query(collection(db, 'planning'), where('employees', 'array-contains', employeeSelect.value)));
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const filteredProjects = projects.filter(project => project.project.toLowerCase().includes(searchTerm));
+                const filteredProjects = projects.filter(project => project.projectAddress.toLowerCase().includes(searchTerm));
 
                 filteredProjects.forEach(project => {
                     const div = document.createElement('div');
-                    div.textContent = project.project;
+                    div.textContent = project.projectAddress;
                     div.addEventListener('click', () => {
                         selectedProjectId = project.id;
-                        projectSearch.value = project.project;
+                        projectSearch.value = project.projectAddress;
                         searchResults.innerHTML = '';
                     });
                     searchResults.appendChild(div);
