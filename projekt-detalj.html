@@ -11,7 +11,37 @@
 <body>
     <div class="container">
         <h1>Projektdetalj</h1>
-        <div id="project-details" class="project-details"></div>
+        <form id="edit-project-form">
+            <label for="project-name">Projektets namn:</label>
+            <input type="text" id="project-name" required>
+            
+            <label for="customer-name">Kundnamn:</label>
+            <input type="text" id="customer-name" required>
+            
+            <label for="customer-phone">Telefonnummer:</label>
+            <input type="text" id="customer-phone" required>
+            
+            <label for="project-address">Adress:</label>
+            <input type="text" id="project-address" required>
+            
+            <label for="project-description">Projektbeskrivning:</label>
+            <textarea id="project-description" required></textarea>
+            
+            <label for="project-status">Status:</label>
+            <select id="project-status" required>
+                <option value="Ny">Ny</option>
+                <option value="Planerad">Planerad</option>
+                <option value="Fakturerad">Fakturerad</option>
+                <option value="Solceller klart">Solceller klart</option>
+                <option value="Elektriker klar">Elektriker klar</option>
+                <option value="Drifsatt">Drifsatt</option>
+            </select>
+            
+            <label for="project-images">Lägg till bilder:</label>
+            <input type="file" id="project-images" accept="image/*" multiple>
+            
+            <button type="submit">Spara ändringar</button>
+        </form>
         <button onclick="navigateTo('status.html')">Tillbaka</button>
     </div>
 </body>
