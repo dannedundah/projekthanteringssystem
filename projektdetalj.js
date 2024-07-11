@@ -1,7 +1,8 @@
-import { db, doc, getDoc, updateDoc } from './firebase-config.js';
+import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const projectDetails = document.getElementById('project-details');
+    const editProjectForm = document.getElementById('edit-project-form');
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
 
@@ -12,29 +13,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (projectSnap.exists()) {
                 const project = projectSnap.data();
-                projectDetails.innerHTML = `
-                    <h2>${project.name}</h2>
-                    <p><strong>Kundnamn:</strong> ${project.customerName}</p>
-                    <p><strong>Telefonnummer:</strong> ${project.customerPhone}</p>
-                    <p><strong>Adress:</strong> ${project.address}</p>
-                    <p><strong>Beskrivning:</strong> ${project.description}</p>
-                    <p><strong>Status:</strong> 
-                        <select id="status-select">
-                            <option value="Ny" ${project.status === 'Ny' ? 'selected' : ''}>Ny</option>
-                            <option value="Planerad" ${project.status === 'Planerad' ? 'selected' : ''}>Planerad</option>
-                            <option value="Solceller klart" ${project.status === 'Solceller klart' ? 'selected' : ''}>Solceller klart</option>
-                            <option value="Elektriker klar" ${project.status === 'Elektriker klar' ? 'selected' : ''}>Elektriker klar</option>
-                            <option value="Drifsatt" ${project.status === 'Drifsatt' ? 'selected' : ''}>Drifsatt</option>
-                        </select>
-                    </p>
-                    ${project.images ? project.images.map(url => `<img src="${url}" alt="Project Image">`).join('') : ''}
-                `;
+                document.getElementById('project-name').value = project.name;
+                document.getElementById('customer-name').value = project.customerName;
+                document.getElementById('customer-phone').value = project.customerPhone;
+                document.getElementById('project-address').value = project.address;
+                document.getElementById('project-description').value = project.description;
+                document.getElementById('project-status').value = project.status;
 
-                // Add event listener to the status select element
-                document.getElementById('status-select').addEventListener('change', async (event) => {
-                    const newStatus = event.target.value;
-                    await updateDoc(projectRef, { status: newStatus });
-                    alert('Status uppdaterad!');
+                editProjectForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const updatedProject = {
+                        name: document.getElementById('project-name').value.trim(),
+                        customerName: document.getElementById('customer-name').value.trim(),
+                        customerPhone: document.getElementById('customer-phone').value.trim(),
+                        address: document.getElementById('project-address').value.trim(),
+                        description: document.getElementById('project-description').value.trim(),
+                        status: document.getElementById('project-status').value.trim(),
+                    };
+
+                    const projectImages = document.getElementById('project-images').files;
+                    const imageUrls = project.images || [];
+
+                    try {
+                        for (const file of projectImages) {
+                            const storageRef = ref(storage, `project_images/${file.name}`);
+                            const snapshot = await uploadBytes(storageRef, file);
+                            const imageUrl = await getDownloadURL(snapshot.ref);
+                            imageUrls.push(imageUrl);
+                        }
+
+                        updatedProject.images = imageUrls;
+
+                        await updateDoc(projectRef, updatedProject);
+                        alert('Projektet har uppdaterats!');
+                        window.location.href = 'projekthantering.html';
+                    } catch (error) {
+                        console.error('Error updating project:', error);
+                        alert('Ett fel uppstod vid uppdatering av projektet.');
+                    }
                 });
             } else {
                 projectDetails.textContent = 'Projektet kunde inte hittas.';
