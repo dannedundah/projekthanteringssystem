@@ -46,16 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
         table.appendChild(headerRow);
 
         for (const schedule of schedules) {
-            const projectDoc = await getDoc(doc(db, 'projects', schedule.project));
-            const projectData = projectDoc.data();
+            try {
+                const projectDoc = await getDoc(doc(db, 'projects', schedule.project));
+                const projectData = projectDoc.data();
 
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${schedule.project}">${projectData.address}</a></td>
-                <td>${schedule.startDate}</td>
-                <td>${schedule.endDate}</td>
-            `;
-            table.appendChild(row);
+                if (projectData) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><a href="projekt-detalj.html?id=${schedule.project}">${projectData.address}</a></td>
+                        <td>${schedule.startDate}</td>
+                        <td>${schedule.endDate}</td>
+                    `;
+                    table.appendChild(row);
+                } else {
+                    console.warn(`Project with ID ${schedule.project} does not exist.`);
+                }
+            } catch (error) {
+                console.error('Error fetching project details:', error);
+            }
         }
 
         ganttChart.appendChild(table);
