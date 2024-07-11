@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleForm = document.getElementById('view-schedule-form');
@@ -13,20 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const querySnapshot = await getDocs(collection(db, "planning"));
             let schedules = querySnapshot.docs.map(doc => doc.data());
 
-            // Sort schedules by start date in descending order
-            schedules = schedules.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            // Sort schedules by start date in ascending order
+            schedules = schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
             ganttChart.innerHTML = '';
             if (employeeName !== '') {
                 const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
                 if (employeeSchedules.length > 0) {
-                    renderGanttChart(employeeSchedules);
+                    await renderGanttChart(employeeSchedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
                 }
             } else {
                 if (schedules.length > 0) {
-                    renderGanttChart(schedules);
+                    await renderGanttChart(schedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades.';
                 }
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function renderGanttChart(schedules) {
+    async function renderGanttChart(schedules) {
         const table = document.createElement('table');
         table.classList.add('gantt-table');
 
@@ -48,15 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         table.appendChild(headerRow);
 
-        schedules.forEach(schedule => {
+        for (const schedule of schedules) {
+            const projectDoc = await getDoc(doc(db, "projects", schedule.project));
+            const projectData = projectDoc.data();
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${schedule.project}">${schedule.projectAddress}</a></td>
+                <td><a href="projekt-detalj.html?id=${schedule.project}">${projectData.address}</a></td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
             table.appendChild(row);
-        });
+        }
 
         ganttChart.appendChild(table);
     }
