@@ -5,11 +5,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const querySnapshot = await getDocs(collection(db, "planning"));
-        const plannings = await Promise.all(querySnapshot.docs.map(async (doc) => {
-            const data = doc.data();
+        const plannings = await Promise.all(querySnapshot.docs.map(async (docSnapshot) => {
+            const data = docSnapshot.data();
             const projectDoc = await getDoc(doc(db, "projects", data.project));
             const projectData = projectDoc.exists() ? projectDoc.data() : {};
-            return { id: doc.id, ...data, projectAddress: projectData.address || 'Ej specificerad' };
+            return { id: docSnapshot.id, ...data, projectAddress: projectData.address || 'Ej specificerad' };
         }));
 
         renderGanttChart(plannings);
