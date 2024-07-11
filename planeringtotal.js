@@ -5,26 +5,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        const plannings = await Promise.all(querySnapshot.docs.map(async planningDoc => {
-            const planningData = planningDoc.data();
-            const projectDoc = await getDoc(doc(db, 'projects', planningData.project));
-            return { ...planningData, projectAddress: projectDoc.exists() ? projectDoc.data().address : 'Ej specificerad' };
-        }));
+        let plannings = querySnapshot.docs.map(doc => doc.data());
 
         // Sort plannings by start date in ascending order
-        plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        plannings = plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         ganttTableBody.innerHTML = '';
-        plannings.forEach(planning => {
+        for (const planning of plannings) {
+            const projectDoc = await getDoc(doc(db, 'projects', planning.project));
+            const projectData = projectDoc.data();
+
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${planning.project}">${planning.projectAddress}</a></td>
+                <td><a href="projekt-detalj.html?id=${planning.project}">${projectData.address}</a></td>
                 <td>${planning.startDate}</td>
                 <td>${planning.endDate}</td>
                 <td>${planning.electricianDate || 'Ej specificerad'}</td>
+                <td>${planning.employees.filter(Boolean).join(', ') || 'Ej specificerad'}</td>
             `;
             ganttTableBody.appendChild(row);
-        });
+        }
     } catch (error) {
         console.error('Error fetching plannings:', error);
     }
@@ -35,13 +35,16 @@ function searchProjects() {
     const rows = document.querySelectorAll('#gantt-table-body tr');
 
     rows.forEach(row => {
-        const projectText = row.textContent.toLowerCase();
-        row.style.display = projectText.includes(input) ? '' : 'none';
+        const projectCell = row.querySelector('td');
+        if (projectCell && projectCell.textContent.toLowerCase().includes(input)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
     });
 }
 
 window.searchProjects = searchProjects;
-
-function navigateTo(page) {
+window.navigateTo = (page) => {
     window.location.href = page;
-}
+};
