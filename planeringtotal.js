@@ -36,13 +36,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.searchProjects = () => {
         const input = document.getElementById('search-input').value.toLowerCase();
-        const filteredPlanningData = planningData.filter(plan => plan.address.toLowerCase().includes(input));
+        const filteredPlanningData = planningData.filter(plan => {
+            const projectRef = doc(db, 'projects', plan.project);
+            return projectRef.get().then((projectSnap) => {
+                const projectData = projectSnap.exists() ? projectSnap.data() : { address: 'Ej specificerad' };
+                const projectAddress = projectData.address || 'Ej specificerad';
+                return projectAddress.toLowerCase().includes(input);
+            });
+        });
+
         ganttTableBody.innerHTML = '';
 
         filteredPlanningData.forEach(plan => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${plan.project}">${plan.address}</td>
+                <td><a href="projekt-detalj.html?id=${plan.project}">${plan.address}</a></td>
                 <td>${plan.startDate}</td>
                 <td>${plan.endDate}</td>
             `;
