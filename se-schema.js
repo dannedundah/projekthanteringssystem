@@ -17,9 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 ganttChart.innerHTML = '';
                 if (employeeSchedules.length > 0) {
-                    // Sort schedules by start date in ascending order
-                    employeeSchedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-                    renderGanttChart(employeeSchedules);
+                    renderGanttChart(employeeSchedules.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
                 }
@@ -33,9 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 ganttChart.innerHTML = '';
                 if (schedules.length > 0) {
-                    // Sort schedules by start date in ascending order
-                    schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-                    renderGanttChart(schedules);
+                    renderGanttChart(schedules.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades.';
                 }
@@ -60,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schedules.forEach(schedule => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${schedule.project}">${schedule.projectAddress}</a></td>
+                <td><a href="projektdetalj.html?id=${schedule.projectId}">${schedule.projectAddress}</a></td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
