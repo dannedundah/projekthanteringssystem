@@ -11,8 +11,18 @@
 <body>
     <div class="container">
         <h1>Planering Total</h1>
-        <input type="text" id="search-input" placeholder="Sök projekt..." onkeyup="searchProjects()" />
-        <div id="gantt-chart"></div>
+        <input type="text" id="search-input" placeholder="Sök projekt..." onkeyup="searchProjects()">
+        <table class="gantt-table">
+            <thead>
+                <tr>
+                    <th>Projekt</th>
+                    <th>Startdatum</th>
+                    <th>Slutdatum</th>
+                    <th>Datum Elektriker</th>
+                </tr>
+            </thead>
+            <tbody id="gantt-table-body"></tbody>
+        </table>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>

@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const viewScheduleForm = document.getElementById('view-schedule-form');
@@ -9,31 +9,43 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const employeeName = employeeDropdown.value.trim();
 
-        try {
-            const querySnapshot = await getDocs(collection(db, "planning"));
-            const schedules = querySnapshot.docs.map(doc => doc.data());
+        if (employeeName !== '') {
+            try {
+                const querySnapshot = await getDocs(collection(db, "schedules"));
+                const schedules = querySnapshot.docs.map(doc => doc.data());
+                const employeeSchedules = schedules.filter(schedule => schedule.name === employeeName);
 
-            ganttChart.innerHTML = '';
-            if (employeeName !== '') {
-                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
+                ganttChart.innerHTML = '';
                 if (employeeSchedules.length > 0) {
-                    await renderGanttChart(employeeSchedules);
+                    // Sort schedules by start date in ascending order
+                    employeeSchedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                    renderGanttChart(employeeSchedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
                 }
-            } else {
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+            }
+        } else {
+            try {
+                const querySnapshot = await getDocs(collection(db, "schedules"));
+                const schedules = querySnapshot.docs.map(doc => doc.data());
+
+                ganttChart.innerHTML = '';
                 if (schedules.length > 0) {
-                    await renderGanttChart(schedules);
+                    // Sort schedules by start date in ascending order
+                    schedules.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                    renderGanttChart(schedules);
                 } else {
                     ganttChart.textContent = 'Inga scheman hittades.';
                 }
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
             }
-        } catch (error) {
-            console.error('Error fetching schedules:', error);
         }
     });
 
-    async function renderGanttChart(schedules) {
+    function renderGanttChart(schedules) {
         const table = document.createElement('table');
         table.classList.add('gantt-table');
 
@@ -45,19 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         table.appendChild(headerRow);
 
-        for (const schedule of schedules) {
-            const projectRef = doc(db, 'projects', schedule.project);
-            const projectSnap = await getDoc(projectRef);
-            const project = projectSnap.data();
-
+        schedules.forEach(schedule => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${schedule.project}">${project.address}</a></td>
+                <td><a href="projekt-detalj.html?id=${schedule.project}">${schedule.projectAddress}</a></td>
                 <td>${schedule.startDate}</td>
                 <td>${schedule.endDate}</td>
             `;
             table.appendChild(row);
-        }
+        });
 
         ganttChart.appendChild(table);
     }
