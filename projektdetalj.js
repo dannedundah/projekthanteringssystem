@@ -1,7 +1,6 @@
 import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectDetails = document.getElementById('project-details');
     const editProjectForm = document.getElementById('edit-project-form');
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');

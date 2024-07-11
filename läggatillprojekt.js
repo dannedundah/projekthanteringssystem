@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const project = {
                 name: projectName,
-                customerName: customerName,
-                customerPhone: customerPhone,
+                customerName,
+                customerPhone,
                 address: projectAddress,
                 description: projectDescription,
                 status: projectStatus,
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Projektet har lagts till!');
             window.location.href = 'projekthantering.html';
         } catch (error) {
-            console.error('Error adding project: ', error);
+            console.error('Error adding project:', error);
             alert('Ett fel uppstod vid tillägg av projekt.');
         }
     });
