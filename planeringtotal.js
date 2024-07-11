@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td><a href="projektdetalj.html?id=${planning.project}">${planning.project}</a></td>
                 <td>${planning.startDate}</td>
                 <td>${planning.endDate}</td>
-                <td>${planning.electricianDate}</td>
+                <td>${planning.electricianDate || 'Ej specificerad'}</td>
             `;
             table.appendChild(row);
         });
