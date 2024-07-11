@@ -35,12 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (selectedProjectId) {
+            const employee = document.getElementById('employee-select').value;
             const timeType = document.getElementById('time-type').value;
             const hours = document.getElementById('hours').value;
             const date = document.getElementById('date').value;
 
             const timeReport = {
                 projectId: selectedProjectId,
+                employee,
                 timeType,
                 hours: parseFloat(hours),
                 date,

@@ -12,24 +12,41 @@
     <div class="container">
         <h1>Tidrapportering</h1>
         <form id="time-report-form">
-            <label for="project-search">Sök projekt:</label>
-            <input type="text" id="project-search" placeholder="Sök projekt" required>
+            <label for="employee-select">Anställd:</label>
+            <select id="employee-select" required>
+                <option value="">Välj anställd</option>
+                <option value="Alireza">Alireza</option>
+                <option value="Andreas">Andreas</option>
+                <option value="Hampus">Hampus</option>
+                <option value="Loa">Loa</option>
+                <option value="Marcus">Marcus</option>
+                <option value="Mustafa">Mustafa</option>
+                <option value="Noah">Noah</option>
+                <option value="Reza">Reza</option>
+                <option value="Rickard">Rickard</option>
+            </select>
+
+            <label for="project-select">Projekt:</label>
+            <input type="text" id="project-select" placeholder="Sök projekt" required>
+
             <label for="time-type">Typ av tid:</label>
             <select id="time-type" required>
-                <option value="Arbetade timmar">Arbetade timmar</option>
+                <option value="Normal tid">Normal tid</option>
                 <option value="Sjuk">Sjuk</option>
                 <option value="Semester">Semester</option>
                 <option value="VAB">VAB</option>
                 <option value="Obetald tjänstledighet">Obetald tjänstledighet</option>
                 <option value="Permission">Permission</option>
             </select>
+
             <label for="hours">Antal timmar:</label>
-            <input type="number" id="hours" min="0" step="0.5" required>
+            <input type="number" id="hours" placeholder="Antal timmar" required>
+
             <label for="date">Datum:</label>
             <input type="date" id="date" required>
+
             <button type="submit">Rapportera tid</button>
         </form>
-        <div id="search-results"></div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>
