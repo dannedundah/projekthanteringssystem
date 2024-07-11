@@ -1,62 +1,53 @@
-import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const ganttTableBody = document.getElementById('gantt-table-body');
-
-    if (!ganttTableBody) {
-        console.error('Element with ID gantt-table-body not found.');
-        return;
-    }
-
-    let planningData = [];
+    const ganttChart = document.getElementById('gantt-chart');
 
     try {
-        const querySnapshot = await getDocs(collection(db, 'planning'));
-        planningData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const querySnapshot = await getDocs(collection(db, "planning"));
+        const plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        ganttTableBody.innerHTML = ''; // Clear any existing content
+        renderGanttChart(plannings);
 
-        for (const plan of planningData) {
-            const projectRef = doc(db, 'projects', plan.project);
-            const projectSnap = await getDoc(projectRef);
-            const projectData = projectSnap.exists() ? projectSnap.data() : { address: 'Ej specificerad' };
-            const projectAddress = projectData.address || 'Ej specificerad';
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${plan.project}">${projectAddress}</a></td>
-                <td>${plan.startDate}</td>
-                <td>${plan.endDate}</td>
-            `;
-            ganttTableBody.appendChild(row);
-        }
+        window.searchProjects = () => {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const filteredPlannings = plannings.filter(planning => 
+                planning.project.toLowerCase().includes(input)
+            );
+            renderGanttChart(filteredPlannings);
+        };
     } catch (error) {
         console.error('Error fetching plannings:', error);
     }
 
-    window.searchProjects = () => {
-        const input = document.getElementById('search-input').value.toLowerCase();
-        const filteredPlanningData = planningData.filter(plan => {
-            const projectRef = doc(db, 'projects', plan.project);
-            return projectRef.get().then((projectSnap) => {
-                const projectData = projectSnap.exists() ? projectSnap.data() : { address: 'Ej specificerad' };
-                const projectAddress = projectData.address || 'Ej specificerad';
-                return projectAddress.toLowerCase().includes(input);
-            });
-        });
+    function renderGanttChart(plannings) {
+        ganttChart.innerHTML = '';
 
-        ganttTableBody.innerHTML = '';
+        const table = document.createElement('table');
+        table.classList.add('gantt-table');
 
-        filteredPlanningData.forEach(plan => {
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+            <th>Projekt</th>
+            <th>Startdatum</th>
+            <th>Slutdatum</th>
+            <th>Datum Elektriker</th>
+        `;
+        table.appendChild(headerRow);
+
+        plannings.forEach(planning => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${plan.project}">${plan.address}</a></td>
-                <td>${plan.startDate}</td>
-                <td>${plan.endDate}</td>
+                <td><a href="projektdetalj.html?id=${planning.project}">${planning.project}</a></td>
+                <td>${planning.startDate}</td>
+                <td>${planning.endDate}</td>
+                <td>${planning.electricianDate}</td>
             `;
-            ganttTableBody.appendChild(row);
+            table.appendChild(row);
         });
-    };
+
+        ganttChart.appendChild(table);
+    }
 
     window.navigateTo = (page) => {
         window.location.href = page;
