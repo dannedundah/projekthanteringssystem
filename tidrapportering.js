@@ -1,9 +1,10 @@
-import { db, collection, getDocs, addDoc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, query, where } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
     const projectSearch = document.getElementById('project-search');
     const searchResults = document.getElementById('search-results');
+    const employeeDropdown = document.getElementById('employee-name'); // Make sure this element exists
     let selectedProjectId = null;
 
     projectSearch.addEventListener('input', async () => {
@@ -12,11 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (searchTerm.length > 0) {
             try {
-                const querySnapshot = await getDocs(collection(db, 'projects'));
+                const employeeName = employeeDropdown.value; // Get the selected employee name
+                const q = query(collection(db, 'planning'), where('employees', 'array-contains', employeeName));
+                const querySnapshot = await getDocs(q);
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const filteredProjects = projects.filter(project => {
-                    return typeof project.address === 'string' && project.address.toLowerCase().includes(searchTerm);
-                });
+
+                const filteredProjects = projects.filter(project => project.address.toLowerCase().includes(searchTerm));
 
                 filteredProjects.forEach(project => {
                     const div = document.createElement('div');
@@ -37,14 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (selectedProjectId) {
-            const employee = document.getElementById('employee').value; // New field for selecting the employee
             const timeType = document.getElementById('time-type').value;
             const hours = document.getElementById('hours').value;
             const date = document.getElementById('date').value;
 
+            if (!timeType || !hours || !date) {
+                alert('Alla fält måste fyllas i.');
+                return;
+            }
+
             const timeReport = {
                 projectId: selectedProjectId,
-                employee,
+                employee: employeeDropdown.value,
                 timeType,
                 hours: parseFloat(hours),
                 date,
