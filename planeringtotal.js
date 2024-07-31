@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let plannings = [];
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        plannings = querySnapshot.docs.map(doc => doc.data());
+        plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         renderGanttChart(plannings); // Render initial chart
     } catch (error) {
@@ -20,10 +20,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Event listener for search input
-    searchInput.addEventListener('input', async () => {
+    searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.trim().toLowerCase();
         const filteredPlannings = plannings.filter(planning => {
-            return planning.projectAddress.toLowerCase().includes(searchTerm);
+            const projectRef = getDocs(collection(db, 'projects'));
+            const projectData = projectRef.docs.find(proj => proj.id === planning.projectId);
+            const project = projectData ? projectData.data() : null;
+
+            return project && project.address.toLowerCase().includes(searchTerm);
         });
 
         renderGanttChart(filteredPlannings); // Re-render chart with filtered data
@@ -36,16 +40,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         for (const planning of plannings) {
-            if (planning.status !== 'Fakturerad') {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><a href="projekt-detalj.html?id=${planning.project}">${planning.projectAddress || 'Ej specificerad'}</a></td>
-                    <td>${planning.startDate}</td>
-                    <td>${planning.endDate}</td>
-                    <td>${planning.electricianDate || 'Ej specificerad'}</td>
-                    <td>${planning.employees.join(', ')}</td>
-                `;
-                ganttTableBody.appendChild(row);
+            // Fetch project details
+            try {
+                const projectDoc = await getDoc(doc(db, 'projects', planning.projectId));
+                const project = projectDoc.exists() ? projectDoc.data() : null;
+
+                if (project && planning.status !== 'Fakturerad') {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><a href="projekt-detalj.html?id=${planning.projectId}">${project.address || 'Ej specificerad'}</a></td>
+                        <td>${planning.startDate}</td>
+                        <td>${planning.endDate}</td>
+                        <td>${planning.electricianDate || 'Ej specificerad'}</td>
+                        <td>${planning.employees.join(', ')}</td>
+                    `;
+                    ganttTableBody.appendChild(row);
+                }
+            } catch (error) {
+                console.error('Error fetching project details:', error);
             }
         }
     }
