@@ -1,50 +1,49 @@
-import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
+import { db, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const ganttTableBody = document.getElementById('gantt-table-body');
 
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        let plannings = querySnapshot.docs.map(doc => doc.data());
+        const plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Filter out projects with status "Fakturerad"
+        const filteredPlannings = plannings.filter(planning => planning.status !== 'Fakturerad');
 
         // Sort plannings by start date in ascending order
-        plannings = plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         ganttTableBody.innerHTML = '';
-        for (const planning of plannings) {
-            const projectDoc = await getDoc(doc(db, 'projects', planning.project));
-            const projectData = projectDoc.data();
-
+        filteredPlannings.forEach(planning => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><a href="projekt-detalj.html?id=${planning.project}">${projectData.address}</a></td>
+                <td><a href="projekt-detalj.html?id=${planning.projectId}">${planning.address}</a></td>
                 <td>${planning.startDate}</td>
                 <td>${planning.endDate}</td>
                 <td>${planning.electricianDate || 'Ej specificerad'}</td>
-                <td>${planning.employees.filter(Boolean).join(', ') || 'Ej specificerad'}</td>
+                <td>${planning.employees.join(', ')}</td>
             `;
             ganttTableBody.appendChild(row);
-        }
+        });
     } catch (error) {
         console.error('Error fetching plannings:', error);
     }
 });
 
-function searchProjects() {
-    const input = document.getElementById('search-input').value.toLowerCase();
+window.searchProjects = () => {
+    const searchInput = document.getElementById('search-input').value.toLowerCase();
     const rows = document.querySelectorAll('#gantt-table-body tr');
 
     rows.forEach(row => {
-        const projectCell = row.querySelector('td');
-        if (projectCell && projectCell.textContent.toLowerCase().includes(input)) {
+        const projectCell = row.cells[0];
+        if (projectCell && projectCell.textContent.toLowerCase().includes(searchInput)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
         }
     });
-}
+};
 
-window.searchProjects = searchProjects;
 window.navigateTo = (page) => {
     window.location.href = page;
 };
