@@ -1,29 +1,29 @@
-import { db, collection, getDocs, addDoc, query, where } from './firebase-config.js';
+import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
     const projectSearch = document.getElementById('project-search');
     const searchResults = document.getElementById('search-results');
-    const employeeSelect = document.getElementById('employee-select');
-    const exportBtn = document.getElementById('export-btn');
     let selectedProjectId = null;
 
     projectSearch.addEventListener('input', async () => {
         const searchTerm = projectSearch.value.trim().toLowerCase();
         searchResults.innerHTML = '';
 
-        if (searchTerm.length > 0 && employeeSelect.value) {
+        if (searchTerm.length > 0) {
             try {
-                const querySnapshot = await getDocs(query(collection(db, 'planning'), where('employees', 'array-contains', employeeSelect.value)));
+                const querySnapshot = await getDocs(collection(db, 'projects'));
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const filteredProjects = projects.filter(project => project.projectAddress.toLowerCase().includes(searchTerm));
+                const filteredProjects = projects.filter(project => {
+                    return typeof project.address === 'string' && project.address.toLowerCase().includes(searchTerm);
+                });
 
                 filteredProjects.forEach(project => {
                     const div = document.createElement('div');
-                    div.textContent = project.projectAddress;
+                    div.textContent = project.address;
                     div.addEventListener('click', () => {
                         selectedProjectId = project.id;
-                        projectSearch.value = project.projectAddress;
+                        projectSearch.value = project.address;
                         searchResults.innerHTML = '';
                     });
                     searchResults.appendChild(div);
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (selectedProjectId) {
-            const employee = employeeSelect.value;
+            const employee = document.getElementById('employee').value; // New field for selecting the employee
             const timeType = document.getElementById('time-type').value;
             const hours = document.getElementById('hours').value;
             const date = document.getElementById('date').value;
@@ -61,29 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             alert('Vänligen välj ett projekt.');
-        }
-    });
-
-    exportBtn.addEventListener('click', async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, 'timeReports'));
-            const reports = querySnapshot.docs.map(doc => doc.data());
-
-            const ws_data = [
-                ["Projekt ID", "Anställd", "Typ av tid", "Antal timmar", "Datum"]
-            ];
-
-            reports.forEach(report => {
-                ws_data.push([report.projectId, report.employee, report.timeType, report.hours, report.date]);
-            });
-
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Tidrapporter");
-
-            XLSX.writeFile(wb, "Tidrapporter.xlsx");
-        } catch (error) {
-            console.error('Error exporting time reports:', error);
         }
     });
 
