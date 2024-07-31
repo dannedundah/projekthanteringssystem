@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const ganttTableBody = document.getElementById('gantt-table-body');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let plannings = [];
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        plannings = querySnapshot.docs.map(doc => doc.data());
 
         renderGanttChart(plannings); // Render initial chart
     } catch (error) {
@@ -23,11 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.trim().toLowerCase();
         const filteredPlannings = plannings.filter(planning => {
-            const projectRef = getDocs(collection(db, 'projects'));
-            const projectData = projectRef.docs.find(proj => proj.id === planning.projectId);
-            const project = projectData ? projectData.data() : null;
-
-            return project && project.address.toLowerCase().includes(searchTerm);
+            return planning.address && planning.address.toLowerCase().includes(searchTerm);
         });
 
         renderGanttChart(filteredPlannings); // Re-render chart with filtered data
