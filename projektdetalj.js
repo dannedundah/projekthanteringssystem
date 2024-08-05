@@ -1,12 +1,8 @@
+import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const editProjectForm = document.getElementById('edit-project-form');
-    const projectDetails = document.getElementById('project-details');
-
-    if (!projectDetails) {
-        console.error("Element with ID 'project-details' not found.");
-        return;
-    }
-
+    const projectDetails = document.getElementById('project-details'); // Fixat ID
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
 
@@ -24,20 +20,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
-                // Check if images exist and are not empty
                 if (project.images && project.images.length > 0) {
-                    const imageContainer = document.getElementById('project-images-container');
-                    if (imageContainer) {
-                        project.images.forEach(url => {
-                            const img = document.createElement('img');
-                            img.src = url;
-                            img.alt = 'Project Image';
-                            img.style.maxWidth = '100%'; // Customize as needed
-                            imageContainer.appendChild(img);
-                        });
-                    } else {
-                        console.error("Element with ID 'project-images-container' not found.");
-                    }
+                    const imageContainer = document.createElement('div');
+                    project.images.forEach(imageUrl => {
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.alt = "Projektbild";
+                        img.className = "project-image";
+                        imageContainer.appendChild(img);
+                    });
+                    projectDetails.appendChild(imageContainer);
                 }
 
                 editProjectForm.addEventListener('submit', async (e) => {
