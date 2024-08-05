@@ -2,6 +2,7 @@ import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const editProjectForm = document.getElementById('edit-project-form');
+    const projectImagesContainer = document.getElementById('project-images-container'); // Container for displaying images
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
 
@@ -18,6 +19,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-address').value = project.address;
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
+
+                // Display existing images
+                if (project.images && project.images.length > 0) {
+                    projectImagesContainer.innerHTML = '';
+                    project.images.forEach(imageUrl => {
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.alt = "Projektbild";
+                        img.classList.add('project-image'); // Add class for styling
+                        projectImagesContainer.appendChild(img);
+                    });
+                }
 
                 editProjectForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -53,14 +66,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 });
             } else {
-                projectDetails.textContent = 'Projektet kunde inte hittas.';
+                alert('Projektet kunde inte hittas.');
             }
         } catch (error) {
             console.error('Error fetching project details:', error);
-            projectDetails.textContent = 'Ett fel uppstod vid hämtning av projektdata.';
+            alert('Ett fel uppstod vid hämtning av projektdata.');
         }
     } else {
-        projectDetails.textContent = 'Inget projekt ID angivet.';
+        alert('Inget projekt ID angivet.');
     }
 });
 
