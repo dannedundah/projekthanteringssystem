@@ -1,11 +1,14 @@
-import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
-
 document.addEventListener('DOMContentLoaded', async () => {
     const editProjectForm = document.getElementById('edit-project-form');
+    const projectDetails = document.getElementById('project-details');
+
+    if (!projectDetails) {
+        console.error("Element with ID 'project-details' not found.");
+        return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
-    const projectDetails = document.getElementById('project-details');
-    const projectImagesContainer = document.getElementById('project-images-container');
 
     if (projectId) {
         try {
@@ -21,18 +24,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
-                // Display images if they exist
+                // Check if images exist and are not empty
                 if (project.images && project.images.length > 0) {
-                    projectImagesContainer.innerHTML = '';
-                    project.images.forEach(url => {
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.alt = 'Project Image';
-                        img.classList.add('project-image'); // You can style the image with this class
-                        projectImagesContainer.appendChild(img);
-                    });
-                } else {
-                    projectImagesContainer.innerHTML = 'Inga bilder tillgängliga.';
+                    const imageContainer = document.getElementById('project-images-container');
+                    if (imageContainer) {
+                        project.images.forEach(url => {
+                            const img = document.createElement('img');
+                            img.src = url;
+                            img.alt = 'Project Image';
+                            img.style.maxWidth = '100%'; // Customize as needed
+                            imageContainer.appendChild(img);
+                        });
+                    } else {
+                        console.error("Element with ID 'project-images-container' not found.");
+                    }
                 }
 
                 editProjectForm.addEventListener('submit', async (e) => {
