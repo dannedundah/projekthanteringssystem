@@ -2,7 +2,8 @@ import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const editProjectForm = document.getElementById('edit-project-form');
-    const projectImagesContainer = document.getElementById('project-images-container'); // Container for displaying images
+    const projectDetails = document.getElementById('project-details'); // Lägg till denna för att hämta project-details elementet
+    const projectImagesContainer = document.getElementById('project-images-container'); // För att visa uppladdade bilder
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
 
@@ -20,14 +21,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
-                // Display existing images
-                if (project.images && project.images.length > 0) {
-                    projectImagesContainer.innerHTML = '';
-                    project.images.forEach(imageUrl => {
+                // Visa uppladdade bilder
+                if (projectImagesContainer && project.images) {
+                    projectImagesContainer.innerHTML = ''; // Rensa tidigare innehåll
+                    project.images.forEach(url => {
                         const img = document.createElement('img');
-                        img.src = imageUrl;
-                        img.alt = "Projektbild";
-                        img.classList.add('project-image'); // Add class for styling
+                        img.src = url;
+                        img.alt = 'Project Image';
+                        img.className = 'project-image'; // Lägg till en klass för styling om så önskas
                         projectImagesContainer.appendChild(img);
                     });
                 }
@@ -66,14 +67,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 });
             } else {
-                alert('Projektet kunde inte hittas.');
+                if (projectDetails) {
+                    projectDetails.textContent = 'Projektet kunde inte hittas.';
+                }
             }
         } catch (error) {
             console.error('Error fetching project details:', error);
-            alert('Ett fel uppstod vid hämtning av projektdata.');
+            if (projectDetails) {
+                projectDetails.textContent = 'Ett fel uppstod vid hämtning av projektdata.';
+            }
         }
     } else {
-        alert('Inget projekt ID angivet.');
+        if (projectDetails) {
+            projectDetails.textContent = 'Inget projekt ID angivet.';
+        }
     }
 });
 
