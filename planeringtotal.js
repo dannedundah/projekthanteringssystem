@@ -26,11 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         for (const planning of plannings) {
             try {
-                if (!planning.projectId) {
-                    console.error('projectId is undefined for planning:', planning);
-                    continue;
-                }
-                const projectDocRef = doc(db, 'projects', planning.projectId);
+                const projectDocRef = doc(db, 'projects', planning.project);
                 const projectDoc = await getDoc(projectDocRef);
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
@@ -54,18 +50,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         for (const planning of plannings) {
             try {
-                if (!planning.projectId) {
-                    console.error('projectId is undefined for planning:', planning);
-                    continue;
-                }
-                const projectDocRef = doc(db, 'projects', planning.projectId);
+                const projectDocRef = doc(db, 'projects', planning.project);
                 const projectDoc = await getDoc(projectDocRef);
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
                     if (planning.status !== 'Fakturerad') {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td><a href="projekt-detalj.html?id=${planning.projectId}">${projectData.address || 'Ej specificerad'}</a></td>
+                            <td><a href="projekt-detalj.html?id=${planning.project}">${projectData.address || 'Ej specificerad'}</a></td>
                             <td>${planning.startDate}</td>
                             <td>${planning.endDate}</td>
                             <td>${planning.electricianDate || 'Ej specificerad'}</td>
@@ -74,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         ganttTableBody.appendChild(row);
                     }
                 } else {
-                    console.error('Project document not found for projectId:', planning.projectId);
+                    console.error('Project document not found for project:', planning.project);
                 }
             } catch (error) {
                 console.error('Error fetching project details:', error);
