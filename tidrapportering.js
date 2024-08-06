@@ -7,45 +7,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const employeeDropdown = document.getElementById('employee-dropdown');
     let selectedProjectId = null;
 
+    // Event listener for project search input
     projectSearch.addEventListener('input', async () => {
         const searchTerm = projectSearch?.value?.trim().toLowerCase() || '';
         searchResults.innerHTML = '';
 
+        // Get selected employee
+        const selectedEmployee = employeeDropdown?.value;
+        if (!selectedEmployee) {
+            alert('Vänligen välj en anställd.');
+            return;
+        }
+
         if (searchTerm.length > 0) {
             try {
-                const selectedEmployee = employeeDropdown?.value || '';
-                if (!selectedEmployee) {
-                    alert('Vänligen välj en anställd.');
-                    return;
-                }
-
                 const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', selectedEmployee));
                 const querySnapshot = await getDocs(q);
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const filteredProjects = projects.filter(project => project.address?.toLowerCase().includes(searchTerm));
+                const filteredProjects = projects.filter(project => project.address.toLowerCase().includes(searchTerm));
 
-                if (filteredProjects.length > 0) {
-                    filteredProjects.forEach(project => {
-                        const div = document.createElement('div');
-                        div.textContent = project.address;
-                        div.addEventListener('click', () => {
-                            selectedProjectId = project.id;
-                            projectSearch.value = project.address;
-                            searchResults.innerHTML = '';
-                        });
-                        searchResults.appendChild(div);
+                filteredProjects.forEach(project => {
+                    const div = document.createElement('div');
+                    div.textContent = project.address;
+                    div.addEventListener('click', () => {
+                        selectedProjectId = project.id;
+                        projectSearch.value = project.address;
+                        searchResults.innerHTML = '';
                     });
-                } else {
-                    searchResults.innerHTML = '<div>Inga projekt matchar sökningen.</div>';
-                }
+                    searchResults.appendChild(div);
+                });
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
         }
     });
 
+    // Event listener for form submission
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const selectedEmployee = employeeDropdown?.value;
+        if (!selectedEmployee) {
+            alert('Vänligen välj en anställd.');
+            return;
+        }
+
         if (selectedProjectId) {
             const timeType = document.getElementById('time-type')?.value || '';
             const hours = document.getElementById('hours')?.value || '';
@@ -54,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeType && hours && date) {
                 const timeReport = {
                     projectId: selectedProjectId,
+                    employee: selectedEmployee,
                     timeType,
                     hours: parseFloat(hours),
                     date,
