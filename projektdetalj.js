@@ -100,8 +100,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function removeFile(fileUrl, index) {
     try {
-        const storageRef = ref(storage, fileUrl);
-        await deleteObject(storageRef);
+        const fileRef = ref(storage, fileUrl);
+        await deleteObject(fileRef);
 
         // Remove from Firestore
         const params = new URLSearchParams(window.location.search);
