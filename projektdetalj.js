@@ -20,32 +20,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-status').value = project.status;
 
                 const fileGallery = document.getElementById('file-gallery');
-                if (fileGallery) {
+                if (fileGallery && project.files) {
                     fileGallery.innerHTML = '';
                     project.files.forEach(fileUrl => {
-                        const fileExtension = fileUrl.split('.').pop().toLowerCase();
-                        let fileElement;
+                        if (typeof fileUrl === 'string') {
+                            const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                            let fileElement;
 
-                        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                            // Bild
-                            fileElement = document.createElement('img');
-                            fileElement.src = fileUrl;
-                            fileElement.alt = 'Project File';
-                            fileElement.style.maxWidth = '150px'; // Mindre storlek
-                            fileElement.style.cursor = 'pointer';
-                            fileElement.onclick = () => window.open(fileUrl, '_blank');
+                            if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                fileElement = document.createElement('img');
+                                fileElement.src = fileUrl;
+                                fileElement.alt = 'Project File';
+                                fileElement.style.maxWidth = '150px';
+                                fileElement.style.cursor = 'pointer';
+                                fileElement.onclick = () => window.open(fileUrl, '_blank');
+                            } else {
+                                fileElement = document.createElement('a');
+                                fileElement.href = fileUrl;
+                                fileElement.textContent = `Ladda ner fil (${fileExtension.toUpperCase()})`;
+                                fileElement.target = '_blank';
+                            }
+
+                            fileGallery.appendChild(fileElement);
                         } else {
-                            // Övriga filer (PDF, etc.)
-                            fileElement = document.createElement('a');
-                            fileElement.href = fileUrl;
-                            fileElement.textContent = `Ladda ner fil (${fileExtension.toUpperCase()})`;
-                            fileElement.target = '_blank';
+                            console.error('Invalid file URL:', fileUrl);
                         }
-
-                        fileGallery.appendChild(fileElement);
                     });
                 } else {
-                    console.error('Element with ID "file-gallery" not found.');
+                    console.error('Element with ID "file-gallery" not found or project.files is undefined.');
                 }
 
                 editProjectForm.addEventListener('submit', async (e) => {
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     };
 
                     const projectImages = document.getElementById('project-images').files;
-                    const imageUrls = project.images || [];
+                    const imageUrls = project.files || [];
 
                     try {
                         for (const file of projectImages) {
@@ -95,3 +97,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 function navigateTo(page) {
     window.location.href = page;
 }
+
