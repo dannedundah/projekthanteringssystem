@@ -20,34 +20,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-status').value = project.status;
 
                 const fileGallery = document.getElementById('file-gallery');
-                if (fileGallery && project.files) {
+                if (fileGallery) {
                     fileGallery.innerHTML = '';
-                    project.files.forEach(fileUrl => {
-                        if (typeof fileUrl === 'string') {
-                            const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                    project.files.forEach(file => {
+                        const fileUrl = file.url;
+                        const fileName = file.name;
+                        if (fileUrl && fileName) {
+                            const fileExtension = fileName.split('.').pop().toLowerCase();
                             let fileElement;
 
                             if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                // Bild
                                 fileElement = document.createElement('img');
                                 fileElement.src = fileUrl;
-                                fileElement.alt = 'Project File';
-                                fileElement.style.maxWidth = '150px';
+                                fileElement.alt = fileName;
+                                fileElement.style.maxWidth = '150px'; // Mindre storlek
                                 fileElement.style.cursor = 'pointer';
                                 fileElement.onclick = () => window.open(fileUrl, '_blank');
                             } else {
+                                // Övriga filer (PDF, etc.)
                                 fileElement = document.createElement('a');
                                 fileElement.href = fileUrl;
-                                fileElement.textContent = `Ladda ner fil (${fileExtension.toUpperCase()})`;
+                                fileElement.textContent = `Ladda ner ${fileName} (${fileExtension.toUpperCase()})`;
                                 fileElement.target = '_blank';
                             }
 
                             fileGallery.appendChild(fileElement);
                         } else {
-                            console.error('Invalid file URL:', fileUrl);
+                            console.error('Invalid file data:', file);
                         }
                     });
                 } else {
-                    console.error('Element with ID "file-gallery" not found or project.files is undefined.');
+                    console.error('Element with ID "file-gallery" not found.');
                 }
 
                 editProjectForm.addEventListener('submit', async (e) => {
@@ -62,18 +66,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         status: document.getElementById('project-status').value.trim(),
                     };
 
-                    const projectImages = document.getElementById('project-images').files;
-                    const imageUrls = project.files || [];
+                    const projectFiles = document.getElementById('project-images').files;
+                    const files = project.files || [];
 
                     try {
-                        for (const file of projectImages) {
+                        for (const file of projectFiles) {
                             const storageRef = ref(storage, `project_files/${file.name}`);
                             const snapshot = await uploadBytes(storageRef, file);
-                            const imageUrl = await getDownloadURL(snapshot.ref);
-                            imageUrls.push(imageUrl);
+                            const fileUrl = await getDownloadURL(snapshot.ref);
+                            files.push({ name: file.name, url: fileUrl });
                         }
 
-                        updatedProject.files = imageUrls;
+                        updatedProject.files = files;
 
                         await updateDoc(projectRef, updatedProject);
                         alert('Projektet har uppdaterats!');
@@ -97,4 +101,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 function navigateTo(page) {
     window.location.href = page;
 }
-
