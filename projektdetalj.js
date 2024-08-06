@@ -19,14 +19,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
-                const fileGallery = document.getElementById('image-gallery');
+                const fileGallery = document.getElementById('file-gallery');
                 if (project.files && project.files.length > 0) {
                     project.files.forEach(file => {
                         const fileExtension = file.url.split('.').pop().toLowerCase();
-                        if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png') {
+                        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                             const img = document.createElement('img');
                             img.src = file.url;
                             img.alt = file.name;
+                            img.classList.add('thumbnail');
                             img.onclick = () => openModal(file.url);
                             fileGallery.appendChild(img);
                         } else {
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             fileLink.href = file.url;
                             fileLink.target = '_blank';
                             fileLink.textContent = `Öppna ${file.name}`;
+                            fileLink.classList.add('file-link');
                             fileLink.style.display = 'block';
                             fileGallery.appendChild(fileLink);
                         }
