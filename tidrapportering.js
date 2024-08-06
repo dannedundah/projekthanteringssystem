@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -14,21 +14,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchTerm.length > 0) {
             try {
                 const selectedEmployee = employeeDropdown?.value || '';
+                if (!selectedEmployee) {
+                    alert('Vänligen välj en anställd.');
+                    return;
+                }
+
                 const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', selectedEmployee));
                 const querySnapshot = await getDocs(q);
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const filteredProjects = projects.filter(project => project.address.toLowerCase().includes(searchTerm));
+                const filteredProjects = projects.filter(project => project.address?.toLowerCase().includes(searchTerm));
 
-                filteredProjects.forEach(project => {
-                    const div = document.createElement('div');
-                    div.textContent = project.address;
-                    div.addEventListener('click', () => {
-                        selectedProjectId = project.id;
-                        projectSearch.value = project.address;
-                        searchResults.innerHTML = '';
+                if (filteredProjects.length > 0) {
+                    filteredProjects.forEach(project => {
+                        const div = document.createElement('div');
+                        div.textContent = project.address;
+                        div.addEventListener('click', () => {
+                            selectedProjectId = project.id;
+                            projectSearch.value = project.address;
+                            searchResults.innerHTML = '';
+                        });
+                        searchResults.appendChild(div);
                     });
-                    searchResults.appendChild(div);
-                });
+                } else {
+                    searchResults.innerHTML = '<div>Inga projekt matchar sökningen.</div>';
+                }
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
