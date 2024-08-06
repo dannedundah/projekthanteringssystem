@@ -2,7 +2,6 @@ import { db, doc, getDoc, updateDoc, storage, ref, uploadBytes, getDownloadURL }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const editProjectForm = document.getElementById('edit-project-form');
-    const projectDetails = document.getElementById('project-details'); // Fixat ID
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
 
@@ -20,16 +19,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
+                const imageGallery = document.getElementById('image-gallery');
                 if (project.images && project.images.length > 0) {
-                    const imageContainer = document.createElement('div');
-                    project.images.forEach(imageUrl => {
+                    project.images.forEach(url => {
                         const img = document.createElement('img');
-                        img.src = imageUrl;
-                        img.alt = "Projektbild";
-                        img.className = "project-image";
-                        imageContainer.appendChild(img);
+                        img.src = url;
+                        img.alt = 'Project Image';
+                        img.onclick = () => openModal(url);
+                        imageGallery.appendChild(img);
                     });
-                    projectDetails.appendChild(imageContainer);
                 }
 
                 editProjectForm.addEventListener('submit', async (e) => {
@@ -66,16 +64,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 });
             } else {
-                projectDetails.textContent = 'Projektet kunde inte hittas.';
+                console.error('Projektet kunde inte hittas.');
             }
         } catch (error) {
             console.error('Error fetching project details:', error);
-            projectDetails.textContent = 'Ett fel uppstod vid hämtning av projektdata.';
         }
     } else {
-        projectDetails.textContent = 'Inget projekt ID angivet.';
+        console.error('Inget projekt ID angivet.');
     }
 });
+
+function openModal(imageUrl) {
+    const modal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    modal.style.display = 'block';
+    modalImage.src = imageUrl;
+}
+
+function closeModal() {
+    const modal = document.getElementById('image-modal');
+    modal.style.display = 'none';
+}
 
 function navigateTo(page) {
     window.location.href = page;
