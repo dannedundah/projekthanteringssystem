@@ -20,26 +20,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-status').value = project.status;
 
                 const fileGallery = document.getElementById('file-gallery');
-                if (project.files && project.files.length > 0) {
-                    project.files.forEach(file => {
-                        const fileExtension = file.url.split('.').pop().toLowerCase();
+                if (fileGallery) {
+                    fileGallery.innerHTML = '';
+                    project.files.forEach(fileUrl => {
+                        const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                        let fileElement;
+
                         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                            const img = document.createElement('img');
-                            img.src = file.url;
-                            img.alt = file.name;
-                            img.classList.add('thumbnail');
-                            img.onclick = () => openModal(file.url);
-                            fileGallery.appendChild(img);
+                            // Bild
+                            fileElement = document.createElement('img');
+                            fileElement.src = fileUrl;
+                            fileElement.alt = 'Project File';
+                            fileElement.style.maxWidth = '150px'; // Mindre storlek
+                            fileElement.style.cursor = 'pointer';
+                            fileElement.onclick = () => window.open(fileUrl, '_blank');
                         } else {
-                            const fileLink = document.createElement('a');
-                            fileLink.href = file.url;
-                            fileLink.target = '_blank';
-                            fileLink.textContent = `Öppna ${file.name}`;
-                            fileLink.classList.add('file-link');
-                            fileLink.style.display = 'block';
-                            fileGallery.appendChild(fileLink);
+                            // Övriga filer (PDF, etc.)
+                            fileElement = document.createElement('a');
+                            fileElement.href = fileUrl;
+                            fileElement.textContent = `Ladda ner fil (${fileExtension.toUpperCase()})`;
+                            fileElement.target = '_blank';
                         }
+
+                        fileGallery.appendChild(fileElement);
                     });
+                } else {
+                    console.error('Element with ID "file-gallery" not found.');
                 }
 
                 editProjectForm.addEventListener('submit', async (e) => {
@@ -54,18 +60,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         status: document.getElementById('project-status').value.trim(),
                     };
 
-                    const projectFiles = document.getElementById('project-images').files;
-                    const uploadedFiles = project.files || [];
+                    const projectImages = document.getElementById('project-images').files;
+                    const imageUrls = project.images || [];
 
                     try {
-                        for (const file of projectFiles) {
+                        for (const file of projectImages) {
                             const storageRef = ref(storage, `project_files/${file.name}`);
                             const snapshot = await uploadBytes(storageRef, file);
-                            const fileUrl = await getDownloadURL(snapshot.ref);
-                            uploadedFiles.push({ name: file.name, url: fileUrl });
+                            const imageUrl = await getDownloadURL(snapshot.ref);
+                            imageUrls.push(imageUrl);
                         }
 
-                        updatedProject.files = uploadedFiles;
+                        updatedProject.files = imageUrls;
 
                         await updateDoc(projectRef, updatedProject);
                         alert('Projektet har uppdaterats!');
@@ -76,27 +82,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 });
             } else {
-                console.error('Projektet kunde inte hittas.');
+                console.error('Project not found.');
             }
         } catch (error) {
             console.error('Error fetching project details:', error);
         }
     } else {
-        console.error('Inget projekt ID angivet.');
+        console.error('No project ID specified.');
     }
 });
-
-function openModal(imageUrl) {
-    const modal = document.getElementById('image-modal');
-    const modalImage = document.getElementById('modal-image');
-    modal.style.display = 'block';
-    modalImage.src = imageUrl;
-}
-
-function closeModal() {
-    const modal = document.getElementById('image-modal');
-    modal.style.display = 'none';
-}
 
 function navigateTo(page) {
     window.location.href = page;
