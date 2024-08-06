@@ -19,14 +19,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
-                const imageGallery = document.getElementById('image-gallery');
-                if (project.images && project.images.length > 0) {
-                    project.images.forEach(url => {
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.alt = 'Project Image';
-                        img.onclick = () => openModal(url);
-                        imageGallery.appendChild(img);
+                const fileGallery = document.getElementById('image-gallery');
+                if (project.files && project.files.length > 0) {
+                    project.files.forEach(file => {
+                        const fileExtension = file.url.split('.').pop().toLowerCase();
+                        if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png') {
+                            const img = document.createElement('img');
+                            img.src = file.url;
+                            img.alt = file.name;
+                            img.onclick = () => openModal(file.url);
+                            fileGallery.appendChild(img);
+                        } else {
+                            const fileLink = document.createElement('a');
+                            fileLink.href = file.url;
+                            fileLink.target = '_blank';
+                            fileLink.textContent = `Öppna ${file.name}`;
+                            fileLink.style.display = 'block';
+                            fileGallery.appendChild(fileLink);
+                        }
                     });
                 }
 
@@ -42,18 +52,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         status: document.getElementById('project-status').value.trim(),
                     };
 
-                    const projectImages = document.getElementById('project-images').files;
-                    const imageUrls = project.images || [];
+                    const projectFiles = document.getElementById('project-images').files;
+                    const uploadedFiles = project.files || [];
 
                     try {
-                        for (const file of projectImages) {
-                            const storageRef = ref(storage, `project_images/${file.name}`);
+                        for (const file of projectFiles) {
+                            const storageRef = ref(storage, `project_files/${file.name}`);
                             const snapshot = await uploadBytes(storageRef, file);
-                            const imageUrl = await getDownloadURL(snapshot.ref);
-                            imageUrls.push(imageUrl);
+                            const fileUrl = await getDownloadURL(snapshot.ref);
+                            uploadedFiles.push({ name: file.name, url: fileUrl });
                         }
 
-                        updatedProject.images = imageUrls;
+                        updatedProject.files = uploadedFiles;
 
                         await updateDoc(projectRef, updatedProject);
                         alert('Projektet har uppdaterats!');
