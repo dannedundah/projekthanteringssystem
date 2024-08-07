@@ -19,10 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
+                console.log('Selected employee:', selectedEmployee); // Debug-utskrift
+
                 const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', selectedEmployee));
                 const querySnapshot = await getDocs(q);
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 const filteredProjects = projects.filter(project => project.address.toLowerCase().includes(searchTerm));
+
+                console.log('Filtered projects:', filteredProjects); // Debug-utskrift
 
                 filteredProjects.forEach(project => {
                     const div = document.createElement('div');
