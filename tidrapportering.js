@@ -7,20 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const employeeDropdown = document.getElementById('employee-dropdown');
     let selectedProjectId = null;
 
-    // Event listener for project search input
     projectSearch.addEventListener('input', async () => {
         const searchTerm = projectSearch?.value?.trim().toLowerCase() || '';
         searchResults.innerHTML = '';
 
-        // Get selected employee
-        const selectedEmployee = employeeDropdown?.value;
-        if (!selectedEmployee) {
-            alert('Vänligen välj en anställd.');
-            return;
-        }
-
         if (searchTerm.length > 0) {
             try {
+                const selectedEmployee = employeeDropdown?.value || '';
+                if (!selectedEmployee) {
+                    alert('Vänligen välj en anställd.');
+                    return;
+                }
+
                 const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', selectedEmployee));
                 const querySnapshot = await getDocs(q);
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -42,15 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener for form submission
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const selectedEmployee = employeeDropdown?.value;
-        if (!selectedEmployee) {
-            alert('Vänligen välj en anställd.');
-            return;
-        }
-
         if (selectedProjectId) {
             const timeType = document.getElementById('time-type')?.value || '';
             const hours = document.getElementById('hours')?.value || '';
@@ -59,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeType && hours && date) {
                 const timeReport = {
                     projectId: selectedProjectId,
-                    employee: selectedEmployee,
                     timeType,
                     hours: parseFloat(hours),
                     date,
