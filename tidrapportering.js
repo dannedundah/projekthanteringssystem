@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchTerm = projectSearch?.value?.trim().toLowerCase() || '';
         searchResults.innerHTML = '';
 
+        const selectedEmployee = employeeDropdown?.value || '';
+        if (!selectedEmployee) {
+            alert('Vänligen välj en anställd.');
+            return;
+        }
+
         if (searchTerm.length > 0) {
             try {
-                const selectedEmployee = employeeDropdown?.value || '';
-                if (!selectedEmployee) {
-                    alert('Vänligen välj en anställd.');
-                    return;
-                }
-
                 console.log('Selected employee:', selectedEmployee); // Debug-utskrift
 
                 const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', selectedEmployee));
