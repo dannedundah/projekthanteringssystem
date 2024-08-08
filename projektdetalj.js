@@ -1,7 +1,8 @@
-import { db, doc, getDoc, updateDoc, storage, ref, deleteObject, getDownloadURL, uploadBytes } from './firebase-config.js';
+import { db, doc, getDoc, updateDoc, storage, ref, deleteObject, getDownloadURL } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const editProjectForm = document.getElementById('edit-project-form');
+    const fileGallery = document.getElementById('file-gallery');
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
 
@@ -19,37 +20,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
 
-                const fileGallery = document.getElementById('file-gallery');
                 if (fileGallery) {
                     fileGallery.innerHTML = '';
-                    project.files.forEach((file, index) => {
-                        const fileUrl = file.url;
-                        const fileName = file.name;
-                        if (fileUrl && fileName) {
-                            const fileExtension = fileName.split('.').pop().toLowerCase();
-                            let fileElement;
+                    const files = project.files || [];
+                    if (Array.isArray(files)) {
+                        files.forEach((file, index) => {
+                            const fileUrl = file.url;
+                            const fileName = file.name;
+                            if (fileUrl && fileName) {
+                                const fileExtension = fileName.split('.').pop().toLowerCase();
+                                let fileElement;
 
-                            if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                // Bild
-                                fileElement = document.createElement('div');
-                                fileElement.innerHTML = `<img src="${fileUrl}" alt="${fileName}" style="max-width: 150px; cursor: pointer;" onclick="window.open('${fileUrl}', '_blank')">`;
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    // Bild
+                                    fileElement = document.createElement('div');
+                                    fileElement.innerHTML = `<img src="${fileUrl}" alt="${fileName}" style="max-width: 150px; cursor: pointer;" onclick="window.open('${fileUrl}', '_blank')">`;
+                                } else {
+                                    // Övriga filer (PDF, etc.)
+                                    fileElement = document.createElement('div');
+                                    fileElement.innerHTML = `<a href="${fileUrl}" target="_blank">Ladda ner ${fileName} (${fileExtension.toUpperCase()})</a>`;
+                                }
+
+                                // Lägg till en ta bort-knapp
+                                const removeButton = document.createElement('button');
+                                removeButton.textContent = 'Ta bort';
+                                removeButton.onclick = async () => await removeFile(fileUrl, index);
+                                fileElement.appendChild(removeButton);
+
+                                fileGallery.appendChild(fileElement);
                             } else {
-                                // Övriga filer (PDF, etc.)
-                                fileElement = document.createElement('div');
-                                fileElement.innerHTML = `<a href="${fileUrl}" target="_blank">Ladda ner ${fileName} (${fileExtension.toUpperCase()})</a>`;
+                                console.error('Invalid file data:', file);
                             }
-
-                            // Lägg till en ta bort-knapp
-                            const removeButton = document.createElement('button');
-                            removeButton.textContent = 'Ta bort';
-                            removeButton.onclick = async () => await removeFile(fileUrl, index);
-                            fileElement.appendChild(removeButton);
-
-                            fileGallery.appendChild(fileElement);
-                        } else {
-                            console.error('Invalid file data:', file);
-                        }
-                    });
+                        });
+                    } else {
+                        console.error('Project files is not an array:', files);
+                    }
                 } else {
                     console.error('Element with ID "file-gallery" not found.');
                 }
