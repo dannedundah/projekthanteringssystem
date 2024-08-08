@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, addDoc, getAuth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedProjectId = null;
     let currentUser = null;
 
-    const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
