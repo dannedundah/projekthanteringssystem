@@ -7,9 +7,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const employee3Dropdown = document.getElementById('employee-3');
     const employee4Dropdown = document.getElementById('employee-4');
 
+    if (!employee1Dropdown || !employee2Dropdown || !employee3Dropdown || !employee4Dropdown) {
+        console.error('One or more employee dropdown elements are not found.');
+        return;
+    }
+
     try {
         const querySnapshot = await getDocs(collection(db, 'users'));
         const users = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log('Fetched users:', users);
 
         const createOption = (user) => {
             const option = document.createElement('option');
