@@ -1,29 +1,21 @@
-import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
     const projectSearch = document.getElementById('project-search');
     const searchResults = document.getElementById('search-results');
     let selectedProjectId = null;
-    let currentUser = null;
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user;
-            console.log("Current user: ", user.email);
-        } else {
-            // Redirect to login page if no user is logged in
-            window.location.href = 'login.html';
-        }
-    });
+    const userFirstName = localStorage.getItem('userFirstName');
+    const userLastName = localStorage.getItem('userLastName');
 
     projectSearch.addEventListener('input', async () => {
-        const searchTerm = projectSearch.value.trim().toLowerCase();
+        const searchTerm = projectSearch?.value?.trim().toLowerCase() || '';
         searchResults.innerHTML = '';
 
-        if (searchTerm.length > 0 && currentUser) {
+        if (searchTerm.length > 0) {
             try {
-                const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', currentUser.email));
+                const q = query(collection(db, 'projects'), where('assignedEmployees', 'array-contains', `${userFirstName} ${userLastName}`));
                 const querySnapshot = await getDocs(q);
                 const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 const filteredProjects = projects.filter(project => project.address.toLowerCase().includes(searchTerm));
@@ -47,17 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (selectedProjectId) {
-            const timeType = document.getElementById('time-type').value;
-            const hours = document.getElementById('hours').value;
-            const date = document.getElementById('date').value;
+            const timeType = document.getElementById('time-type')?.value || '';
+            const hours = document.getElementById('hours')?.value || '';
+            const date = document.getElementById('date')?.value || '';
 
-            if (timeType && hours && date && currentUser) {
+            if (timeType && hours && date) {
                 const timeReport = {
                     projectId: selectedProjectId,
                     timeType,
                     hours: parseFloat(hours),
                     date,
-                    user: currentUser.email
                 };
 
                 try {

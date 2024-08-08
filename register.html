@@ -3,20 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrera</title>
+    <title>Registera Användare</title>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="register.js"></script>
+    <script type="module" src="auth.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Registrera</h1>
+        <h1>Registera Användare</h1>
         <form id="register-form">
-            <input type="email" id="email" placeholder="E-post" required>
-            <input type="password" id="password" placeholder="Lösenord" required>
-            <button type="submit">Registrera</button>
+            <label for="first-name">Förnamn:</label>
+            <input type="text" id="first-name" required>
+
+            <label for="last-name">Efternamn:</label>
+            <input type="text" id="last-name" required>
+
+            <label for="email">E-post:</label>
+            <input type="email" id="email" required>
+
+            <label for="password">Lösenord:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Registera</button>
         </form>
-        <p>Har du redan ett konto? <a href="login.html">Logga in här</a></p>
+        <button onclick="navigateTo('login.html')">Tillbaka</button>
     </div>
+
+    <script>
+        import { registerUser } from './auth.js';
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+
+            await registerUser(email, password, firstName, lastName);
+        });
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
