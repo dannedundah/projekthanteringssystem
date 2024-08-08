@@ -1,21 +1,34 @@
-import { db, collection, getDocs, addDoc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, query, where } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
+    const projectDropdown = document.getElementById('project-id');
     const employee1Dropdown = document.getElementById('employee-1');
     const employee2Dropdown = document.getElementById('employee-2');
     const employee3Dropdown = document.getElementById('employee-3');
     const employee4Dropdown = document.getElementById('employee-4');
 
-    if (!employee1Dropdown || !employee2Dropdown || !employee3Dropdown || !employee4Dropdown) {
-        console.error('One or more employee dropdown elements are not found.');
+    if (!projectDropdown || !employee1Dropdown || !employee2Dropdown || !employee3Dropdown || !employee4Dropdown) {
+        console.error('One or more dropdown elements are not found.');
         return;
     }
 
     try {
-        const querySnapshot = await getDocs(collection(db, 'users'));
-        const users = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log('Fetched users:', users);
+        // Fetch projects with status "Ny"
+        const projectsQuery = query(collection(db, 'projects'), where('status', '==', 'Ny'));
+        const projectsSnapshot = await getDocs(projectsQuery);
+        const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        projects.forEach(project => {
+            const option = document.createElement('option');
+            option.value = project.id;
+            option.textContent = project.name;
+            projectDropdown.appendChild(option);
+        });
+
+        // Fetch registered users
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         const createOption = (user) => {
             const option = document.createElement('option');
@@ -32,13 +45,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             employee4Dropdown.appendChild(option.cloneNode(true));
         });
     } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching data:', error);
     }
 
     planningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const projectId = document.getElementById('project-id').value.trim();
+        const projectId = projectDropdown.value.trim();
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
         const electricianDate = document.getElementById('electrician-date').value;
