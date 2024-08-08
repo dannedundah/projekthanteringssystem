@@ -1,48 +1,67 @@
 import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const projectSelect = document.getElementById('project-select');
     const planningForm = document.getElementById('planning-form');
+    const employee1Dropdown = document.getElementById('employee-1');
+    const employee2Dropdown = document.getElementById('employee-2');
+    const employee3Dropdown = document.getElementById('employee-3');
+    const employee4Dropdown = document.getElementById('employee-4');
 
-    // Fetch and populate projects
     try {
-        const querySnapshot = await getDocs(collection(db, 'projects'));
-        querySnapshot.forEach(doc => {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        const users = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const createOption = (user) => {
             const option = document.createElement('option');
-            option.value = doc.id;
-            option.textContent = doc.data().name;
-            projectSelect.appendChild(option);
+            option.value = `${user.firstName} ${user.lastName}`;
+            option.textContent = `${user.firstName} ${user.lastName}`;
+            return option;
+        };
+
+        users.forEach(user => {
+            const option = createOption(user);
+            employee1Dropdown.appendChild(option.cloneNode(true));
+            employee2Dropdown.appendChild(option.cloneNode(true));
+            employee3Dropdown.appendChild(option.cloneNode(true));
+            employee4Dropdown.appendChild(option.cloneNode(true));
         });
     } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error('Error fetching users:', error);
     }
 
     planningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const project = projectSelect.value;
-        const employee1 = document.getElementById('employee-select-1').value;
-        const employee2 = document.getElementById('employee-select-2').value;
-        const employee3 = document.getElementById('employee-select-3').value;
-        const employee4 = document.getElementById('employee-select-4').value;
+        const projectId = document.getElementById('project-id').value.trim();
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
         const electricianDate = document.getElementById('electrician-date').value;
+        const employees = [
+            employee1Dropdown.value,
+            employee2Dropdown.value,
+            employee3Dropdown.value,
+            employee4Dropdown.value,
+        ].filter(employee => employee !== '');
 
-        if (project && startDate && endDate) {
-            try {
-                await addDoc(collection(db, 'planning'), {
-                    project,
-                    employees: [employee1, employee2, employee3, employee4],
-                    startDate,
-                    endDate,
-                    electricianDate
-                });
-                alert('Planering tillagd');
-                planningForm.reset();
-            } catch (error) {
-                console.error('Error adding planning:', error);
-            }
+        const planning = {
+            projectId,
+            startDate,
+            endDate,
+            electricianDate,
+            employees,
+        };
+
+        try {
+            await addDoc(collection(db, 'planning'), planning);
+            alert('Planering sparad!');
+            planningForm.reset();
+        } catch (error) {
+            console.error('Error saving planning:', error);
+            alert('Ett fel uppstod vid sparandet av planeringen.');
         }
     });
+
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
 });

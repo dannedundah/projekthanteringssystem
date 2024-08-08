@@ -12,70 +12,8 @@
     <div class="container">
         <h1>Planering</h1>
         <form id="planning-form">
-            <label for="project-select">Projekt:</label>
-            <select id="project-select">
-                <option value="">Välj projekt</option>
-            </select>
-
-            <label for="employee-select-1">Anställd 1:</label>
-            <select id="employee-select-1">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Daniel">Daniel</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
-
-            <label for="employee-select-2">Anställd 2:</label>
-            <select id="employee-select-2">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Daniel">Daniel</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
-
-            <label for="employee-select-3">Anställd 3:</label>
-            <select id="employee-select-3">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Daniel">Daniel</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
-
-            <label for="employee-select-4">Anställd 4:</label>
-            <select id="employee-select-4">
-                <option value="">Välj namn</option>
-                <option value="Alireza">Alireza</option>
-                <option value="Andreas">Andreas</option>
-                <option value="Daniel">Daniel</option>
-                <option value="Hampus">Hampus</option>
-                <option value="Loa">Loa</option>
-                <option value="Marcus">Marcus</option>
-                <option value="Mustafa">Mustafa</option>
-                <option value="Noah">Noah</option>
-                <option value="Reza">Reza</option>
-                <option value="Rickard">Rickard</option>
-            </select>
+            <label for="project-id">Projekt ID:</label>
+            <input type="text" id="project-id" required>
 
             <label for="start-date">Startdatum:</label>
             <input type="date" id="start-date" required>
@@ -83,11 +21,24 @@
             <label for="end-date">Slutdatum:</label>
             <input type="date" id="end-date" required>
 
-            <label for="electrician-date">Datum Elektriker:</label>
+            <label for="electrician-date">Datum för Elektriker:</label>
             <input type="date" id="electrician-date">
 
-            <button type="submit">Lägg till planering</button>
+            <label for="employee-1">Anställd 1:</label>
+            <select id="employee-1" required></select>
+
+            <label for="employee-2">Anställd 2:</label>
+            <select id="employee-2"></select>
+
+            <label for="employee-3">Anställd 3:</label>
+            <select id="employee-3"></select>
+
+            <label for="employee-4">Anställd 4:</label>
+            <select id="employee-4"></select>
+
+            <button type="submit">Spara Planering</button>
         </form>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>
 </html>
