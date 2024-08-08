@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         for (const planning of plannings) {
             try {
-                const projectDocRef = doc(db, 'projects', planning.project);
+                const projectDocRef = doc(db, 'projects', planning.projectId);
                 const projectDoc = await getDoc(projectDocRef);
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
-                    if (projectData.address.toLowerCase().includes(searchTerm)) {
+                    if (projectData.address && projectData.address.toLowerCase().includes(searchTerm)) {
                         filteredPlannings.push(planning);
                     }
                 }
@@ -50,23 +50,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         for (const planning of plannings) {
             try {
-                const projectDocRef = doc(db, 'projects', planning.project);
+                const projectDocRef = doc(db, 'projects', planning.projectId);
                 const projectDoc = await getDoc(projectDocRef);
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
                     if (planning.status !== 'Fakturerad') {
+                        const address = projectData.address || 'Ej specificerad';
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td><a href="projekt-detalj.html?id=${planning.project}">${projectData.address || 'Ej specificerad'}</a></td>
+                            <td><a href="projekt-detalj.html?id=${planning.projectId}">${address}</a></td>
                             <td>${planning.startDate}</td>
                             <td>${planning.endDate}</td>
                             <td>${planning.electricianDate || 'Ej specificerad'}</td>
-                            <td>${planning.employees ? planning.employees.join(', ') : 'Inga anställda'}</td>
+                            <td>${planning.employees.join(', ')}</td>
                         `;
                         ganttTableBody.appendChild(row);
                     }
-                } else {
-                    console.error('Project document not found for project:', planning.project);
                 }
             } catch (error) {
                 console.error('Error fetching project details:', error);
