@@ -42,8 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
-        } else {
-            alert('Vänligen välj en anställd.');
         }
     });
 
