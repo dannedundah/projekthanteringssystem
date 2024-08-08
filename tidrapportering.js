@@ -4,14 +4,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
     const projectSearch = document.getElementById('project-search');
     const searchResults = document.getElementById('search-results');
-    const employeeDropdown = document.getElementById('employee-dropdown');
+    const employeeSelect = document.getElementById('employee-select');
     let selectedProjectId = null;
+    let selectedEmployee = '';
+
+    // Event listener for employee selection
+    employeeSelect.addEventListener('change', () => {
+        selectedEmployee = employeeSelect.value;
+        console.log('Selected employee:', selectedEmployee); // Debug-utskrift
+    });
 
     projectSearch.addEventListener('input', async () => {
         const searchTerm = projectSearch?.value?.trim().toLowerCase() || '';
         searchResults.innerHTML = '';
 
-        const selectedEmployee = employeeDropdown?.value || '';
         if (!selectedEmployee) {
             alert('Vänligen välj en anställd.');
             return;
