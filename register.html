@@ -11,20 +11,26 @@
   <div class="container">
     <h1>Registrering</h1>
     <form id="register-form">
-      <label for="email">Email:</label>
-      <input type="email" id="email" placeholder="Email" required>
-
       <label for="first-name">Förnamn:</label>
       <input type="text" id="first-name" placeholder="Förnamn" required>
 
       <label for="last-name">Efternamn:</label>
       <input type="text" id="last-name" placeholder="Efternamn" required>
 
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Email" required>
+
       <label for="password">Lösenord:</label>
       <input type="password" id="password" placeholder="Lösenord" required>
 
       <button type="submit">Registrera</button>
     </form>
+    <button onclick="navigateTo('index.html')">Tillbaka</button>
   </div>
+  <script>
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+  </script>
 </body>
 </html>
