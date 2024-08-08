@@ -13,9 +13,10 @@
     <div class="container">
         <h1>Tidrapportering</h1>
         <form id="time-report-form">
-            <label for="project-search">Sök projekt:</label>
-            <input type="text" id="project-search" placeholder="Sök projekt">
-            <div id="search-results"></div>
+            <label for="project-dropdown">Välj projekt:</label>
+            <select id="project-dropdown" required>
+                <option value="">Välj projekt</option>
+            </select>
 
             <label for="time-type">Typ av tid:</label>
             <select id="time-type" required>
