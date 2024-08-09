@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusBtn = document.getElementById('status-btn');
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn'); // New button
+    const exportTimeReportBtn = document.getElementById('export-time-report-btn'); // Button for exporting time reports
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -41,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (timeReportingBtn) {
         timeReportingBtn.addEventListener('click', () => navigateTo('tidrapportering.html')); // New event listener
+    }
+    if (exportTimeReportBtn) {
+        exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html')); // New event listener for exporting time reports
     }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
@@ -70,8 +74,4 @@ async function logout() {
         console.error('Error logging out:', error);
         alert('Ett fel uppstod vid utloggning.');
     }
-    document.getElementById('export-time-report-btn').addEventListener('click', () => {
-        navigateTo('export-time-report.html');
-    });
-    
 }
