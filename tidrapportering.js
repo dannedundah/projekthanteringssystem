@@ -6,53 +6,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
     const dateInput = document.getElementById('date');
-    let selectedEmployeeEmail = null;
+    let selectedEmployeeName = null;
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            selectedEmployeeEmail = user.email;
-            console.log(`Logged in as: ${selectedEmployeeEmail}`);
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-            try {
-                const employeeProjects = [];
-                const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
-                const querySnapshot = await getDocs(q);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
+                console.log(`Logged in as: ${selectedEmployeeName}`);
 
-                console.log('Fetched planning docs:', querySnapshot.docs.map(doc => doc.data()));
+                try {
+                    const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeName));
+                    const querySnapshot = await getDocs(q);
 
-                for (const doc of querySnapshot.docs) {
-                    const planningData = doc.data();
-                    console.log('Processing planning data:', planningData);
-                    
-                    if (planningData.projectId) {
-                        const projectDocRef = doc(db, 'projects', planningData.projectId);
-                        const projectDoc = await getDoc(projectDocRef);
-    
-                        if (projectDoc.exists()) {
-                            const projectData = projectDoc.data();
-                            employeeProjects.push({ id: projectDoc.id, address: projectData.address });
-                        } else {
-                            console.log(`Project not found: ${planningData.projectId}`);
-                        }
+                    console.log('Fetched planning docs:', querySnapshot.docs.map(doc => doc.data()));
+
+                    const employeeProjects = await Promise.all(
+                        querySnapshot.docs.map(async (doc) => {
+                            const planningData = doc.data();
+                            console.log('Processing planning data:', planningData);
+
+                            if (planningData.projectId) {
+                                const projectDocRef = doc(db, 'projects', planningData.projectId);
+                                const projectDoc = await getDoc(projectDocRef);
+            
+                                if (projectDoc.exists()) {
+                                    const projectData = projectDoc.data();
+                                    return { id: projectDoc.id, address: projectData.address };
+                                } else {
+                                    console.log(`Project not found: ${planningData.projectId}`);
+                                }
+                            } else {
+                                console.log(`Missing projectId in planning document: ${doc.id}`);
+                            }
+                            return null;
+                        })
+                    );
+
+                    const validProjects = employeeProjects.filter(project => project !== null);
+
+                    if (validProjects.length > 0) {
+                        projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                        validProjects.forEach(project => {
+                            const option = document.createElement('option');
+                            option.value = project.id;
+                            option.textContent = project.address || 'Ej specificerad';
+                            projectDropdown.appendChild(option);
+                        });
                     } else {
-                        console.log(`Missing projectId in planning document: ${doc.id}`);
+                        console.log('No projects found for the user');
                     }
-                }
 
-                if (employeeProjects.length > 0) {
-                    projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
-                    employeeProjects.forEach(project => {
-                        const option = document.createElement('option');
-                        option.value = project.id;
-                        option.textContent = project.address || 'Ej specificerad';
-                        projectDropdown.appendChild(option);
-                    });
-                } else {
-                    console.log('No projects found for the user');
+                } catch (error) {
+                    console.error('Error fetching projects:', error);
                 }
-
-            } catch (error) {
-                console.error('Error fetching projects:', error);
+            } else {
+                console.error('User document not found.');
             }
         } else {
             console.error('User not logged in');
@@ -72,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeType,
                 hours,
                 date,
-                employee: selectedEmployeeEmail
+                employee: selectedEmployeeName
             };
 
             try {
