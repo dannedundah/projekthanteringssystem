@@ -11,20 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             selectedEmployeeEmail = user.email;
+            console.log(`Logged in as: ${selectedEmployeeEmail}`);
 
             try {
                 const employeeProjects = [];
                 const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
                 const querySnapshot = await getDocs(q);
 
+                console.log(`Fetched planning documents: ${querySnapshot.size}`);
+                
                 for (const planningDoc of querySnapshot.docs) {
                     const planningData = planningDoc.data();
+                    console.log(`Processing planning document: ${planningDoc.id} with data:`, planningData);
+
                     const projectDocRef = doc(db, 'projects', planningData.projectId);
                     const projectDoc = await getDoc(projectDocRef);
 
                     if (projectDoc.exists()) {
                         const projectData = projectDoc.data();
+                        console.log(`Fetched project: ${projectDoc.id} with address: ${projectData.address}`);
                         employeeProjects.push({ id: projectDoc.id, address: projectData.address });
+                    } else {
+                        console.log(`Project not found: ${planningData.projectId}`);
                     }
                 }
 
@@ -35,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     option.textContent = project.address || 'Ej specificerad';
                     projectDropdown.appendChild(option);
                 });
+
+                console.log('Projects added to dropdown:', employeeProjects);
+
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
