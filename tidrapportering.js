@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged, getDoc, doc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -6,35 +6,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
     const dateInput = document.getElementById('date');
-    let selectedEmployeeEmail = null;
+    let selectedEmployeeName = null;
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            selectedEmployeeEmail = user.email;
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                selectedEmployeeName = userDoc.data().displayName; // Förutsätter att användarens namn finns i 'displayName'
+                console.log("Logged in as:", selectedEmployeeName); // Loggar inloggad användare
 
-            try {
-                const employeeProjects = [];
-                const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
-                const querySnapshot = await getDocs(q);
-                console.log("Fetched projects:", querySnapshot.docs);
+                try {
+                    const employeeProjects = [];
+                    const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeName));
+                    const querySnapshot = await getDocs(q);
 
-                if (!querySnapshot.empty) {
+                    console.log("Fetched projects:", querySnapshot.docs.map(doc => doc.data())); // Logga hämtade projekt
+
                     querySnapshot.forEach(doc => {
                         employeeProjects.push({ id: doc.id, ...doc.data() });
                     });
 
-                    projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
-                    employeeProjects.forEach(project => {
-                        const option = document.createElement('option');
-                        option.value = project.projectId;
-                        option.textContent = project.projectAddress || 'Ej specificerad';
-                        projectDropdown.appendChild(option);
-                    });
-                } else {
-                    console.log("No projects found for the user");
+                    if (employeeProjects.length > 0) {
+                        projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                        employeeProjects.forEach(project => {
+                            const option = document.createElement('option');
+                            option.value = project.projectId;
+                            option.textContent = project.projectAddress || 'Ej specificerad';
+                            projectDropdown.appendChild(option);
+                        });
+                    } else {
+                        console.log("No projects found for the user");
+                    }
+                } catch (error) {
+                    console.error('Error fetching projects:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching projects:', error);
+            } else {
+                console.error('User document not found');
             }
         } else {
             console.error('User not logged in');
@@ -54,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeType,
                 hours,
                 date,
-                employee: selectedEmployeeEmail
+                employee: selectedEmployeeName
             };
 
             try {
