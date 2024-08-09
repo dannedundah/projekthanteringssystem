@@ -58,9 +58,10 @@ async function fetchProjectDetails(reports) {
     const projectDetails = {};
 
     for (const projectId of projectIds) {
-        const projectDoc = await getDocs(collection(db, 'projects'), where('__name__', '==', projectId));
-        if (projectDoc.docs.length > 0) {
-            projectDetails[projectId] = projectDoc.docs[0].data().address || 'Ej specificerad';
+        const projectDocRef = doc(db, 'projects', projectId);
+        const projectDoc = await getDoc(projectDocRef);
+        if (projectDoc.exists()) {
+            projectDetails[projectId] = projectDoc.data().address || 'Ej specificerad';
         } else {
             projectDetails[projectId] = 'Ej specificerad';
         }
