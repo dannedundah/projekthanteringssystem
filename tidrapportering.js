@@ -11,34 +11,33 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             selectedEmployeeEmail = user.email;
-            console.log("Logged in as:", selectedEmployeeEmail); // Lägg till detta för felsökning
+            console.log(`Logged in as: ${selectedEmployeeEmail}`);
 
-            if (selectedEmployeeEmail) {
-                try {
-                    const employeeProjects = [];
-                    const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
-                    const querySnapshot = await getDocs(q);
+            try {
+                const employeeProjects = [];
+                const q = query(collection(db, 'planning'), where('employees', 'array-contains', 'Daniel Pannblom')); // Manuell matchning för att felsöka
+                const querySnapshot = await getDocs(q);
 
-                    querySnapshot.forEach(doc => {
-                        employeeProjects.push({ id: doc.id, ...doc.data() });
+                console.log('Fetched projects:', querySnapshot.docs.map(doc => doc.data())); // Lägg till mer loggning här
+
+                querySnapshot.forEach(doc => {
+                    employeeProjects.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (employeeProjects.length > 0) {
+                    projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                    employeeProjects.forEach(project => {
+                        const option = document.createElement('option');
+                        option.value = project.projectId;
+                        option.textContent = project.projectAddress || 'Ej specificerad';
+                        projectDropdown.appendChild(option);
                     });
-
-                    if (employeeProjects.length > 0) {
-                        projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
-                        employeeProjects.forEach(project => {
-                            const option = document.createElement('option');
-                            option.value = project.projectId;
-                            option.textContent = project.projectAddress || 'Ej specificerad';
-                            projectDropdown.appendChild(option);
-                        });
-                    } else {
-                        console.log('No projects found for the user');
-                    }
-                } catch (error) {
-                    console.error('Error fetching projects:', error);
+                } else {
+                    console.log('No projects found for the user');
                 }
-            } else {
-                console.error('User email is undefined');
+
+            } catch (error) {
+                console.error('Error fetching projects:', error);
             }
         } else {
             console.error('User not logged in');
