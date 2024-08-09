@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged, getDoc, doc } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -6,22 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
     const dateInput = document.getElementById('date');
-    let selectedEmployeeName = null;
+    let selectedEmployeeEmail = null;
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                selectedEmployeeName = userDoc.data().displayName; // Förutsätter att användarens namn finns i 'displayName'
-                console.log("Logged in as:", selectedEmployeeName); // Loggar inloggad användare
+            selectedEmployeeEmail = user.email;
+            console.log("Logged in as:", selectedEmployeeEmail); // Lägg till detta för felsökning
 
+            if (selectedEmployeeEmail) {
                 try {
                     const employeeProjects = [];
-                    const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeName));
+                    const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
                     const querySnapshot = await getDocs(q);
-
-                    console.log("Fetched projects:", querySnapshot.docs.map(doc => doc.data())); // Logga hämtade projekt
 
                     querySnapshot.forEach(doc => {
                         employeeProjects.push({ id: doc.id, ...doc.data() });
@@ -36,13 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             projectDropdown.appendChild(option);
                         });
                     } else {
-                        console.log("No projects found for the user");
+                        console.log('No projects found for the user');
                     }
                 } catch (error) {
                     console.error('Error fetching projects:', error);
                 }
             } else {
-                console.error('User document not found');
+                console.error('User email is undefined');
             }
         } else {
             console.error('User not logged in');
@@ -62,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeType,
                 hours,
                 date,
-                employee: selectedEmployeeName
+                employee: selectedEmployeeEmail
             };
 
             try {
