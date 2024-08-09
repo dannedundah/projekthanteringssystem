@@ -34,7 +34,7 @@ export {
   uploadBytes, 
   getDownloadURL, 
   deleteObject, 
-  auth, 
+  auth,  // Auth is exported here
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   GoogleAuthProvider, 

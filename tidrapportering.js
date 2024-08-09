@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, addDoc, getAuth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('date');
     let selectedEmployeeEmail = null;
 
-    const auth = getAuth();
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             selectedEmployeeEmail = user.email;
@@ -41,21 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const selectedProjectId = projectDropdown.value;
         const timeType = timeTypeDropdown.value;
-        const hours = hoursInput.value;
+        const hours = parseFloat(hoursInput.value);
         const date = dateInput.value;
 
         if (selectedProjectId && timeType && hours && date) {
             const timeReport = {
                 projectId: selectedProjectId,
                 timeType,
-                hours: parseFloat(hours),
+                hours,
                 date,
+                employee: selectedEmployeeEmail
             };
 
             try {
                 await addDoc(collection(db, 'timeReports'), timeReport);
                 alert('Tidrapporten har sparats!');
                 timeReportForm.reset();
+                projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
             } catch (error) {
                 console.error('Error adding time report:', error);
                 alert('Ett fel uppstod vid sparandet av tidrapporten.');
@@ -64,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Vänligen fyll i alla fält.');
         }
     });
-
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
 });
+
+window.navigateTo = (page) => {
+    window.location.href = page;
+};
