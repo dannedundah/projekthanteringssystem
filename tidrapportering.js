@@ -1,4 +1,5 @@
 import { db, collection, query, where, getDocs, addDoc, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import * as XLSX from 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -6,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
     const dateInput = document.getElementById('date');
+    const exportBtn = document.getElementById('export-btn');
     let selectedEmployeeName = null;
 
     onAuthStateChanged(auth, async (user) => {
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Error fetching projects:', error);
                 }
             } else {
-                console.error('User document not found.');
+                console.error('User document not found');
             }
         } else {
             console.error('User not logged in');
@@ -95,6 +97,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             alert('Vänligen fyll i alla fält.');
+        }
+    });
+
+    exportBtn.addEventListener('click', async () => {
+        try {
+            const q = query(collection(db, 'timeReports'), where('employee', '==', selectedEmployeeName));
+            const querySnapshot = await getDocs(q);
+
+            const timeReports = querySnapshot.docs.map(doc => doc.data());
+
+            if (timeReports.length > 0) {
+                const worksheet = XLSX.utils.json_to_sheet(timeReports);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Tidrapporter');
+                XLSX.writeFile(workbook, 'tidrapporter.xlsx');
+            } else {
+                alert('Inga tidrapporter att exportera.');
+            }
+        } catch (error) {
+            console.error('Error exporting time reports:', error);
+            alert('Ett fel uppstod vid exporteringen av tidrapporter.');
         }
     });
 });
