@@ -70,4 +70,8 @@ async function logout() {
         console.error('Error logging out:', error);
         alert('Ett fel uppstod vid utloggning.');
     }
+    document.getElementById('export-time-report-btn').addEventListener('click', () => {
+        navigateTo('export-time-report.html');
+    });
+    
 }

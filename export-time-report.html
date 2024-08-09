@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dra ut tidsrapport</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="export-time-report.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dra ut tidsrapport</h1>
+        <form id="date-range-form">
+            <label for="start-date">Startdatum:</label>
+            <input type="date" id="start-date" required>
+
+            <label for="end-date">Slutdatum:</label>
+            <input type="date" id="end-date" required>
+
+            <button type="submit">Exportera till Excel</button>
+        </form>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
+    </div>
+</body>
+</html>
