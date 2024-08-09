@@ -18,33 +18,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
                 const querySnapshot = await getDocs(q);
 
-                console.log(`Fetched planning documents: ${querySnapshot.size}`);
-                
-                for (const planningDoc of querySnapshot.docs) {
-                    const planningData = planningDoc.data();
-                    console.log(`Processing planning document: ${planningDoc.id} with data:`, planningData);
+                console.log('Fetched projects:', querySnapshot.docs.map(doc => doc.data())); 
 
+                for (const doc of querySnapshot.docs) {
+                    const planningData = doc.data();
                     const projectDocRef = doc(db, 'projects', planningData.projectId);
                     const projectDoc = await getDoc(projectDocRef);
 
                     if (projectDoc.exists()) {
                         const projectData = projectDoc.data();
-                        console.log(`Fetched project: ${projectDoc.id} with address: ${projectData.address}`);
                         employeeProjects.push({ id: projectDoc.id, address: projectData.address });
                     } else {
                         console.log(`Project not found: ${planningData.projectId}`);
                     }
                 }
 
-                projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
-                employeeProjects.forEach(project => {
-                    const option = document.createElement('option');
-                    option.value = project.id;
-                    option.textContent = project.address || 'Ej specificerad';
-                    projectDropdown.appendChild(option);
-                });
-
-                console.log('Projects added to dropdown:', employeeProjects);
+                if (employeeProjects.length > 0) {
+                    projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                    employeeProjects.forEach(project => {
+                        const option = document.createElement('option');
+                        option.value = project.id;
+                        option.textContent = project.address || 'Ej specificerad';
+                        projectDropdown.appendChild(option);
+                    });
+                } else {
+                    console.log('No projects found for the user');
+                }
 
             } catch (error) {
                 console.error('Error fetching projects:', error);
