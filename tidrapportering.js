@@ -16,23 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const employeeProjects = [];
                 const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
                 const querySnapshot = await getDocs(q);
+                console.log("Fetched projects:", querySnapshot.docs);
 
-                querySnapshot.forEach(doc => {
-                    const project = doc.data();
-                    const projectOption = {
-                        id: doc.id,
-                        address: project.projectAddress || 'Ej specificerad'
-                    };
-                    employeeProjects.push(projectOption);
-                });
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach(doc => {
+                        employeeProjects.push({ id: doc.id, ...doc.data() });
+                    });
 
-                projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
-                employeeProjects.forEach(project => {
-                    const option = document.createElement('option');
-                    option.value = project.id;
-                    option.textContent = project.address;
-                    projectDropdown.appendChild(option);
-                });
+                    projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                    employeeProjects.forEach(project => {
+                        const option = document.createElement('option');
+                        option.value = project.projectId;
+                        option.textContent = project.projectAddress || 'Ej specificerad';
+                        projectDropdown.appendChild(option);
+                    });
+                } else {
+                    console.log("No projects found for the user");
+                }
             } catch (error) {
                 console.error('Error fetching projects:', error);
             }
