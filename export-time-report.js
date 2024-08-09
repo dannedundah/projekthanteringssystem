@@ -1,45 +1,38 @@
 import { db, collection, query, where, getDocs } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const exportForm = document.getElementById('export-time-report-form');
-    const startDateInput = document.getElementById('start-date');
-    const endDateInput = document.getElementById('end-date');
-    const exportButton = document.getElementById('export-time-report-btn');
+    const form = document.getElementById('date-range-form');
 
-    exportButton.addEventListener('click', async (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
 
-        if (!startDate || !endDate) {
-            alert('Vänligen fyll i båda datumen.');
-            return;
-        }
+        if (startDate && endDate) {
+            try {
+                const q = query(collection(db, 'timeReports'), where('date', '>=', startDate), where('date', '<=', endDate));
+                const querySnapshot = await getDocs(q);
 
-        try {
-            // Hämta tidrapporter från Firestore baserat på datumintervall
-            const q = query(collection(db, 'timeReports'), where('date', '>=', startDate), where('date', '<=', endDate));
-            const querySnapshot = await getDocs(q);
-            const timeReports = querySnapshot.docs.map(doc => doc.data());
+                const timeReports = [];
+                querySnapshot.forEach((doc) => {
+                    timeReports.push(doc.data());
+                });
 
-            if (timeReports.length === 0) {
-                alert('Inga tidrapporter hittades för det angivna datumintervallet.');
-                return;
+                if (timeReports.length > 0) {
+                    const worksheet = XLSX.utils.json_to_sheet(timeReports);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'Tidrapporter');
+                    XLSX.writeFile(workbook, `Tidrapporter_${startDate}_till_${endDate}.xlsx`);
+                } else {
+                    alert('Inga tidrapporter hittades inom det valda datumintervallet.');
+                }
+            } catch (error) {
+                console.error('Error exporting time reports:', error);
+                alert('Ett fel uppstod vid exporten av tidrapporter.');
             }
-
-            // Konvertera tidrapporterna till ett Excel-format
-            const ws = XLSX.utils.json_to_sheet(timeReports);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Time Reports');
-
-            // Exportera arbetsboken till en fil
-            XLSX.writeFile(wb, `time_reports_${startDate}_till_${endDate}.xlsx`);
-
-            alert('Tidrapporter har exporterats till Excel!');
-        } catch (error) {
-            console.error('Error exporting time reports:', error);
-            alert('Ett fel uppstod vid exporteringen.');
+        } else {
+            alert('Vänligen välj både startdatum och slutdatum.');
         }
     });
 });
