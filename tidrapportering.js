@@ -18,14 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const querySnapshot = await getDocs(q);
 
                 querySnapshot.forEach(doc => {
-                    employeeProjects.push({ id: doc.id, ...doc.data() });
+                    const project = doc.data();
+                    const projectOption = {
+                        id: doc.id,
+                        address: project.projectAddress || 'Ej specificerad'
+                    };
+                    employeeProjects.push(projectOption);
                 });
 
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
                 employeeProjects.forEach(project => {
                     const option = document.createElement('option');
-                    option.value = project.projectId;
-                    option.textContent = project.projectAddress || 'Ej specificerad';
+                    option.value = project.id;
+                    option.textContent = project.address;
                     projectDropdown.appendChild(option);
                 });
             } catch (error) {
