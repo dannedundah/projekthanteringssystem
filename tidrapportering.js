@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, addDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
@@ -11,31 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             selectedEmployeeEmail = user.email;
-            console.log(`Logged in as: ${selectedEmployeeEmail}`);
 
             try {
                 const employeeProjects = [];
-                const q = query(collection(db, 'planning'), where('employees', 'array-contains', 'Daniel Pannblom')); // Se till att användarnamnet matchar exakt
+                const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
                 const querySnapshot = await getDocs(q);
 
-                console.log('Fetched projects:', querySnapshot.docs.map(doc => doc.data())); // Kontrollera att projektdata hämtas korrekt
-
-                querySnapshot.forEach(async (planningDoc) => {
+                for (const planningDoc of querySnapshot.docs) {
                     const planningData = planningDoc.data();
-                    const projectRef = doc(db, 'projects', planningData.projectId); // Anta att 'projectId' refererar till 'projects' samlingen
-                    const projectDoc = await getDoc(projectRef);
+                    const projectDocRef = doc(db, 'projects', planningData.projectId);
+                    const projectDoc = await getDoc(projectDocRef);
+
                     if (projectDoc.exists()) {
                         const projectData = projectDoc.data();
-                        const projectAddress = projectData.address || 'Ej specificerad';
-                        employeeProjects.push({ id: planningDoc.id, address: projectAddress });
+                        employeeProjects.push({ id: projectDoc.id, address: projectData.address });
                     }
-                });
+                }
 
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
                 employeeProjects.forEach(project => {
                     const option = document.createElement('option');
                     option.value = project.id;
-                    option.textContent = project.address;
+                    option.textContent = project.address || 'Ej specificerad';
                     projectDropdown.appendChild(option);
                 });
             } catch (error) {
