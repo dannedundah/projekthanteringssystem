@@ -1,37 +1,45 @@
 import { db, collection, query, where, getDocs } from './firebase-config.js';
-import * as XLSX from 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const dateRangeForm = document.getElementById('date-range-form');
+    const exportForm = document.getElementById('export-time-report-form');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    const exportButton = document.getElementById('export-time-report-btn');
 
-    dateRangeForm.addEventListener('submit', async (e) => {
+    exportButton.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const startDate = new Date(document.getElementById('start-date').value);
-        const endDate = new Date(document.getElementById('end-date').value);
-        endDate.setHours(23, 59, 59, 999); // Sätt slutdatumets tid till slutet av dagen
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+
+        if (!startDate || !endDate) {
+            alert('Vänligen fyll i båda datumen.');
+            return;
+        }
 
         try {
-            const q = query(
-                collection(db, 'timeReports'),
-                where('date', '>=', startDate.toISOString().split('T')[0]),
-                where('date', '<=', endDate.toISOString().split('T')[0])
-            );
+            // Hämta tidrapporter från Firestore baserat på datumintervall
+            const q = query(collection(db, 'timeReports'), where('date', '>=', startDate), where('date', '<=', endDate));
             const querySnapshot = await getDocs(q);
-
             const timeReports = querySnapshot.docs.map(doc => doc.data());
 
-            if (timeReports.length > 0) {
-                const worksheet = XLSX.utils.json_to_sheet(timeReports);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, 'Tidsrapporter');
-                XLSX.writeFile(workbook, 'Tidsrapporter.xlsx');
-            } else {
-                alert('Inga tidsrapporter hittades för det angivna datumintervallet.');
+            if (timeReports.length === 0) {
+                alert('Inga tidrapporter hittades för det angivna datumintervallet.');
+                return;
             }
+
+            // Konvertera tidrapporterna till ett Excel-format
+            const ws = XLSX.utils.json_to_sheet(timeReports);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Time Reports');
+
+            // Exportera arbetsboken till en fil
+            XLSX.writeFile(wb, `time_reports_${startDate}_till_${endDate}.xlsx`);
+
+            alert('Tidrapporter har exporterats till Excel!');
         } catch (error) {
             console.error('Error exporting time reports:', error);
-            alert('Ett fel uppstod vid exporten av tidsrapporter.');
+            alert('Ett fel uppstod vid exporteringen.');
         }
     });
 });
