@@ -18,18 +18,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeEmail));
                 const querySnapshot = await getDocs(q);
 
-                console.log('Fetched projects:', querySnapshot.docs.map(doc => doc.data())); 
+                console.log('Fetched planning docs:', querySnapshot.docs.map(doc => doc.data()));
 
                 for (const doc of querySnapshot.docs) {
                     const planningData = doc.data();
-                    const projectDocRef = doc(db, 'projects', planningData.projectId);
-                    const projectDoc = await getDoc(projectDocRef);
-
-                    if (projectDoc.exists()) {
-                        const projectData = projectDoc.data();
-                        employeeProjects.push({ id: projectDoc.id, address: projectData.address });
+                    console.log('Processing planning data:', planningData);
+                    
+                    if (planningData.projectId) {
+                        const projectDocRef = doc(db, 'projects', planningData.projectId);
+                        const projectDoc = await getDoc(projectDocRef);
+    
+                        if (projectDoc.exists()) {
+                            const projectData = projectDoc.data();
+                            employeeProjects.push({ id: projectDoc.id, address: projectData.address });
+                        } else {
+                            console.log(`Project not found: ${planningData.projectId}`);
+                        }
                     } else {
-                        console.log(`Project not found: ${planningData.projectId}`);
+                        console.log(`Missing projectId in planning document: ${doc.id}`);
                     }
                 }
 
