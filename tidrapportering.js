@@ -24,33 +24,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     console.log('Fetched planning docs:', querySnapshot.docs.map(doc => doc.data()));
 
-                    const employeeProjects = await Promise.all(
-                        querySnapshot.docs.map(async (doc) => {
-                            const planningData = doc.data();
-                            console.log('Processing planning data:', planningData);
+                    const employeeProjects = [];
+                    
+                    for (const docSnapshot of querySnapshot.docs) {
+                        const planningData = docSnapshot.data();
+                        console.log('Processing planning data:', planningData);
 
-                            if (planningData.projectId) {
-                                const projectDocRef = doc(db, 'projects', planningData.projectId);
-                                const projectDoc = await getDoc(projectDocRef);
-            
-                                if (projectDoc.exists()) {
-                                    const projectData = projectDoc.data();
-                                    return { id: projectDoc.id, address: projectData.address };
-                                } else {
-                                    console.log(`Project not found: ${planningData.projectId}`);
-                                }
+                        if (planningData.projectId) {
+                            const projectDocRef = doc(db, 'projects', planningData.projectId);
+                            const projectDoc = await getDoc(projectDocRef);
+
+                            if (projectDoc.exists()) {
+                                const projectData = projectDoc.data();
+                                employeeProjects.push({ id: projectDoc.id, address: projectData.address });
                             } else {
-                                console.log(`Missing projectId in planning document: ${doc.id}`);
+                                console.log(`Project not found: ${planningData.projectId}`);
                             }
-                            return null;
-                        })
-                    );
+                        } else {
+                            console.log(`Missing projectId in planning document: ${docSnapshot.id}`);
+                        }
+                    }
 
-                    const validProjects = employeeProjects.filter(project => project !== null);
-
-                    if (validProjects.length > 0) {
+                    if (employeeProjects.length > 0) {
                         projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
-                        validProjects.forEach(project => {
+                        employeeProjects.forEach(project => {
                             const option = document.createElement('option');
                             option.value = project.id;
                             option.textContent = project.address || 'Ej specificerad';
