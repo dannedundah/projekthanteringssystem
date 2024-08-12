@@ -8,10 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
     const monthYearHeader = document.getElementById('month-year');
-    const reportStatus = document.getElementById('report-status');
-    const reportStatusBody = document.getElementById('report-status-body');
-    const employeeStatusDiv = document.getElementById('employee-status');
-    const employeeStatusBody = document.getElementById('employee-status-body');
     let selectedEmployeeName = null;
     let selectedDate = null;
     let currentYear = new Date().getFullYear();
@@ -29,14 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 generateCalendar(currentYear, currentMonth);
                 await loadProjects();
-                await loadReportStatus(currentYear, currentMonth);
                 await markReportedDays(currentYear, currentMonth);
-
-                // If logged in user is Daniel Pannblom, show the employee status section
-                if (selectedEmployeeName === 'Daniel Pannblom') {
-                    employeeStatusDiv.style.display = 'block';
-                    loadEmployeeStatus(currentYear, currentMonth);
-                }
             } else {
                 console.error('User document not found.');
             }
@@ -137,43 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadReportStatus(year, month) {
-        reportStatus.style.display = 'block';
-        reportStatusBody.innerHTML = '';
-
-        const weekdays = getWeekdaysInMonth(year, month);
-
-        for (const day of weekdays) {
-            const q = query(
-                collection(db, 'timeReports'),
-                where('employee', '==', selectedEmployeeName),
-                where('date', '==', day)
-            );
-
-            const querySnapshot = await getDocs(q);
-            const reported = querySnapshot.docs.length > 0;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${day}</td><td>${reported ? '✅' : '❌'}</td>`;
-            reportStatusBody.appendChild(row);
-        }
-    }
-
-    function getWeekdaysInMonth(year, month) {
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const weekdays = [];
-
-        for (let i = 1; i <= daysInMonth; i++) {
-            const date = new Date(year, month, i);
-            const day = date.getDay();
-            if (day !== 0 && day !== 6) { // Monday to Friday
-                weekdays.push(date.toISOString().split('T')[0]);
-            }
-        }
-
-        return weekdays;
-    }
-
     async function getReportForDate(date) {
         const q = query(
             collection(db, 'timeReports'),
@@ -219,37 +171,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadEmployeeStatus(year, month) {
-        const weekdays = getWeekdaysInMonth(year, month);
+    function getWeekdaysInMonth(year, month) {
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const weekdays = [];
 
-        const q = query(collection(db, 'users'));
-        const usersSnapshot = await getDocs(q);
-
-        usersSnapshot.forEach(async (userDoc) => {
-            const userData = userDoc.data();
-            const employeeName = `${userData.firstName} ${userData.lastName}`;
-
-            let hasReportedAllDays = true;
-
-            for (const day of weekdays) {
-                const q = query(
-                    collection(db, 'timeReports'),
-                    where('employee', '==', employeeName),
-                    where('date', '==', day)
-                );
-
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    hasReportedAllDays = false;
-                    break;
-                }
+        for (let i = 1; i <= daysInMonth; i++) {
+            const date = new Date(year, month, i);
+            const day = date.getDay();
+            if (day !== 0 && day !== 6) { // Monday to Friday
+                weekdays.push(date.toISOString().split('T')[0]);
             }
+        }
 
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${employeeName}</td><td>${hasReportedAllDays ? 'Ja' : 'Nej'}</td>`;
-            employeeStatusBody.appendChild(row);
-        });
+        return weekdays;
     }
 
     document.getElementById('prev-month').addEventListener('click', async () => {
@@ -259,12 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentYear--;
         }
         generateCalendar(currentYear, currentMonth);
-        await loadReportStatus(currentYear, currentMonth);
         await markReportedDays(currentYear, currentMonth);
-        if (selectedEmployeeName === 'Daniel Pannblom') {
-            employeeStatusBody.innerHTML = '';
-            await loadEmployeeStatus(currentYear, currentMonth);
-        }
     });
 
     document.getElementById('next-month').addEventListener('click', async () => {
@@ -274,12 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentYear++;
         }
         generateCalendar(currentYear, currentMonth);
-        await loadReportStatus(currentYear, currentMonth);
         await markReportedDays(currentYear, currentMonth);
-        if (selectedEmployeeName === 'Daniel Pannblom') {
-            employeeStatusBody.innerHTML = '';
-            await loadEmployeeStatus(currentYear, currentMonth);
-        }
     });
 
     timeReportForm.addEventListener('submit', async (e) => {
@@ -304,11 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
                 timeReportForm.style.display = 'none';
                 markReportedDay(selectedDate);
-                await loadReportStatus(currentYear, currentMonth);
-                if (selectedEmployeeName === 'Daniel Pannblom') {
-                    employeeStatusBody.innerHTML = '';
-                    await loadEmployeeStatus(currentYear, currentMonth);
-                }
             } catch (error) {
                 console.error('Error adding time report:', error);
                 alert('Ett fel uppstod vid sparandet av tidrapporten.');
