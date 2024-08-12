@@ -230,3 +230,10 @@ table#calendar td.reported {
     background-color: #32a852;
     color: white;
 }
+/* Add this to your existing CSS */
+
+table#calendar td.reported {
+    background-color: #28a745;
+    color: white;
+}
+

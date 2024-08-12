@@ -7,12 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectDropdown = document.getElementById('project-dropdown');
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
-    const monthYearElement = document.getElementById('month-year');
+    const monthYearHeader = document.getElementById('month-year');
+    const reportStatus = document.getElementById('report-status');
+    const reportStatusBody = document.getElementById('report-status-body');
     let selectedEmployeeName = null;
     let selectedDate = null;
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
-    let reportedDates = [];
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -24,9 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
                 console.log(`Logged in as: ${selectedEmployeeName}`);
 
-                await loadReportedDates(selectedEmployeeName);
                 generateCalendar(currentYear, currentMonth);
                 await loadProjects();
+                await loadReportStatus(currentYear, currentMonth);
+                await markReportedDays(currentYear, currentMonth);
             } else {
                 console.error('User document not found.');
             }
@@ -35,42 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('prev-month').addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
-        generateCalendar(currentYear, currentMonth);
-    });
-
-    document.getElementById('next-month').addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        generateCalendar(currentYear, currentMonth);
-    });
-
-    async function loadReportedDates(employeeName) {
-        try {
-            const q = query(collection(db, 'timeReports'), where('employee', '==', employeeName));
-            const querySnapshot = await getDocs(q);
-            reportedDates = querySnapshot.docs.map(doc => doc.data().date);
-            console.log('Reported dates:', reportedDates);
-        } catch (error) {
-            console.error('Error fetching reported dates:', error);
-        }
-    }
-
     function generateCalendar(year, month) {
         const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
         const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];
-        
+
         // Update the month-year in the header
-        monthYearElement.textContent = `${monthNames[month]} ${year}`;
-        
+        monthYearHeader.textContent = `${monthNames[month]} ${year}`;
+
         // Start with an empty calendar
         calendar.innerHTML = `<tr>${daysOfWeek.map(day => `<th>${day}</th>`).join('')}</tr>`;
 
@@ -84,20 +57,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const cell = document.createElement('td');
 
             if (i >= firstDay && dayNumber <= daysInMonth) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
                 cell.textContent = dayNumber;
-                cell.classList.add('calendar-cell');
-                cell.dataset.date = dateStr;
+                cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
 
-                // Mark as reported if it exists in reportedDates
-                if (reportedDates.includes(dateStr)) {
-                    cell.classList.add('reported');
-                }
-
-                cell.addEventListener('click', () => {
+                cell.addEventListener('click', async () => {
                     selectedDate = cell.dataset.date;
-                    selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
-                    timeReportForm.style.display = 'block';
+                    const report = await getReportForDate(selectedDate);
+
+                    if (report) {
+                        alert(`Du har rapporterat följande:\n\nProjekt: ${report.project}\nTyp av tid: ${report.timeType}\nAntal timmar: ${report.hours}`);
+                    } else {
+                        selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
+                        timeReportForm.style.display = 'block';
+                    }
                 });
 
                 dayNumber++;
@@ -120,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const querySnapshot = await getDocs(q);
 
             const employeeProjects = [];
-            
+
             for (const docSnapshot of querySnapshot.docs) {
                 const planningData = docSnapshot.data();
                 console.log('Processing planning data:', planningData);
@@ -157,6 +129,110 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadReportStatus(year, month) {
+        reportStatus.style.display = 'block';
+        reportStatusBody.innerHTML = '';
+
+        const weekdays = getWeekdaysInMonth(year, month);
+
+        for (const day of weekdays) {
+            const q = query(
+                collection(db, 'timeReports'),
+                where('employee', '==', selectedEmployeeName),
+                where('date', '==', day)
+            );
+
+            const querySnapshot = await getDocs(q);
+            const reported = querySnapshot.docs.length > 0;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${day}</td><td>${reported ? '✅' : '❌'}</td>`;
+            reportStatusBody.appendChild(row);
+        }
+    }
+
+    function getWeekdaysInMonth(year, month) {
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const weekdays = [];
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const date = new Date(year, month, i);
+            const day = date.getDay();
+            if (day !== 0 && day !== 6) { // Monday to Friday
+                weekdays.push(date.toISOString().split('T')[0]);
+            }
+        }
+
+        return weekdays;
+    }
+
+    async function getReportForDate(date) {
+        const q = query(
+            collection(db, 'timeReports'),
+            where('employee', '==', selectedEmployeeName),
+            where('date', '==', date)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const reportData = querySnapshot.docs[0].data();
+            const projectDoc = await getDoc(doc(db, 'projects', reportData.projectId));
+            const project = projectDoc.exists() ? projectDoc.data().address : 'Ej specificerad';
+
+            return {
+                project,
+                timeType: reportData.timeType,
+                hours: reportData.hours
+            };
+        }
+
+        return null;
+    }
+
+    async function markReportedDays(year, month) {
+        const weekdays = getWeekdaysInMonth(year, month);
+
+        for (const day of weekdays) {
+            const q = query(
+                collection(db, 'timeReports'),
+                where('employee', '==', selectedEmployeeName),
+                where('date', '==', day)
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const cell = document.querySelector(`[data-date="${day}"]`);
+                if (cell) {
+                    cell.classList.add('reported');
+                }
+            }
+        }
+    }
+
+    document.getElementById('prev-month').addEventListener('click', async () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generateCalendar(currentYear, currentMonth);
+        await loadReportStatus(currentYear, currentMonth);
+        await markReportedDays(currentYear, currentMonth);
+    });
+
+    document.getElementById('next-month').addEventListener('click', async () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        generateCalendar(currentYear, currentMonth);
+        await loadReportStatus(currentYear, currentMonth);
+        await markReportedDays(currentYear, currentMonth);
+    });
+
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const selectedProjectId = projectDropdown.value;
@@ -189,9 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function markReportedDay(date) {
-        const cells = document.querySelectorAll(`.calendar-cell[data-date="${date}"]`);
-        if (cells.length > 0) {
-            cells[0].classList.add('reported');
+        const cell = document.querySelector(`[data-date="${date}"]`);
+        if (cell) {
+            cell.classList.add('reported');
         }
     }
 });
