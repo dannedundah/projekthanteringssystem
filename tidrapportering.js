@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const monthYearHeader = document.getElementById('month-year');
     const reportStatus = document.getElementById('report-status');
     const reportStatusBody = document.getElementById('report-status-body');
+    const employeeStatusDiv = document.getElementById('employee-status');
+    const employeeStatusBody = document.getElementById('employee-status-body');
     let selectedEmployeeName = null;
     let selectedDate = null;
     let currentYear = new Date().getFullYear();
@@ -29,6 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 await loadProjects();
                 await loadReportStatus(currentYear, currentMonth);
                 await markReportedDays(currentYear, currentMonth);
+
+                // If logged in user is Daniel Pannblom, show the employee status section
+                if (selectedEmployeeName === 'Daniel Pannblom') {
+                    employeeStatusDiv.style.display = 'block';
+                    loadEmployeeStatus(currentYear, currentMonth);
+                }
             } else {
                 console.error('User document not found.');
             }
@@ -211,6 +219,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadEmployeeStatus(year, month) {
+        const weekdays = getWeekdaysInMonth(year, month);
+
+        const q = query(collection(db, 'users'));
+        const usersSnapshot = await getDocs(q);
+
+        usersSnapshot.forEach(async (userDoc) => {
+            const userData = userDoc.data();
+            const employeeName = `${userData.firstName} ${userData.lastName}`;
+
+            let hasReportedAllDays = true;
+
+            for (const day of weekdays) {
+                const q = query(
+                    collection(db, 'timeReports'),
+                    where('employee', '==', employeeName),
+                    where('date', '==', day)
+                );
+
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    hasReportedAllDays = false;
+                    break;
+                }
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${employeeName}</td><td>${hasReportedAllDays ? 'Ja' : 'Nej'}</td>`;
+            employeeStatusBody.appendChild(row);
+        });
+    }
+
     document.getElementById('prev-month').addEventListener('click', async () => {
         currentMonth--;
         if (currentMonth < 0) {
@@ -220,6 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
         generateCalendar(currentYear, currentMonth);
         await loadReportStatus(currentYear, currentMonth);
         await markReportedDays(currentYear, currentMonth);
+        if (selectedEmployeeName === 'Daniel Pannblom') {
+            employeeStatusBody.innerHTML = '';
+            await loadEmployeeStatus(currentYear, currentMonth);
+        }
     });
 
     document.getElementById('next-month').addEventListener('click', async () => {
@@ -231,6 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
         generateCalendar(currentYear, currentMonth);
         await loadReportStatus(currentYear, currentMonth);
         await markReportedDays(currentYear, currentMonth);
+        if (selectedEmployeeName === 'Daniel Pannblom') {
+            employeeStatusBody.innerHTML = '';
+            await loadEmployeeStatus(currentYear, currentMonth);
+        }
     });
 
     timeReportForm.addEventListener('submit', async (e) => {
@@ -255,6 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
                 timeReportForm.style.display = 'none';
                 markReportedDay(selectedDate);
+                await loadReportStatus(currentYear, currentMonth);
+                if (selectedEmployeeName === 'Daniel Pannblom') {
+                    employeeStatusBody.innerHTML = '';
+                    await loadEmployeeStatus(currentYear, currentMonth);
+                }
             } catch (error) {
                 console.error('Error adding time report:', error);
                 alert('Ett fel uppstod vid sparandet av tidrapporten.');
