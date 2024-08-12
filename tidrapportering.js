@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDate = null;
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
+    let reportedDates = [];
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
                 console.log(`Logged in as: ${selectedEmployeeName}`);
 
+                await loadReportedDates(selectedEmployeeName);
                 generateCalendar(currentYear, currentMonth);
                 await loadProjects();
             } else {
@@ -51,6 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
         generateCalendar(currentYear, currentMonth);
     });
 
+    async function loadReportedDates(employeeName) {
+        try {
+            const q = query(collection(db, 'timeReports'), where('employee', '==', employeeName));
+            const querySnapshot = await getDocs(q);
+            reportedDates = querySnapshot.docs.map(doc => doc.data().date);
+            console.log('Reported dates:', reportedDates);
+        } catch (error) {
+            console.error('Error fetching reported dates:', error);
+        }
+    }
+
     function generateCalendar(year, month) {
         const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
         const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];
@@ -71,9 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const cell = document.createElement('td');
 
             if (i >= firstDay && dayNumber <= daysInMonth) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
                 cell.textContent = dayNumber;
                 cell.classList.add('calendar-cell');
-                cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+                cell.dataset.date = dateStr;
+
+                // Mark as reported if it exists in reportedDates
+                if (reportedDates.includes(dateStr)) {
+                    cell.classList.add('reported');
+                }
 
                 cell.addEventListener('click', () => {
                     selectedDate = cell.dataset.date;
