@@ -58,10 +58,10 @@ async function fetchProjectDetails(reports) {
     const projectDetails = {};
 
     for (const projectId of projectIds) {
-        const projectDocRef = doc(db, 'projects', projectId);
-        const projectDoc = await getDoc(projectDocRef);
-        if (projectDoc.exists()) {
-            projectDetails[projectId] = projectDoc.data().address || 'Ej specificerad';
+        const projectQuery = query(collection(db, 'projects'), where('__name__', '==', projectId));
+        const projectSnapshot = await getDocs(projectQuery);
+        if (projectSnapshot.docs.length > 0) {
+            projectDetails[projectId] = projectSnapshot.docs[0].data().address || 'Ej specificerad';
         } else {
             projectDetails[projectId] = 'Ej specificerad';
         }
