@@ -6,14 +6,19 @@
     <title>Tidrapportering</title>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="tidrapportering.js"></script> <!-- JavaScript-filen som hanterar kalendern och rapporteringen -->
+    <script type="module" src="tidrapportering.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Tidrapportering</h1>
         
         <!-- Kalender -->
-        <div id="calendar"></div>
+        <div id="calendar-header">
+            <button id="prev-month-btn">&lt;</button>
+            <span id="month-year"></span>
+            <button id="next-month-btn">&gt;</button>
+        </div>
+        <table id="calendar"></table>
         
         <!-- Formulär för tidrapportering -->
         <form id="time-report-form" style="display: none;">

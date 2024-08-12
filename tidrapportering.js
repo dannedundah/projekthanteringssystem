@@ -31,41 +31,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function generateCalendar(year, month) {
-        calendar.innerHTML = ''; // Rensa kalendern
+        const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
+        const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];
+        
+        // Update the month-year in the header
+        document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
+        
+        // Start with an empty calendar
+        calendar.innerHTML = `<tr>${daysOfWeek.map(day => `<th>${day}</th>`).join('')}</tr>`;
+
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         let dayNumber = 1;
+        let row = document.createElement('tr');
 
-        for (let i = 0; i < 6; i++) { // Kalendern består av 6 rader
-            const row = document.createElement('div');
-            row.className = 'calendar-row';
+        for (let i = 0; i < 42; i++) {
+            const cell = document.createElement('td');
 
-            for (let j = 0; j < 7; j++) { // Veckan har 7 dagar
-                const cell = document.createElement('div');
-                cell.className = 'calendar-cell';
+            if (i >= firstDay && dayNumber <= daysInMonth) {
+                cell.textContent = dayNumber;
+                cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
 
-                if (i === 0 && j < firstDay) {
-                    cell.className += ' empty-cell';
-                } else if (dayNumber > daysInMonth) {
-                    cell.className += ' empty-cell';
-                } else {
-                    cell.textContent = dayNumber;
-                    cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+                cell.addEventListener('click', () => {
+                    selectedDate = cell.dataset.date;
+                    selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
+                    timeReportForm.style.display = 'block';
+                });
 
-                    cell.addEventListener('click', () => {
-                        selectedDate = cell.dataset.date;
-                        selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
-                        timeReportForm.style.display = 'block';
-                    });
-
-                    dayNumber++;
-                }
-
-                row.appendChild(cell);
+                dayNumber++;
+            } else {
+                cell.classList.add('empty-cell');
             }
 
-            calendar.appendChild(row);
+            row.appendChild(cell);
+
+            if ((i + 1) % 7 === 0) {
+                calendar.appendChild(row);
+                row = document.createElement('tr');
+            }
         }
     }
 
