@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, addDoc, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, addDoc, doc, getDoc, auth, onAuthStateChanged, updateDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const calendar = document.getElementById('calendar');
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDate = null;
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
+    let existingReportId = null; // To store the ID of the existing report
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -62,11 +63,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const report = await getReportForDate(selectedDate);
 
                     if (report) {
-                        alert(`Du har rapporterat följande:\n\nProjekt: ${report.project}\nTyp av tid: ${report.timeType}\nAntal timmar: ${report.hours}`);
+                        existingReportId = report.id; // Store the ID of the existing report
+                        projectDropdown.value = report.projectId;
+                        timeTypeDropdown.value = report.timeType;
+                        hoursInput.value = report.hours;
+                        selectedDateHeader.textContent = `Ändra rapportering för ${selectedDate}`;
                     } else {
                         selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
-                        timeReportForm.style.display = 'block';
+                        timeReportForm.reset();
+                        existingReportId = null;
                     }
+
+                    timeReportForm.style.display = 'block';
                 });
 
                 dayNumber++;
@@ -136,11 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            const reportData = querySnapshot.docs[0].data();
+            const reportDoc = querySnapshot.docs[0];
+            const reportData = reportDoc.data();
             const projectDoc = await getDoc(doc(db, 'projects', reportData.projectId));
             const project = projectDoc.exists() ? projectDoc.data().address : 'Ej specificerad';
 
             return {
+                id: reportDoc.id, // Return the report ID
+                projectId: reportData.projectId,
                 project,
                 timeType: reportData.timeType,
                 hours: reportData.hours
@@ -222,14 +233,23 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                await addDoc(collection(db, 'timeReports'), timeReport);
-                alert('Tidrapporten har sparats!');
+                if (existingReportId) {
+                    // Update existing report
+                    const reportDocRef = doc(db, 'timeReports', existingReportId);
+                    await updateDoc(reportDocRef, timeReport);
+                    alert('Tidrapporten har uppdaterats!');
+                } else {
+                    // Add new report
+                    await addDoc(collection(db, 'timeReports'), timeReport);
+                    alert('Tidrapporten har sparats!');
+                }
+
                 timeReportForm.reset();
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
                 timeReportForm.style.display = 'none';
                 markReportedDay(selectedDate);
             } catch (error) {
-                console.error('Error adding time report:', error);
+                console.error('Error saving time report:', error);
                 alert('Ett fel uppstod vid sparandet av tidrapporten.');
             }
         } else {
