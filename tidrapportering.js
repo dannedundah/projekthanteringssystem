@@ -7,8 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectDropdown = document.getElementById('project-dropdown');
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
+    const monthYearElement = document.getElementById('month-year');
     let selectedEmployeeName = null;
     let selectedDate = null;
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -20,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
                 console.log(`Logged in as: ${selectedEmployeeName}`);
 
-                generateCalendar(new Date().getFullYear(), new Date().getMonth());
+                generateCalendar(currentYear, currentMonth);
                 await loadProjects();
             } else {
                 console.error('User document not found.');
@@ -30,12 +33,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('prev-month').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generateCalendar(currentYear, currentMonth);
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        generateCalendar(currentYear, currentMonth);
+    });
+
     function generateCalendar(year, month) {
         const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
         const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];
         
         // Update the month-year in the header
-        document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
+        monthYearElement.textContent = `${monthNames[month]} ${year}`;
         
         // Start with an empty calendar
         calendar.innerHTML = `<tr>${daysOfWeek.map(day => `<th>${day}</th>`).join('')}</tr>`;
