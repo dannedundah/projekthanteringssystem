@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         text: projectData.address || 'Ej specificerad',
                         start_date: planningData.startDate,
                         end_date: planningData.endDate,
-                        detailsLink: `kund-detaljer.html?id=${projectDoc.id}`
+                        detailsLink: `projekt-detalj.html?id=${projectDoc.id}` // Uppdaterad länk
                     });
                 }
             }
