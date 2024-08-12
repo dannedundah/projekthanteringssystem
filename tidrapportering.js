@@ -3,6 +3,7 @@ import { db, collection, query, where, getDocs, addDoc, doc, getDoc, auth, onAut
 document.addEventListener('DOMContentLoaded', () => {
     const timeReportForm = document.getElementById('time-report-form');
     const projectDropdown = document.getElementById('project-dropdown');
+    const reportedDaysOverview = document.getElementById('reported-days-overview');
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
     const dateInput = document.getElementById('date');
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Logged in as: ${selectedEmployeeName}`);
 
                 try {
+                    // Fetch projects related to the logged-in user
                     const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeName));
                     const querySnapshot = await getDocs(q);
 
@@ -57,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('No projects found for the user');
                     }
 
+                    // Fetch and display reported days
+                    fetchReportedDays(selectedEmployeeName);
+
                 } catch (error) {
                     console.error('Error fetching projects:', error);
                 }
@@ -67,6 +72,24 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('User not logged in');
         }
     });
+
+    async function fetchReportedDays(employeeName) {
+        try {
+            const q = query(collection(db, 'timeReports'), where('employee', '==', employeeName));
+            const querySnapshot = await getDocs(q);
+            const reportedDays = querySnapshot.docs.map(doc => doc.data().date);
+            
+            if (reportedDays.length > 0) {
+                const daysList = reportedDays.map(day => `<li>${day}</li>`).join('');
+                reportedDaysOverview.innerHTML = `<ul>${daysList}</ul>`;
+            } else {
+                reportedDaysOverview.innerHTML = 'Inga dagar med rapporterad tid.';
+            }
+        } catch (error) {
+            console.error('Error fetching reported days:', error);
+            reportedDaysOverview.innerHTML = 'Ett fel uppstod vid hämtning av rapporterade dagar.';
+        }
+    }
 
     timeReportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -89,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Tidrapporten har sparats!');
                 timeReportForm.reset();
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                fetchReportedDays(selectedEmployeeName); // Refresh the reported days overview
             } catch (error) {
                 console.error('Error adding time report:', error);
                 alert('Ett fel uppstod vid sparandet av tidrapporten.');
