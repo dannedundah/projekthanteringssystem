@@ -46,7 +46,7 @@ label {
     margin-bottom: 5px;
 }
 
-select, button, input[type="number"], input[type="date"] {
+select, button {
     padding: 10px;
     margin-bottom: 10px;
     width: 100%;
@@ -227,6 +227,6 @@ table#calendar td:hover {
 }
 
 table#calendar td.reported {
-    background-color: #28a745;
+    background-color: #32a852;
     color: white;
 }

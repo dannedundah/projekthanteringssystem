@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (i >= firstDay && dayNumber <= daysInMonth) {
                 cell.textContent = dayNumber;
+                cell.classList.add('calendar-cell');
                 cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
 
                 cell.addEventListener('click', () => {
