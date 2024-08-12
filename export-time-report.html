@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="export-time-report.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script> <!-- XLSX-biblioteket -->
 </head>
 <body>
     <div class="container">
@@ -18,22 +19,24 @@
             <label for="end-date">Slutdatum:</label>
             <input type="date" id="end-date" required>
 
-            <button type="submit">Visa rapporteringsstatus</button>
+            <button type="button" id="export-btn">Exportera till Excel</button>
+            <button type="button" id="status-btn">Visa status</button>
         </form>
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
-
-        <div id="report-status-table" style="display: none;">
-            <h3>Status för anställdas tidrapportering</h3>
+        
+        <div id="status-report" style="display: none;">
+            <h2>Status för tidrapportering</h2>
             <table>
                 <thead>
                     <tr>
                         <th>Anställd</th>
-                        <th>Rapporterat tid:</th>
+                        <th>Rapporterat tid</th>
                     </tr>
                 </thead>
-                <tbody id="report-status-body"></tbody>
+                <tbody id="status-report-body"></tbody>
             </table>
         </div>
+
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>
 </html>
