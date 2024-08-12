@@ -11,16 +11,13 @@
 <body>
     <div class="container">
         <h1>Tidrapportering</h1>
-
-        <!-- Calendar Header with month-year and navigation buttons -->
-        <div id="calendar-header">
-            <button id="prev-month">&lt;</button> <!-- Left arrow button -->
-            <span id="month-year"></span>
-            <button id="next-month">&gt;</button> <!-- Right arrow button -->
+        
+        <div id="calendar-container">
+            <button id="prev-month">&lt; Föregående</button>
+            <h2 id="month-year"></h2>
+            <button id="next-month">Nästa &gt;</button>
+            <table id="calendar"></table>
         </div>
-
-        <!-- Kalender -->
-        <table id="calendar"></table>
         
         <!-- Formulär för tidrapportering -->
         <form id="time-report-form" style="display: none;">
@@ -45,6 +42,21 @@
 
             <button type="submit">Rapportera tid</button>
         </form>
+
+        <!-- Report Status -->
+        <div id="report-status" style="display: none;">
+            <h3>Status för tidrapportering</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="report-status-body"></tbody>
+            </table>
+        </div>
+
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>
