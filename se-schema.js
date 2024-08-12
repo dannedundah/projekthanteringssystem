@@ -1,75 +1,79 @@
-import { db, collection, getDocs, doc, getDoc } from './firebase-config.js';
+import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const viewScheduleForm = document.getElementById('view-schedule-form');
-    const ganttChart = document.getElementById('gantt-chart');
-    const employeeDropdown = document.getElementById('employee-name');
+    const ganttChartContainer = document.getElementById('gantt-chart');
+    let selectedEmployeeName = null;
 
-    viewScheduleForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const employeeName = employeeDropdown.value.trim();
+    // Kontrollera vem som är inloggad och ladda deras schema
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-        try {
-            const querySnapshot = await getDocs(collection(db, "planning"));
-            const schedules = querySnapshot.docs.map(doc => doc.data()).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
+                console.log(`Logged in as: ${selectedEmployeeName}`);
 
-            ganttChart.innerHTML = '';
-            if (employeeName !== '') {
-                const employeeSchedules = schedules.filter(schedule => schedule.employees.includes(employeeName));
-                if (employeeSchedules.length > 0) {
-                    await renderGanttChart(employeeSchedules);
-                } else {
-                    ganttChart.textContent = 'Inga scheman hittades för denna anställd.';
-                }
+                await loadSchedule();
             } else {
-                if (schedules.length > 0) {
-                    await renderGanttChart(schedules);
-                } else {
-                    ganttChart.textContent = 'Inga scheman hittades.';
-                }
+                console.error('User document not found.');
             }
-        } catch (error) {
-            console.error('Error fetching schedules:', error);
+        } else {
+            console.error('User not logged in');
+            navigateTo('login.html');
         }
     });
 
-    async function renderGanttChart(schedules) {
-        const table = document.createElement('table');
-        table.classList.add('gantt-table');
+    async function loadSchedule() {
+        try {
+            // Query för att hämta schemat för den inloggade användaren
+            const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeName));
+            const querySnapshot = await getDocs(q);
 
-        const headerRow = document.createElement('tr');
-        headerRow.innerHTML = `
-            <th>Projekt</th>
-            <th>Startdatum</th>
-            <th>Slutdatum</th>
-        `;
-        table.appendChild(headerRow);
-
-        for (const schedule of schedules) {
-            try {
-                const projectDoc = await getDoc(doc(db, 'projects', schedule.project));
-                const projectData = projectDoc.data();
-
-                if (projectData) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><a href="projekt-detalj.html?id=${schedule.project}">${projectData.address}</a></td>
-                        <td>${schedule.startDate}</td>
-                        <td>${schedule.endDate}</td>
-                    `;
-                    table.appendChild(row);
-                } else {
-                    console.warn(`Project with ID ${schedule.project} does not exist.`);
-                }
-            } catch (error) {
-                console.error('Error fetching project details:', error);
+            if (querySnapshot.empty) {
+                ganttChartContainer.innerHTML = '<p>Inga schemaposter hittades.</p>';
+                return;
             }
-        }
 
-        ganttChart.appendChild(table);
+            const ganttData = [];
+
+            for (const docSnapshot of querySnapshot.docs) {
+                const planningData = docSnapshot.data();
+                const projectDocRef = doc(db, 'projects', planningData.projectId);
+                const projectDoc = await getDoc(projectDocRef);
+
+                if (projectDoc.exists()) {
+                    const projectData = projectDoc.data();
+                    ganttData.push({
+                        id: docSnapshot.id,
+                        text: projectData.address || 'Ej specificerad',
+                        start_date: planningData.startDate,
+                        end_date: planningData.endDate,
+                        detailsLink: `kund-detaljer.html?id=${projectDoc.id}`
+                    });
+                }
+            }
+
+            renderGanttChart(ganttData);
+        } catch (error) {
+            console.error('Error loading schedule:', error);
+        }
     }
 
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
+    function renderGanttChart(ganttData) {
+        ganttChartContainer.innerHTML = ''; // Töm tidigare innehåll
+
+        // Här kan du använda en Gantt-diagramsbibliotek (t.ex. DHTMLX Gantt) för att rendera diagrammet
+        ganttData.forEach(task => {
+            const taskElement = document.createElement('div');
+            taskElement.classList.add('gantt-task');
+            taskElement.innerHTML = `<a href="${task.detailsLink}">${task.text}</a> (${task.start_date} - ${task.end_date})`;
+            ganttChartContainer.appendChild(taskElement);
+        });
+    }
 });
+
+window.navigateTo = (page) => {
+    window.location.href = page;
+};
