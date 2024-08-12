@@ -167,6 +167,60 @@ select, button {
         text-decoration: none;
         cursor: pointer;
     }
+    .calendar-container {
+        display: inline-block;
+        text-align: center;
+        font-family: Arial, sans-serif;
+    }
+    
+    #calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    #calendar-header button {
+        background-color: #0078d7;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    
+    #calendar-header button:hover {
+        background-color: #005fa3;
+    }
+    
+    #month-year {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    table#calendar {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table#calendar th, table#calendar td {
+        width: 14.28%; /* 100% / 7 dagar i veckan */
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ccc;
+    }
+    
+    table#calendar td {
+        cursor: pointer;
+    }
+    
+    table#calendar td.selected {
+        background-color: #0078d7;
+        color: white;
+    }
+    
+    table#calendar td:hover {
+        background-color: #e5e5e5;
+    }
     
     
 }
