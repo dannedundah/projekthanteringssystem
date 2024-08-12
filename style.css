@@ -236,4 +236,22 @@ table#calendar td.reported {
     background-color: #28a745;
     color: white;
 }
+#report-status-table {
+    margin-top: 20px;
+}
+
+#report-status-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#report-status-table th, #report-status-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#report-status-table th {
+    background-color: #f4f4f4;
+}
 
