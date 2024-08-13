@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -12,9 +12,13 @@ const firebaseConfig = {
   measurementId: "G-8HMD30CFYS"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Kontrollera om appen redan är initierad
+if (!getApps().length) {
+    initializeApp(firebaseConfig);
+}
+
+const auth = getAuth();
+const db = getFirestore();
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
