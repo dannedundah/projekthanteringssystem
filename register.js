@@ -1,24 +1,34 @@
-import { auth, createUserWithEmailAndPassword, updateProfile } from './firebase-config.js';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 
-const registerForm = document.getElementById('register-form');
+const auth = getAuth();
+const db = getFirestore();
 
-registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const firstName = document.getElementById('first-name').value;
-    const lastName = document.getElementById('last-name').value;
-    
+async function registerUser(email, password, firstName, lastName) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, {
+        const user = userCredential.user;
+
+        // Spara användardata med inaktiv status
+        await setDoc(doc(db, 'users', user.uid), {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            active: false // Markera som inaktiv
+        });
+
+        // Uppdatera profilnamn
+        await updateProfile(user, {
             displayName: `${firstName} ${lastName}`
         });
-        alert('User registered successfully!');
-        // Redirect or other actions
+
+        // Logga ut användaren direkt efter registrering
+        await auth.signOut();
+
+        alert('Användare registrerad. Vänta på verifiering från administratören.');
+
     } catch (error) {
-        console.error('Error registering user:', error);
-        alert('Error registering user.');
+        console.error('Fel vid registrering:', error);
+        alert('Ett fel uppstod vid registrering.');
     }
-});
+}
