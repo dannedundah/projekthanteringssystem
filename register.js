@@ -1,8 +1,5 @@
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore"; 
-
-const auth = getAuth();
-const db = getFirestore();
+import { auth, createUserWithEmailAndPassword, updateProfile } from './firebase-config.js';
+import { db, doc, setDoc } from './firebase-config.js';
 
 async function registerUser(email, password, firstName, lastName) {
     try {
