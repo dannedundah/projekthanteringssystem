@@ -3,21 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logga in</title>
+    <title>Mitt Schema</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="se-schema.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Logga in</h1>
-        <form id="login-form">
-            <input type="email" id="login-email" placeholder="E-post" required>
-            <input type="password" id="login-password" placeholder="Lösenord" required>
-            <button type="submit">Logga in</button>
-            <div id="error-message"></div>
-        </form>
-        <p>Har du inget konto? <a href="register.html">Registrera dig här</a></p>
+        <h1>Mitt Schema</h1>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
+        <div id="gantt-chart"></div>
     </div>
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="login.js"></script>
 </body>
 </html>
