@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitt Schema</title>
+    <title>Logga In</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="login.js"></script> <!-- Se till att detta är rätt JavaScript-fil -->
 </head>
 <body>
     <div class="container">
-        <h1>Mitt Schema</h1>
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
-        <div id="gantt-chart"></div>
+        <h1>Logga In</h1>
+        <form id="login-form">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="password">Lösenord:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Logga In</button>
+        </form>
     </div>
 </body>
 </html>
