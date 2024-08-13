@@ -63,3 +63,30 @@
     </script>
 </body>
 </html>
+<script type="module">
+    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    
+    const db = getFirestore();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Kontrollera om användaren är aktiv
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().active) {
+                    // Användaren är inloggad och aktiv
+                    console.log('User is active:', user);
+                } else {
+                    // Användaren är inloggad men inte aktiv
+                    await signOut(auth);
+                    alert('Din användare är inte aktiv. Kontakta administratören.');
+                    window.location.href = 'login.html';
+                }
+            } else {
+                // Användaren är inte inloggad
+                window.location.href = 'login.html';
+            }
+        });
+    });
+</script>
