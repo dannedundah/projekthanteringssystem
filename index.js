@@ -1,11 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDYqBOra2wDjyPweyBGnkVMANsvLOx9pps",
   authDomain: "projekthanteringsystem.firebaseapp.com",
   projectId: "projekthanteringsystem",
-  storageBucket: "projekthanteringsystem.appspot.com",
+  storageBucket: "projekthanteringsystem",
   messagingSenderId: "87207954816",
   appId: "1:87207954816:web:167659270c0d6eee901965",
   measurementId: "G-8HMD30CFYS"
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,9 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Auth state observer
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            console.log('User is signed in:', user);
+            // Kontrollera om användaren är aktiv
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().active) {
+                console.log('User is signed in and active:', user);
+            } else {
+                // Om användaren inte är aktiv, logga ut dem
+                await signOut(auth);
+                alert('Din användare är inte aktiv. Kontakta administratören.');
+                window.location.href = 'login.html';
+            }
         } else {
             console.log('No user is signed in.');
             window.location.href = 'login.html';
