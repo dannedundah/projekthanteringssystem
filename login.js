@@ -1,22 +1,26 @@
-import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; 
 
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    const errorMessage = document.getElementById('error-message');
+const auth = getAuth();
+const db = getFirestore();
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+async function loginUser(email, password) {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
+        // Hämta användarens dokument
+        const userDoc = await getDoc(doc(db, "users", user.uid));
 
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            localStorage.setItem('loggedIn', 'true');
+        if (userDoc.exists() && userDoc.data().active) {
+            alert('Inloggad!');
             window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Error logging in:', error);
-            errorMessage.textContent = 'Fel användarnamn eller lösenord';
+        } else {
+            await auth.signOut();
+            alert('Din användare är inte aktiv. Kontakta administratören.');
         }
-    });
-});
+    } catch (error) {
+        console.error('Fel vid inloggning:', error);
+        alert('Ett fel uppstod vid inloggning.');
+    }
+}
