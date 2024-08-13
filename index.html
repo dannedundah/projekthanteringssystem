@@ -19,6 +19,20 @@
         <button id="time-reporting-btn">Tidrapportering</button> <!-- New button added -->
         <button id="export-time-report-btn">Dra ut tidsrapport</button>
         <button id="logout-btn">Logga ut</button>
+        <!-- Lägg till admin länk om inloggad användare är admin -->
+<script type="module">
+    import { auth, onAuthStateChanged } from './firebase-config.js';
+    
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.email === 'daniel@delidel.se') {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin.html';
+            adminLink.textContent = 'Admin Dashboard';
+            document.body.appendChild(adminLink);
+        }
+    });
+</script>
+
     </div>
 </body>
 </html>

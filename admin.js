@@ -1,43 +1,42 @@
-import { getFirestore, collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
 
-const db = getFirestore();
+document.addEventListener('DOMContentLoaded', () => {
+    const userList = document.getElementById('user-list');
 
-// Hämtar alla inaktiva användare
-async function getInactiveUsers() {
-    const querySnapshot = await getDocs(collection(db, "users"));
-    const inactiveUsers = [];
-    querySnapshot.forEach((doc) => {
-        if (!doc.data().active) {
-            inactiveUsers.push({ id: doc.id, ...doc.data() });
+    onAuthStateChanged(auth, async (user) => {
+        if (user && user.email === 'daniel@delidel.se') {
+            const usersSnapshot = await getDocs(collection(db, 'users'));
+
+            usersSnapshot.forEach((doc) => {
+                const userData = doc.data();
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+
+                userItem.innerHTML = `
+                    <p><strong>Namn:</strong> ${userData.firstName} ${userData.lastName}</p>
+                    <p><strong>Email:</strong> ${userData.email}</p>
+                    <p><strong>Status:</strong> ${userData.active ? 'Aktiv' : 'Inaktiv'}</p>
+                    <button onclick="toggleUserStatus('${doc.id}', ${userData.active})">
+                        ${userData.active ? 'Inaktivera' : 'Aktivera'}
+                    </button>
+                    <hr>
+                `;
+
+                userList.appendChild(userItem);
+            });
+        } else {
+            alert('Du har inte behörighet att se denna sida.');
+            window.location.href = 'login.html';
         }
     });
-    return inactiveUsers;
-}
+});
 
-// Aktivera en användare
-async function activateUser(userId) {
-    const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, { active: true });
-    alert('Användaren har aktiverats.');
-    window.location.reload();
-}
+window.toggleUserStatus = async (userId, currentStatus) => {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, { active: !currentStatus });
+    window.location.reload(); // Uppdatera sidan för att visa ändringar
+};
 
-// Visa alla inaktiva användare på sidan
-async function renderInactiveUsers() {
-    const userList = document.getElementById('user-list');
-    const users = await getInactiveUsers();
-    
-    users.forEach(user => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${user.firstName} ${user.lastName} (${user.email})`;
-        
-        const activateButton = document.createElement('button');
-        activateButton.textContent = 'Aktivera';
-        activateButton.addEventListener('click', () => activateUser(user.id));
-        
-        listItem.appendChild(activateButton);
-        userList.appendChild(listItem);
-    });
-}
-
-renderInactiveUsers();
+window.navigateTo = (page) => {
+    window.location.href = page;
+};
