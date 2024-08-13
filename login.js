@@ -1,8 +1,4 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; 
-
-const auth = getAuth();
-const db = getFirestore();
+import { auth, signInWithEmailAndPassword, db, getDoc, doc } from './firebase-config.js';
 
 async function loginUser(email, password) {
     try {
