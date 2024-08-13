@@ -73,7 +73,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
-
+querySnapshot.forEach((doc) => {
+    if (doc.id !== 'moBgPPK2jgyZaeBnqza1') { // Uteslut det specifika projektet
+        projects.push({ id: doc.id, ...doc.data() });
+    }
+});
 window.navigateTo = (page) => {
     window.location.href = page;
 };
