@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Filter out the specific project you want to exclude
-            plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1');
+            // Filter out projects with specific status and specific project ID
+            plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad');
 
             renderGanttChart(plannings); // Render initial chart
         } catch (error) {
@@ -78,18 +78,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const projectDoc = await getDoc(projectDocRef);
                     if (projectDoc.exists()) {
                         const projectData = projectDoc.data();
-                        if (planning.status !== 'Fakturerad') {
-                            const address = projectData.address || 'Ej specificerad';
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td><a href="projekt-detalj.html?id=${planning.projectId}">${address}</a></td>
-                                <td>${planning.startDate}</td>
-                                <td>${planning.endDate}</td>
-                                <td>${planning.electricianDate || 'Ej specificerad'}</td>
-                                <td>${planning.employees.join(', ')}</td>
-                            `;
-                            ganttTableBody.appendChild(row);
-                        }
+                        const address = projectData.address || 'Ej specificerad';
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><a href="projekt-detalj.html?id=${planning.projectId}">${address}</a></td>
+                            <td>${planning.startDate}</td>
+                            <td>${planning.endDate}</td>
+                            <td>${planning.electricianDate || 'Ej specificerad'}</td>
+                            <td>${planning.employees.join(', ')}</td>
+                        `;
+                        ganttTableBody.appendChild(row);
                     }
                 } catch (error) {
                     console.error('Error fetching project details:', error);
