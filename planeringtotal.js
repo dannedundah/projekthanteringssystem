@@ -12,7 +12,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let plannings = [];
     try {
         const querySnapshot = await getDocs(collection(db, 'planning'));
-        plannings = querySnapshot.docs.map(doc => doc.data());
+        plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Filter out the specific project you want to exclude
+        plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1');
 
         renderGanttChart(plannings); // Render initial chart
     } catch (error) {
@@ -73,11 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
-querySnapshot.forEach((doc) => {
-    if (doc.id !== 'moBgPPK2jgyZaeBnqza1') { // Uteslut det specifika projektet
-        projects.push({ id: doc.id, ...doc.data() });
-    }
-});
+
 window.navigateTo = (page) => {
     window.location.href = page;
 };
