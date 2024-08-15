@@ -6,9 +6,10 @@
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <script type="module">
-        import { loadUserManagement, loadProjectManagement } from './admin.js'; // Importera funktionerna från admin.js
+        import { loadUserManagement, loadProjectManagement, filterUsers } from './admin.js'; // Importera funktionerna från admin.js
         window.loadUserManagement = loadUserManagement;
         window.loadProjectManagement = loadProjectManagement;
+        window.filterUsers = filterUsers;
     </script>
 </head>
 <body>
@@ -19,6 +20,16 @@
         <div id="admin-options">
             <button onclick="loadUserManagement()">Hantera användare</button>
             <button onclick="loadProjectManagement()">Hantera projekt</button>
+        </div>
+
+        <!-- Filter för användare -->
+        <div id="user-filter" style="display:none;">
+            <label for="filter">Filtrera användare:</label>
+            <select id="filter" onchange="filterUsers(this.value)">
+                <option value="all">Alla</option>
+                <option value="active">Aktiva</option>
+                <option value="inactive">Inaktiva</option>
+            </select>
         </div>
 
         <!-- Dynamiskt innehåll -->
