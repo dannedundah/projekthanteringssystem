@@ -11,7 +11,6 @@
 <body>
     <div class="container">
         <h1>Projektdetalj</h1>
-        <div id="project-details"></div> <!-- Lägg till detta element för att visa projektets detaljer -->
         <form id="edit-project-form">
             <label for="project-name">Projektets namn:</label>
             <input type="text" id="project-name" required>
@@ -35,16 +34,33 @@
                 <option value="Fakturerad">Fakturerad</option>
                 <option value="Solceller klart">Solceller klart</option>
                 <option value="Elektriker klar">Elektriker klar</option>
-                <option value="Driftsatt">Drifsatt</option>
+                <option value="Driftsatt">Driftsatt</option> <!-- Korrigerad stavning -->
             </select>
             
-            <label for="project-images">Lägg till bilder:</label>
-            <input type="file" id="project-images" accept="image/*" multiple>
+            <label for="project-images">Lägg till filer:</label>
+            <input type="file" id="project-images" accept="image/*,.pdf" multiple>
             
             <button type="submit">Spara ändringar</button>
         </form>
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
+
+        <!-- Display Images and Files -->
+        <div id="file-gallery"></div>
+
+        <button onclick="navigateTo('status.html')">Tillbaka</button>
     </div>
+
+    <!-- Modal for image preview -->
+    <div id="image-modal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modal-image">
+        <div id="caption"></div>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
 <script type="module">
