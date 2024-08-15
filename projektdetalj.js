@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         updatedProject.files = imageUrls;
 
                         await updateDoc(projectRef, updatedProject);
+                        console.log(`Projekt ${projectId} uppdaterat med status: ${updatedProject.status}`);
                         alert('Projektet har uppdaterats!');
                         window.location.href = 'projekthantering.html';
                     } catch (error) {
