@@ -1,11 +1,15 @@
-import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const userList = document.getElementById('user-list');
+    const projectList = document.getElementById('project-list');
 
     onAuthStateChanged(auth, async (user) => {
-        if (user && user.email === 'daniel@delidel.se') {
+        const allowedEmails = ['daniel@delidel.se', 'leia@delidel.se', 'sofie@delidel.se'];
+
+        if (user && allowedEmails.includes(user.email)) {
             const usersSnapshot = await getDocs(collection(db, 'users'));
+            const projectsSnapshot = await getDocs(collection(db, 'projects'));
 
             usersSnapshot.forEach((doc) => {
                 const userData = doc.data();
@@ -19,11 +23,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button onclick="toggleUserStatus('${doc.id}', ${userData.active})">
                         ${userData.active ? 'Inaktivera' : 'Aktivera'}
                     </button>
+                    <button onclick="deleteUser('${doc.id}')">Ta bort</button>
                     <hr>
                 `;
 
                 userList.appendChild(userItem);
             });
+
+            projectsSnapshot.forEach((doc) => {
+                const projectData = doc.data();
+                const projectItem = document.createElement('div');
+                projectItem.className = 'project-item';
+
+                projectItem.innerHTML = `
+                    <p><strong>Projekt Namn:</strong> ${projectData.name}</p>
+                    <button onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
+                    <hr>
+                `;
+
+                projectList.appendChild(projectItem);
+            });
+
         } else {
             alert('Du har inte behörighet att se denna sida.');
             window.location.href = 'login.html';
@@ -34,6 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
 window.toggleUserStatus = async (userId, currentStatus) => {
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, { active: !currentStatus });
+    window.location.reload(); // Uppdatera sidan för att visa ändringar
+};
+
+window.deleteUser = async (userId) => {
+    const userRef = doc(db, 'users', userId);
+    await deleteDoc(userRef);
+    window.location.reload(); // Uppdatera sidan för att visa ändringar
+};
+
+window.deleteProject = async (projectId) => {
+    const projectRef = doc(db, 'projects', projectId);
+    await deleteDoc(projectRef);
     window.location.reload(); // Uppdatera sidan för att visa ändringar
 };
 
