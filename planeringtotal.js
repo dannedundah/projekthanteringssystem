@@ -33,19 +33,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         let plannings = [];
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
-            plannings = querySnapshot.docs.map(doc => {
-                const data = doc.data();
-                console.log('Planning Data:', data);  // Logga hela dokumentets data för varje planning
-                return { id: doc.id, ...data };
-            });
+            plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             // Logga alla plannings för att se statusar
             console.log('Alla plannings:', plannings);
 
-            // Filtrera bort projekt med specifik status och specifikt projekt-ID
+            // Filtrera bort projekt där slutdatum är mer än en månad gammalt
+            const currentDate = new Date();
             plannings = plannings.filter(planning => {
-                console.log(`Projekt ID: ${planning.projectId}, Status: ${planning.status}`);
-                return planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad' && planning.status !== 'elektriker klar';
+                const endDate = new Date(planning.endDate);
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(currentDate.getMonth() - 1);
+
+                return endDate >= oneMonthAgo;
             });
 
             console.log('Filtrerade plannings:', plannings);
