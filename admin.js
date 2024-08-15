@@ -1,5 +1,5 @@
-import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; // Endast en import av deleteDoc
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
@@ -34,13 +34,13 @@ export async function loadUserManagement() {
             <button class="user-action ${statusButtonClass}" onclick="toggleUserStatus('${doc.id}', ${userData.active})">
                 ${statusButtonText}
             </button>
-            <button class="user-action" onclick="deleteUser('${doc.id}')">Ta bort</button>
+            <button class="user-action remove-button" onclick="deleteUser('${doc.id}')">Ta bort</button>
             <hr>
         `;
 
         userList.appendChild(userItem);
     });
-};
+}
 
 export async function loadProjectManagement() {
     const adminContent = document.getElementById('admin-content');
@@ -56,32 +56,32 @@ export async function loadProjectManagement() {
 
         projectItem.innerHTML = `
             <p><strong>Projekt Namn:</strong> ${projectData.name}</p>
-            <button class="user-action" onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
+            <button class="user-action remove-button" onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
             <hr>
         `;
 
         projectList.appendChild(projectItem);
     });
-};
+}
 
 window.toggleUserStatus = async (userId, currentStatus) => {
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, { active: !currentStatus });
     loadUserManagement(); // Ladda om användarlistan efter uppdatering
-};
+}
 
 window.deleteUser = async (userId) => {
     const userRef = doc(db, 'users', userId);
     await deleteDoc(userRef);
     loadUserManagement(); // Ladda om användarlistan efter borttagning
-};
+}
 
 window.deleteProject = async (projectId) => {
     const projectRef = doc(db, 'projects', projectId);
     await deleteDoc(projectRef);
     loadProjectManagement(); // Ladda om projektlistan efter borttagning
-};
+}
 
 window.navigateTo = (page) => {
     window.location.href = page;
-};
+}
