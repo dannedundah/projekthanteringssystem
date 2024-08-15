@@ -1,5 +1,4 @@
 import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
-// Importera endast deleteDoc om det inte redan är importerat någon annanstans
 import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
 
 let allUsers = []; // Håll koll på alla användare
@@ -30,7 +29,29 @@ export async function loadUserManagement() {
     renderUsers(allUsers); // Initial render för alla användare
 }
 
-export function filterUsers(filter) {
+export async function loadProjectManagement() { // Se till att denna funktion är korrekt exporterad
+    const adminContent = document.getElementById('admin-content');
+    adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
+
+    const projectList = document.getElementById('project-list');
+    const projectsSnapshot = await getDocs(collection(db, 'projects'));
+
+    projectsSnapshot.forEach((doc) => {
+        const projectData = doc.data();
+        const projectItem = document.createElement('div');
+        projectItem.className = 'project-item';
+
+        projectItem.innerHTML = `
+            <p><strong>Projekt Namn:</strong> ${projectData.name}</p>
+            <button class="user-action remove-button" onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
+            <hr>
+        `;
+
+        projectList.appendChild(projectItem);
+    });
+}
+
+export function filterUsers(filter) { // Se till att denna funktion är korrekt exporterad
     let filteredUsers = allUsers;
 
     if (filter === 'active') {
