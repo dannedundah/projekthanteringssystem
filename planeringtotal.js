@@ -33,7 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         let plannings = [];
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
-            plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            plannings = querySnapshot.docs.map(doc => {
+                const data = doc.data();
+                console.log('Planning Data:', data);  // Logga hela dokumentets data för varje planning
+                return { id: doc.id, ...data };
+            });
 
             // Logga alla plannings för att se statusar
             console.log('Alla plannings:', plannings);
