@@ -3,9 +3,9 @@ import { db, collection, getDocs, doc } from './firebase-config.js';
 document.addEventListener('DOMContentLoaded', async () => {
     const newProjects = document.getElementById('new-projects');
     const plannedProjects = document.getElementById('planned-projects');
-    const solarCompletedProjects = document.getElementById('solar-completed-projects'); // Ny sektion för "Solceller klart"
-    const electricianCompletedProjects = document.getElementById('electrician-completed-projects'); // Ny sektion för "Elektriker Klar"
-    const commissionedProjects = document.getElementById('commissioned-projects'); // Ny sektion för "Driftsatt"
+    const solarCompletedProjects = document.getElementById('solar-completed-projects');
+    const electricianCompletedProjects = document.getElementById('electrician-completed-projects');
+    const commissionedProjects = document.getElementById('commissioned-projects');
     const billedProjects = document.getElementById('billed-projects');
 
     try {
@@ -22,23 +22,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.onclick = () => navigateToProjectDetail(project.id);
             li.classList.add('project-item');
 
-            switch (project.status) {
-                case 'Ny':
+            // Normalisera status för att undvika problem med versaler/gemener eller extra mellanslag
+            const normalizedStatus = project.status.trim().toLowerCase();
+
+            switch (normalizedStatus) {
+                case 'ny':
                     newProjects.appendChild(li);
                     break;
-                case 'Planerad':
+                case 'planerad':
                     plannedProjects.appendChild(li);
                     break;
-                case 'Solceller klart':
+                case 'solceller klart':
                     solarCompletedProjects.appendChild(li);
                     break;
-                case 'Elektriker Klar':
+                case 'elektriker klar':
                     electricianCompletedProjects.appendChild(li);
                     break;
-                case 'Driftsatt':
+                case 'driftsatt':
                     commissionedProjects.appendChild(li);
                     break;
-                case 'Fakturerad':
+                case 'fakturerad':
                     billedProjects.appendChild(li);
                     break;
                 default:
