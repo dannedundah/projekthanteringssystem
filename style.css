@@ -230,12 +230,7 @@ table#calendar td.reported {
     background-color: #32a852;
     color: white;
 }
-/* Add this to your existing CSS */
 
-table#calendar td.reported {
-    background-color: #28a745;
-    color: white;
-}
 #report-status-table {
     margin-top: 20px;
 }
@@ -255,3 +250,18 @@ table#calendar td.reported {
     background-color: #f4f4f4;
 }
 
+/* Uppdaterad CSS för "Ta bort"-knappen */
+button.remove-button {
+    background-color: #ff4c4c; /* Röd bakgrund för att indikera borttagning */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px; /* Mindre padding för att göra knappen kompakt */
+    cursor: pointer;
+    font-size: 12px; /* Mindre fontstorlek */
+    margin-left: 8px; /* Avstånd till vänster om knappen, om det behövs */
+}
+
+button.remove-button:hover {
+    background-color: #e04444; /* Mörkare röd vid hover */
+}

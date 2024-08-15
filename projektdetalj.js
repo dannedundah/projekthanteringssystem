@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 // Lägg till en ta bort-knapp
                                 const removeButton = document.createElement('button');
                                 removeButton.textContent = 'Ta bort';
+                                removeButton.classList.add('remove-button'); // Använd CSS-klassen för styling
                                 removeButton.onclick = async () => await removeFile(fileUrl, index);
                                 fileElement.appendChild(removeButton);
 
