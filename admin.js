@@ -1,4 +1,5 @@
-import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+// Importera endast deleteDoc om det inte redan är importerat någon annanstans
 import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
 
 let allUsers = []; // Håll koll på alla användare
