@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Filter out projects with specific status and specific project ID
+            // Filtrera bort projekt med specifik status och specifikt projekt-ID
             plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad');
 
             renderGanttChart(plannings); // Render initial chart
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error fetching plannings:', error);
         }
 
-        // Event listener for search input
+        // Event listener för sökinput
         searchInput.addEventListener('input', async () => {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const filteredPlannings = [];
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         async function renderGanttChart(plannings) {
             ganttTableBody.innerHTML = ''; // Clear existing content
 
-            // Sort plannings by startDate in ascending order
+            // Sortera plannings efter startdatum i stigande ordning
             plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
             for (const planning of plannings) {
