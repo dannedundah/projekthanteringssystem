@@ -1,5 +1,5 @@
-import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; // Importera deleteDoc direkt från Firebase SDK
+import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-export async function loadUserManagement() { // Exportera funktionen så att den är tillgänglig i HTML
+export async function loadUserManagement() {
     const adminContent = document.getElementById('admin-content');
     adminContent.innerHTML = '<h2>Hantera användare</h2><div id="user-list"></div>';
 
@@ -24,14 +24,17 @@ export async function loadUserManagement() { // Exportera funktionen så att den
         const userItem = document.createElement('div');
         userItem.className = 'user-item';
 
+        const statusButtonClass = userData.active ? 'deactivate' : 'activate';
+        const statusButtonText = userData.active ? 'Inaktivera' : 'Aktivera';
+
         userItem.innerHTML = `
             <p><strong>Namn:</strong> ${userData.firstName} ${userData.lastName}</p>
             <p><strong>Email:</strong> ${userData.email}</p>
             <p><strong>Status:</strong> ${userData.active ? 'Aktiv' : 'Inaktiv'}</p>
-            <button onclick="toggleUserStatus('${doc.id}', ${userData.active})">
-                ${userData.active ? 'Inaktivera' : 'Aktivera'}
+            <button class="user-action ${statusButtonClass}" onclick="toggleUserStatus('${doc.id}', ${userData.active})">
+                ${statusButtonText}
             </button>
-            <button onclick="deleteUser('${doc.id}')">Ta bort</button>
+            <button class="user-action" onclick="deleteUser('${doc.id}')">Ta bort</button>
             <hr>
         `;
 
@@ -39,7 +42,7 @@ export async function loadUserManagement() { // Exportera funktionen så att den
     });
 };
 
-export async function loadProjectManagement() { // Exportera funktionen så att den är tillgänglig i HTML
+export async function loadProjectManagement() {
     const adminContent = document.getElementById('admin-content');
     adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
 
@@ -53,7 +56,7 @@ export async function loadProjectManagement() { // Exportera funktionen så att 
 
         projectItem.innerHTML = `
             <p><strong>Projekt Namn:</strong> ${projectData.name}</p>
-            <button onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
+            <button class="user-action" onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
             <hr>
         `;
 

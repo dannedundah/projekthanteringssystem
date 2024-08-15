@@ -24,19 +24,40 @@ h1 {
 }
 
 button {
-    padding: 10px 20px;
-    margin: 10px;
+    padding: 5px 10px; /* Mindre padding för alla knappar */
+    margin: 5px; /* Mindre marginal för att göra knapparna mer kompakta */
     cursor: pointer;
     background-color: #ff7f00;
     color: white;
     border: none;
     border-radius: 5px;
+    font-size: 14px; /* Mindre textstorlek för att matcha knapparnas storlek */
 }
 
 button:hover {
     background-color: #cc6600;
 }
 
+/* Stil för specifika aktivera/inaktivera knappar */
+button.activate {
+    background-color: #28a745; /* Grön för aktivera */
+    color: white;
+}
+
+button.activate:hover {
+    background-color: #218838; /* Mörkare grön vid hover */
+}
+
+button.deactivate {
+    background-color: #dc3545; /* Röd för inaktivera */
+    color: white;
+}
+
+button.deactivate:hover {
+    background-color: #c82333; /* Mörkare röd vid hover */
+}
+
+/* Formulärstilar */
 form {
     margin-bottom: 20px;
 }
@@ -53,6 +74,7 @@ select, button {
     box-sizing: border-box;
 }
 
+/* Stil för Gantt-tabell */
 #gantt-chart {
     margin-top: 20px;
     overflow-x: auto;
@@ -78,6 +100,7 @@ select, button {
     white-space: nowrap;
 }
 
+/* Stil för bildgalleriet */
 #image-gallery img {
     width: 100px;
     height: auto;
@@ -90,6 +113,7 @@ select, button {
     transform: scale(1.1);
 }
 
+/* Stil för modal fönster */
 .modal {
     display: none;
     position: fixed;
@@ -120,6 +144,7 @@ select, button {
     cursor: pointer;
 }
 
+/* Stil för thumbnails */
 .thumbnail {
     max-width: 100px;
     max-height: 100px;
@@ -128,6 +153,7 @@ select, button {
     border: 1px solid #ccc;
 }
 
+/* Stil för fil länkar */
 .file-link {
     display: block;
     margin: 5px 0;
@@ -135,6 +161,7 @@ select, button {
     text-decoration: underline;
 }
 
+/* Modal för bilder */
 #image-modal {
     display: none;
     position: fixed;
@@ -171,6 +198,7 @@ select, button {
     cursor: pointer;
 }
 
+/* Kalenderstilar */
 .calendar-container {
     display: inline-block;
     text-align: center;
@@ -231,6 +259,7 @@ table#calendar td.reported {
     color: white;
 }
 
+/* Rapport status tabell */
 #report-status-table {
     margin-top: 20px;
 }
