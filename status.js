@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newProjects = document.getElementById('new-projects');
     const plannedProjects = document.getElementById('planned-projects');
     const billedProjects = document.getElementById('billed-projects');
+    const completedProjects = document.getElementById('completed-projects'); // Ny kategori för färdiga projekt
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
@@ -29,11 +30,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'Fakturerad':
                     billedProjects.appendChild(li);
                     break;
-                case 'elektriker klar':
-                    // Du kan hantera detta om du vill lista dessa separat
+                case 'Elektriker klar':
+                    completedProjects.appendChild(li);
+                    break;
+                case 'Solceller klart':
+                    completedProjects.appendChild(li);
+                    break;
+                case 'Driftsatt':
+                    completedProjects.appendChild(li);
                     break;
                 default:
                     console.warn(`Projekt med ID ${project.id} har okänd status: ${project.status}`);
+                    break;
             }
         });
     } catch (error) {

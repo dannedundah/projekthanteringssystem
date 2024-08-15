@@ -12,52 +12,63 @@
     <div class="container">
         <h1>Status</h1>
         <input type="text" id="search-input" placeholder="Sök projekt..." onkeyup="searchProjects()" />
+        
         <div class="project-category">
             <h3 onclick="toggleCategory('new-projects')">Ny</h3>
             <ul id="new-projects" class="category-list"></ul>
         </div>
+
         <div class="project-category">
             <h3 onclick="toggleCategory('planned-projects')">Planerad</h3>
             <ul id="planned-projects" class="category-list"></ul>
         </div>
+
         <div class="project-category">
             <h3 onclick="toggleCategory('billed-projects')">Fakturerad</h3>
             <ul id="billed-projects" class="category-list"></ul>
         </div>
+        
+        <!-- Ny sektion för färdiga projekt -->
+        <div class="project-category">
+            <h3 onclick="toggleCategory('completed-projects')">Färdiga projekt</h3>
+            <ul id="completed-projects" class="category-list"></ul>
+        </div>
+
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+
     <script>
         function navigateTo(page) {
             window.location.href = page;
         }
     </script>
-</body>
-</html>
-<script type="module">
-    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
     
-    const db = getFirestore();
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        
+        const db = getFirestore();
 
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Kontrollera om användaren är aktiv
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().active) {
-                    // Användaren är inloggad och aktiv
-                    console.log('User is active:', user);
+        document.addEventListener('DOMContentLoaded', () => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // Kontrollera om användaren är aktiv
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().active) {
+                        // Användaren är inloggad och aktiv
+                        console.log('User is active:', user);
+                    } else {
+                        // Användaren är inloggad men inte aktiv
+                        await signOut(auth);
+                        alert('Din användare är inte aktiv. Kontakta administratören.');
+                        window.location.href = 'login.html';
+                    }
                 } else {
-                    // Användaren är inloggad men inte aktiv
-                    await signOut(auth);
-                    alert('Din användare är inte aktiv. Kontakta administratören.');
+                    // Användaren är inte inloggad
                     window.location.href = 'login.html';
                 }
-            } else {
-                // Användaren är inte inloggad
-                window.location.href = 'login.html';
-            }
+            });
         });
-    });
-</script>
-
+    </script>
+</body>
+</html>
