@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planering Total</title>
+    <title>Status - Elektriker Klar</title>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="planeringtotal.js"></script>
+    <script type="module" src="status.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Planering Total</h1>
-        <input type="text" id="search-input" placeholder="Sök projekt..." />
-        <table class="gantt-table">
+        <h1>Status - Elektriker Klar</h1>
+        <input type="text" id="search-input" placeholder="Sök efter adress...">
+        <table>
             <thead>
                 <tr>
-                    <th>Projekt</th>
+                    <th>Adress</th>
                     <th>Startdatum</th>
                     <th>Slutdatum</th>
-                    <th>Datum Elektriker</th>
+                    <th>Datum för Elektriker</th>
                     <th>Anställda</th>
                 </tr>
             </thead>
-            <tbody id="gantt-table-body"></tbody>
+            <tbody id="gantt-table-body">
+                <!-- Innehåll kommer att genereras av JavaScript -->
+            </tbody>
         </table>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
