@@ -12,13 +12,15 @@
     <div class="container">
         <h1>Admin Dashboard</h1>
         
-        <div id="user-list">
-            <!-- Lista med användare kommer att fyllas här -->
+        <!-- Valmöjligheter för admin -->
+        <div id="admin-options">
+            <button onclick="loadUserManagement()">Hantera användare</button>
+            <button onclick="loadProjectManagement()">Hantera projekt</button>
         </div>
 
-        <h2>Projekt Administration</h2>
-        <div id="project-list">
-            <!-- Här kan du lägga till funktionalitet för att hantera projekt -->
+        <!-- Dynamiskt innehåll -->
+        <div id="admin-content">
+            <!-- Innehåll för hantering kommer att laddas här -->
         </div>
 
         <button onclick="navigateTo('index.html')">Tillbaka</button>
