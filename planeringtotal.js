@@ -35,8 +35,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+            // Logga alla plannings för att se statusar
+            console.log('Alla plannings:', plannings);
+
             // Filtrera bort projekt med specifik status och specifikt projekt-ID
-            plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad' && planning.status !== 'elektriker klar');
+            plannings = plannings.filter(planning => {
+                console.log(`Projekt ID: ${planning.projectId}, Status: ${planning.status}`);
+                return planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad' && planning.status !== 'elektriker klar';
+            });
+
+            console.log('Filtrerade plannings:', plannings);
 
             renderGanttChart(plannings); // Render initial chart
         } catch (error) {
