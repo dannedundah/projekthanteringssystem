@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="admin.js"></script>
+    <script type="module">
+        import { loadUserManagement, loadProjectManagement } from './admin.js'; // Importera funktionerna från admin.js
+        window.loadUserManagement = loadUserManagement;
+        window.loadProjectManagement = loadProjectManagement;
+    </script>
 </head>
 <body>
     <div class="container">

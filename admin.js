@@ -1,4 +1,5 @@
-import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; // Importera deleteDoc direkt från Firebase SDK
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-window.loadUserManagement = async () => {
+export async function loadUserManagement() { // Exportera funktionen så att den är tillgänglig i HTML
     const adminContent = document.getElementById('admin-content');
     adminContent.innerHTML = '<h2>Hantera användare</h2><div id="user-list"></div>';
 
@@ -38,7 +39,7 @@ window.loadUserManagement = async () => {
     });
 };
 
-window.loadProjectManagement = async () => {
+export async function loadProjectManagement() { // Exportera funktionen så att den är tillgänglig i HTML
     const adminContent = document.getElementById('admin-content');
     adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
 
