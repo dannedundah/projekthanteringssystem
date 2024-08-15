@@ -38,14 +38,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Logga alla plannings för att se statusar
             console.log('Alla plannings:', plannings);
 
-            // Filtrera bort projekt där slutdatum är mer än en månad gammalt
+            // Filtrera bort projekt där slutdatum är mer än en månad gammalt eller med specifikt projekt-ID
             const currentDate = new Date();
             plannings = plannings.filter(planning => {
                 const endDate = new Date(planning.endDate);
                 const oneMonthAgo = new Date();
                 oneMonthAgo.setMonth(currentDate.getMonth() - 1);
 
-                return endDate >= oneMonthAgo;
+                return endDate >= oneMonthAgo && planning.projectId !== 'moBgPPK2jgyZaeBnqza1';
             });
 
             console.log('Filtrerade plannings:', plannings);
