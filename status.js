@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Projects:', projects);
 
         projects.forEach(project => {
+            console.log(`Project ID: ${project.id}, Status: ${project.status}`);
+
             const li = document.createElement('li');
             li.id = project.id;
             li.textContent = project.name;
@@ -27,6 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'Fakturerad':
                     billedProjects.appendChild(li);
                     break;
+                case 'elektriker klar':
+                    // Du kan hantera detta om du vill lista dessa separat
+                    break;
+                default:
+                    console.warn(`Projekt med ID ${project.id} har okänd status: ${project.status}`);
             }
         });
     } catch (error) {
