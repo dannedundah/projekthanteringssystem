@@ -1,10 +1,12 @@
-import { db, collection, getDocs, updateDoc, doc } from './firebase-config.js';
+import { db, collection, getDocs, doc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const newProjects = document.getElementById('new-projects');
     const plannedProjects = document.getElementById('planned-projects');
+    const solarCompletedProjects = document.getElementById('solar-completed-projects'); // Ny sektion för "Solceller klart"
+    const electricianCompletedProjects = document.getElementById('electrician-completed-projects'); // Ny sektion för "Elektriker Klar"
+    const commissionedProjects = document.getElementById('commissioned-projects'); // Ny sektion för "Driftsatt"
     const billedProjects = document.getElementById('billed-projects');
-    const completedProjects = document.getElementById('completed-projects'); // Ny kategori för färdiga projekt
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
@@ -27,17 +29,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'Planerad':
                     plannedProjects.appendChild(li);
                     break;
-                case 'Fakturerad':
-                    billedProjects.appendChild(li);
-                    break;
-                case 'Elektriker klar':
-                    completedProjects.appendChild(li);
-                    break;
                 case 'Solceller klart':
-                    completedProjects.appendChild(li);
+                    solarCompletedProjects.appendChild(li);
+                    break;
+                case 'Elektriker Klar':
+                    electricianCompletedProjects.appendChild(li);
                     break;
                 case 'Driftsatt':
-                    completedProjects.appendChild(li);
+                    commissionedProjects.appendChild(li);
+                    break;
+                case 'Fakturerad':
+                    billedProjects.appendChild(li);
                     break;
                 default:
                     console.warn(`Projekt med ID ${project.id} har okänd status: ${project.status}`);

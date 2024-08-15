@@ -12,7 +12,7 @@
     <div class="container">
         <h1>Status</h1>
         <input type="text" id="search-input" placeholder="Sök projekt..." onkeyup="searchProjects()" />
-        
+
         <div class="project-category">
             <h3 onclick="toggleCategory('new-projects')">Ny</h3>
             <ul id="new-projects" class="category-list"></ul>
@@ -24,14 +24,23 @@
         </div>
 
         <div class="project-category">
+            <h3 onclick="toggleCategory('solar-completed-projects')">Solceller klart</h3>
+            <ul id="solar-completed-projects" class="category-list"></ul>
+        </div>
+
+        <div class="project-category">
+            <h3 onclick="toggleCategory('electrician-completed-projects')">Elektriker Klar</h3>
+            <ul id="electrician-completed-projects" class="category-list"></ul>
+        </div>
+
+        <div class="project-category">
+            <h3 onclick="toggleCategory('commissioned-projects')">Driftsatt</h3>
+            <ul id="commissioned-projects" class="category-list"></ul>
+        </div>
+
+        <div class="project-category">
             <h3 onclick="toggleCategory('billed-projects')">Fakturerad</h3>
             <ul id="billed-projects" class="category-list"></ul>
-        </div>
-        
-        <!-- Ny sektion för färdiga projekt -->
-        <div class="project-category">
-            <h3 onclick="toggleCategory('completed-projects')">Färdiga projekt</h3>
-            <ul id="completed-projects" class="category-list"></ul>
         </div>
 
         <button onclick="navigateTo('index.html')">Tillbaka</button>
@@ -41,8 +50,30 @@
         function navigateTo(page) {
             window.location.href = page;
         }
+
+        function toggleCategory(categoryId) {
+            const categoryList = document.getElementById(categoryId);
+            if (categoryList.style.display === 'none') {
+                categoryList.style.display = 'block';
+            } else {
+                categoryList.style.display = 'none';
+            }
+        }
+
+        function searchProjects() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const projectItems = document.querySelectorAll('.project-item');
+
+            projectItems.forEach(item => {
+                if (item.textContent.toLowerCase().includes(input)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
     </script>
-    
+
     <script type="module">
         import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
