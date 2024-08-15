@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             // Filtrera bort projekt med specifik status och specifikt projekt-ID
-            plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad');
+            plannings = plannings.filter(planning => planning.projectId !== 'moBgPPK2jgyZaeBnqza1' && planning.status !== 'Fakturerad' && planning.status !== 'elektriker klar');
 
             renderGanttChart(plannings); // Render initial chart
         } catch (error) {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         async function renderGanttChart(plannings) {
-            ganttTableBody.innerHTML = ''; // Clear existing content
+            ganttTableBody.innerHTML = ''; // Rensa befintligt innehåll
 
             // Sortera plannings efter startdatum i stigande ordning
             plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
