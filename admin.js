@@ -1,5 +1,4 @@
-import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
+import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js'; // Här importeras deleteDoc endast en gång
 
 let allUsers = []; // Håll koll på alla användare
 let allProjects = []; // Håll koll på alla projekt
@@ -45,7 +44,7 @@ export async function loadProjectManagement() {
     renderProjects(allProjects); // Initial render för alla projekt
 }
 
-export function searchProjects(query) { // Säkerställ att searchProjects är korrekt exporterad
+export function searchProjects(query) {
     const filteredProjects = allProjects.filter(project =>
         project.address.toLowerCase().includes(query.toLowerCase())
     );
