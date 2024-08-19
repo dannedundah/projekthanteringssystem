@@ -1,6 +1,4 @@
-import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
-// Importera deleteDoc direkt från Firebase SDK
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js'; // Importera rätt från Firebase SDK
 
 let allUsers = []; // Håll koll på alla användare
 let allProjects = []; // Håll koll på alla projekt
@@ -31,6 +29,18 @@ export async function loadUserManagement() {
     renderUsers(allUsers); // Initial render för alla användare
 }
 
+export function filterUsers(filter) { // Se till att denna funktion är korrekt exporterad
+    let filteredUsers = allUsers;
+
+    if (filter === 'active') {
+        filteredUsers = allUsers.filter(user => user.active);
+    } else if (filter === 'inactive') {
+        filteredUsers = allUsers.filter(user => !user.active);
+    }
+
+    renderUsers(filteredUsers);
+}
+
 export async function loadProjectManagement() {
     const adminContent = document.getElementById('admin-content');
     adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
@@ -46,7 +56,7 @@ export async function loadProjectManagement() {
     renderProjects(allProjects); // Initial render för alla projekt
 }
 
-export function searchProjects(query) {
+export function searchProjects(query) { // Se till att denna funktion är korrekt exporterad
     const filteredProjects = allProjects.filter(project =>
         project.address.toLowerCase().includes(query.toLowerCase())
     );
