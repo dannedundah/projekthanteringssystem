@@ -6,10 +6,11 @@
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <script type="module">
-        import { loadUserManagement, loadProjectManagement, filterUsers } from './admin.js'; // Importera funktionerna från admin.js
+        import { loadUserManagement, loadProjectManagement, filterUsers, searchProjects } from './admin.js'; // Importera funktionerna från admin.js
         window.loadUserManagement = loadUserManagement;
         window.loadProjectManagement = loadProjectManagement;
         window.filterUsers = filterUsers;
+        window.searchProjects = searchProjects;
     </script>
 </head>
 <body>
@@ -30,6 +31,12 @@
                 <option value="active">Aktiva</option>
                 <option value="inactive">Inaktiva</option>
             </select>
+        </div>
+
+        <!-- Sökfält för projekt -->
+        <div id="project-search" style="display:none; margin-top: 10px;">
+            <label for="search">Sök projekt (adress):</label>
+            <input type="text" id="search" placeholder="Skriv adress..." oninput="searchProjects(this.value)">
         </div>
 
         <!-- Dynamiskt innehåll -->

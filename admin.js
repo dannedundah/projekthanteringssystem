@@ -1,7 +1,8 @@
-import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
 import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
 
 let allUsers = []; // Håll koll på alla användare
+let allProjects = []; // Håll koll på alla projekt
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
@@ -29,38 +30,26 @@ export async function loadUserManagement() {
     renderUsers(allUsers); // Initial render för alla användare
 }
 
-export async function loadProjectManagement() { // Se till att denna funktion är korrekt exporterad
+export async function loadProjectManagement() {
     const adminContent = document.getElementById('admin-content');
     adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
 
     const projectList = document.getElementById('project-list');
+    const searchField = document.getElementById('project-search');
+    searchField.style.display = 'block'; // Visa sökfältet
+
     const projectsSnapshot = await getDocs(collection(db, 'projects'));
 
-    projectsSnapshot.forEach((doc) => {
-        const projectData = doc.data();
-        const projectItem = document.createElement('div');
-        projectItem.className = 'project-item';
+    allProjects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Spara alla projekt
 
-        projectItem.innerHTML = `
-            <p><strong>Projekt Namn:</strong> ${projectData.name}</p>
-            <button class="user-action remove-button" onclick="deleteProject('${doc.id}')">Ta bort projekt</button>
-            <hr>
-        `;
-
-        projectList.appendChild(projectItem);
-    });
+    renderProjects(allProjects); // Initial render för alla projekt
 }
 
-export function filterUsers(filter) { // Se till att denna funktion är korrekt exporterad
-    let filteredUsers = allUsers;
-
-    if (filter === 'active') {
-        filteredUsers = allUsers.filter(user => user.active);
-    } else if (filter === 'inactive') {
-        filteredUsers = allUsers.filter(user => !user.active);
-    }
-
-    renderUsers(filteredUsers);
+export function searchProjects(query) {
+    const filteredProjects = allProjects.filter(project =>
+        project.address.toLowerCase().includes(query.toLowerCase())
+    );
+    renderProjects(filteredProjects);
 }
 
 function renderUsers(users) {
@@ -86,6 +75,24 @@ function renderUsers(users) {
         `;
 
         userList.appendChild(userItem);
+    });
+}
+
+function renderProjects(projects) {
+    const projectList = document.getElementById('project-list');
+    projectList.innerHTML = ''; // Rensa befintlig lista
+
+    projects.forEach(project => {
+        const projectItem = document.createElement('div');
+        projectItem.className = 'project-item';
+
+        projectItem.innerHTML = `
+            <p><strong>Adress:</strong> ${project.address}</p>
+            <button class="user-action remove-button" onclick="deleteProject('${project.id}')">Ta bort projekt</button>
+            <hr>
+        `;
+
+        projectList.appendChild(projectItem);
     });
 }
 
