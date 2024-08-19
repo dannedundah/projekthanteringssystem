@@ -1,34 +1,19 @@
-import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js';
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js'; // Importera från din konfigurationsfil
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; // Importera deleteDoc direkt från Firebase SDK
+
+let allUsers = []; // Håll koll på alla användare
+let allProjects = []; // Håll koll på alla projekt
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
-        // Lista över tillåtna e-postadresser för admin
         const allowedEmails = ['daniel@delidel.se', 'leia@delidel.se', 'sofie@delidel.se'];
 
-        if (user) {
-            // Kontrollera om användaren har en tillåten e-postadress
-            if (allowedEmails.includes(user.email)) {
-                console.log(`Användare ${user.email} har åtkomst till adminpanelen.`);
-                // Fortsätt till adminpanelen
-                loadAdminDashboard();
-            } else {
-                alert('Du har inte behörighet att se denna sida.');
-                window.location.href = 'login.html'; // Skicka tillbaka till inloggningssidan
-            }
-        } else {
-            // Om ingen användare är inloggad, skicka tillbaka till inloggningssidan
+        if (!user || !allowedEmails.includes(user.email)) {
+            alert('Du har inte behörighet att se denna sida.');
             window.location.href = 'login.html';
         }
     });
 });
-
-function loadAdminDashboard() {
-    // Detta är där du laddar och visar admininnehållet
-    // Om du vill kan du också dölja inloggningsknappen eller visa adminspecifik information här
-    console.log("Adminpanelen laddas...");
-    // Din befintliga kod för att ladda adminpanelen kan placeras här
-}
 
 export async function loadUserManagement() {
     const adminContent = document.getElementById('admin-content');
