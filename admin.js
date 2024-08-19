@@ -45,7 +45,7 @@ export async function loadProjectManagement() {
     renderProjects(allProjects); // Initial render för alla projekt
 }
 
-export function searchProjects(query) {
+export function searchProjects(query) { // Säkerställ att searchProjects är korrekt exporterad
     const filteredProjects = allProjects.filter(project =>
         project.address.toLowerCase().includes(query.toLowerCase())
     );
