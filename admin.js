@@ -1,4 +1,6 @@
-import { db, collection, getDocs, updateDoc, doc, deleteDoc, auth, onAuthStateChanged } from './firebase-config.js'; // Här importeras deleteDoc endast en gång
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+// Importera deleteDoc direkt från Firebase SDK
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 let allUsers = []; // Håll koll på alla användare
 let allProjects = []; // Håll koll på alla projekt
