@@ -129,6 +129,7 @@ function groupReportsByEmployee(reports, projectDetails) {
             projectAddress,
             timeType: report.timeType,
             hours: report.hours,
+            comment: report.comment || '' // Lägg till kommentaren här
         });
     });
 
@@ -136,11 +137,11 @@ function groupReportsByEmployee(reports, projectDetails) {
 }
 
 function generateSheetData(reports) {
-    const sheetData = [['Datum', 'Projekt', 'Typ av tid', 'Antal timmar']];
+    const sheetData = [['Datum', 'Projekt', 'Typ av tid', 'Antal timmar', 'Kommentar']]; // Uppdatera rubrikerna
     const timeSummary = {};
 
     reports.forEach(report => {
-        sheetData.push([report.date, report.projectAddress, report.timeType, report.hours]);
+        sheetData.push([report.date, report.projectAddress, report.timeType, report.hours, report.comment]); // Inkludera kommentar
 
         if (!timeSummary[report.timeType]) {
             timeSummary[report.timeType] = 0;
