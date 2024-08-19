@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectDropdown = document.getElementById('project-dropdown');
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
+    const commentInput = document.getElementById('work-comment'); // Kommentarsfältet
     const monthYearHeader = document.getElementById('month-year');
     let selectedEmployeeName = null;
     let selectedDate = null;
@@ -67,10 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         projectDropdown.value = report.projectId;
                         timeTypeDropdown.value = report.timeType;
                         hoursInput.value = report.hours;
+                        commentInput.value = report.comment || ''; // Fyll i kommentaren om den finns
                         selectedDateHeader.textContent = `Ändra rapportering för ${selectedDate}`;
                     } else {
                         selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
                         timeReportForm.reset();
+                        commentInput.value = ''; // Rensa kommentarsfältet
                         existingReportId = null;
                     }
 
@@ -154,7 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 projectId: reportData.projectId,
                 project,
                 timeType: reportData.timeType,
-                hours: reportData.hours
+                hours: reportData.hours,
+                comment: reportData.comment // Lägg till kommentaren här
             };
         }
 
@@ -222,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedProjectId = projectDropdown.value;
         const timeType = timeTypeDropdown.value;
         const hours = parseFloat(hoursInput.value);
+        const comment = commentInput.value; // Hämta kommentaren
 
         if (selectedProjectId && timeType && hours && selectedDate) {
             const timeReport = {
@@ -229,7 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeType,
                 hours,
                 date: selectedDate,
-                employee: selectedEmployeeName
+                employee: selectedEmployeeName,
+                comment // Lägg till kommentaren här
             };
 
             try {
