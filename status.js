@@ -10,8 +10,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
-        const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        let projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log('Projects:', projects);
+
+        // Sortera projekten alfabetiskt efter namn
+        projects.sort((a, b) => a.name.localeCompare(b.name, 'sv', { sensitivity: 'base' }));
 
         projects.forEach(project => {
             console.log(`Project ID: ${project.id}, Status: ${project.status}`);

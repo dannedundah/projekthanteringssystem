@@ -24,14 +24,14 @@ h1 {
 }
 
 button {
-    padding: 5px 10px; /* Mindre padding för alla knappar */
-    margin: 5px; /* Mindre marginal för att göra knapparna mer kompakta */
+    padding: 5px 10px;
+    margin: 5px;
     cursor: pointer;
     background-color: #ff7f00;
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 14px; /* Mindre textstorlek för att matcha knapparnas storlek */
+    font-size: 14px;
 }
 
 button:hover {
@@ -40,21 +40,21 @@ button:hover {
 
 /* Stil för specifika aktivera/inaktivera knappar */
 button.activate {
-    background-color: #28a745; /* Grön för aktivera */
+    background-color: #28a745;
     color: white;
 }
 
 button.activate:hover {
-    background-color: #218838; /* Mörkare grön vid hover */
+    background-color: #218838;
 }
 
 button.deactivate {
-    background-color: #dc3545; /* Röd för inaktivera */
+    background-color: #dc3545;
     color: white;
 }
 
 button.deactivate:hover {
-    background-color: #c82333; /* Mörkare röd vid hover */
+    background-color: #c82333;
 }
 
 /* Formulärstilar */
@@ -235,7 +235,7 @@ table#calendar {
 }
 
 table#calendar th, table#calendar td {
-    width: 14.28%; /* 100% / 7 dagar i veckan */
+    width: 14.28%;
     padding: 10px;
     text-align: center;
     border: 1px solid #ccc;
@@ -281,16 +281,45 @@ table#calendar td.reported {
 
 /* Uppdaterad CSS för "Ta bort"-knappen */
 button.remove-button {
-    background-color: #ff4c4c; /* Röd bakgrund för att indikera borttagning */
+    background-color: #ff4c4c;
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 4px 8px; /* Mindre padding för att göra knappen kompakt */
+    padding: 4px 8px;
     cursor: pointer;
-    font-size: 12px; /* Mindre fontstorlek */
-    margin-left: 8px; /* Avstånd till vänster om knappen, om det behövs */
+    font-size: 12px;
+    margin-left: 8px;
 }
 
 button.remove-button:hover {
-    background-color: #e04444; /* Mörkare röd vid hover */
+    background-color: #e04444;
+}
+
+/* Stil för projektkategorier */
+.project-category h3 {
+    cursor: pointer;
+    margin: 0;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.category-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    padding-left: 20px;
+}
+
+.category-list.expanded {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.project-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+    list-style-type: none;
 }

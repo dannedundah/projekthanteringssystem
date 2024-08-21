@@ -48,29 +48,31 @@
 
     <script>
         function navigateTo(page) {
-            window.location.href = page;
+            window.history.back();
         }
 
         function toggleCategory(categoryId) {
             const categoryList = document.getElementById(categoryId);
-            if (categoryList.style.display === 'none') {
-                categoryList.style.display = 'block';
-            } else {
-                categoryList.style.display = 'none';
-            }
+            categoryList.classList.toggle('expanded');
         }
 
         function searchProjects() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const projectItems = document.querySelectorAll('.project-item');
+            let hasResults = false;
 
             projectItems.forEach(item => {
                 if (item.textContent.toLowerCase().includes(input)) {
                     item.style.display = '';
+                    hasResults = true;
                 } else {
                     item.style.display = 'none';
                 }
             });
+
+            if (!hasResults) {
+                console.log('Inga projekt matchar din sökning.');
+            }
         }
     </script>
 
@@ -83,23 +85,29 @@
         document.addEventListener('DOMContentLoaded', () => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // Kontrollera om användaren är aktiv
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists() && userDoc.data().active) {
-                        // Användaren är inloggad och aktiv
-                        console.log('User is active:', user);
-                    } else {
-                        // Användaren är inloggad men inte aktiv
-                        await signOut(auth);
-                        alert('Din användare är inte aktiv. Kontakta administratören.');
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists() && userDoc.data().active) {
+                            console.log('User is active:', user);
+                        } else {
+                            await signOut(auth);
+                            alert('Din användare är inte aktiv. Kontakta administratören.');
+                            window.location.href = 'login.html';
+                        }
+                    } catch (error) {
+                        console.error('Ett fel uppstod vid hämtning av användarinformation:', error);
+                        alert('Ett problem uppstod. Försök igen senare.');
                         window.location.href = 'login.html';
                     }
                 } else {
-                    // Användaren är inte inloggad
                     window.location.href = 'login.html';
                 }
             });
         });
     </script>
+
+    <noscript>
+        <p>JavaScript krävs för att denna sida ska fungera korrekt. Aktivera JavaScript i din webbläsare.</p>
+    </noscript>
 </body>
 </html>
