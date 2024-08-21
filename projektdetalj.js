@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await updateDoc(projectRef, updatedProject);
                         console.log(`Projekt ${projectId} uppdaterat med status: ${updatedProject.status}`);
                         alert('Projektet har uppdaterats!');
-                        window.location.href = 'projekthantering.html';
+                        window.location.href = 'status.html';
                     } catch (error) {
                         console.error('Error updating project:', error);
                         alert('Ett fel uppstod vid uppdatering av projektet.');
