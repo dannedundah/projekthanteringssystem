@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await addDoc(collection(db, 'projects'), project);
             alert('Projektet har lagts till!');
-            window.location.href = 'projekthantering.html';
+            window.location.href = 'status.html';
         } catch (error) {
             console.error('Error adding project:', error);
             alert('Ett fel uppstod vid tillägg av projekt.');
