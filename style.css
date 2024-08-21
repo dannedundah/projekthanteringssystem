@@ -314,8 +314,10 @@ button.remove-button:hover {
 }
 
 .category-list.expanded {
-    max-height: 500px;
+    max-height: 300px; /* Justerbart beroende på hur många projekt du förväntar dig */
+    overflow-y: auto; /* Lägg till vertikal rullning om innehållet överstiger max-höjden */
     opacity: 1;
+    border: 1px solid #ddd; /* Valfritt: Lägg till en ram för att visa rullningsområdet */
 }
 
 .project-item {
