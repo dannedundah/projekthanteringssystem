@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const storageRef = ref(storage, `project_images/${uniqueFileName}`);
                 const snapshot = await uploadBytes(storageRef, file);
                 const imageUrl = await getDownloadURL(snapshot.ref);
-                imageUrls.push(imageUrl);
+                imageUrls.push({ name: file.name, url: imageUrl }); // Sparar både namn och URL
             }
 
             const project = {
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 address: projectAddress,
                 description: projectDescription,
                 status: projectStatus,
-                images: imageUrls,
+                images: imageUrls, // Array med objekt som innehåller bildens namn och URL
                 createdAt: new Date().toISOString()
             };
 

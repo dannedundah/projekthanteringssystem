@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (fileGallery) {
                     fileGallery.innerHTML = '';
-                    const files = project.files || [];
-                    if (Array.isArray(files)) {
-                        files.forEach((file, index) => {
-                            const fileUrl = file.url;
-                            const fileName = file.name;
+                    const images = project.images || [];
+                    if (Array.isArray(images)) {
+                        images.forEach((image, index) => {
+                            const fileUrl = image.url;
+                            const fileName = image.name;
                             if (fileUrl && fileName) {
                                 const fileExtension = fileName.split('.').pop().toLowerCase();
                                 let fileElement;
@@ -50,11 +50,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                                 fileGallery.appendChild(fileElement);
                             } else {
-                                console.error('Invalid file data:', file);
+                                console.error('Invalid file data:', image);
                             }
                         });
                     } else {
-                        console.error('Project files is not an array:', files);
+                        console.error('Project images is not an array:', images);
                     }
                 } else {
                     console.error('Element with ID "file-gallery" not found.');
@@ -73,17 +73,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     };
 
                     const projectImages = document.getElementById('project-images').files;
-                    const imageUrls = project.files || [];
+                    const imageUrls = project.images || [];
 
                     try {
                         for (const file of projectImages) {
-                            const storageRef = ref(storage, `project_files/${file.name}`);
+                            const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+                            const storageRef = ref(storage, `project_images/${uniqueFileName}`);
                             const snapshot = await uploadBytes(storageRef, file);
                             const imageUrl = await getDownloadURL(snapshot.ref);
                             imageUrls.push({ name: file.name, url: imageUrl });
                         }
 
-                        updatedProject.files = imageUrls;
+                        updatedProject.images = imageUrls;
 
                         await updateDoc(projectRef, updatedProject);
                         console.log(`Projekt ${projectId} uppdaterat med status: ${updatedProject.status}`);
@@ -118,8 +119,8 @@ async function removeFile(fileUrl, index) {
 
         if (projectSnap.exists()) {
             const project = projectSnap.data();
-            project.files.splice(index, 1);
-            await updateDoc(projectRef, { files: project.files });
+            project.images.splice(index, 1);
+            await updateDoc(projectRef, { images: project.images });
             alert('Filen har tagits bort!');
             window.location.reload(); // Refresh the page to update the file list
         }
