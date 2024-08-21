@@ -1,5 +1,4 @@
 import { db, collection, addDoc, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
-import { v4 as uuidv4 } from 'uuid'; // Används för att generera unika ID:n för filnamn
 
 document.addEventListener('DOMContentLoaded', () => {
     const projectForm = document.getElementById('project-form');
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             for (const file of projectImages) {
-                const uniqueFileName = `${uuidv4()}_${file.name}`;
+                const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
                 const storageRef = ref(storage, `project_images/${uniqueFileName}`);
                 const snapshot = await uploadBytes(storageRef, file);
                 const imageUrl = await getDownloadURL(snapshot.ref);
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: projectDescription,
                 status: projectStatus,
                 images: imageUrls,
-                createdAt: new Date().toISOString() // Lägg till en tidsstämpel
+                createdAt: new Date().toISOString()
             };
 
             await addDoc(collection(db, 'projects'), project);
