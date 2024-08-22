@@ -1,10 +1,13 @@
-import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
     const employeeSelect = document.getElementById('employee-select');
     let plannings = [];
     let canEdit = false;
+
+    // Här anger du ID för det projekt som ska döljas
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
     // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
@@ -27,9 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializePage() {
         try {
-            // Hämta all planering
+            // Hämta all planering och filtrera bort det dolda projektet
             const querySnapshot = await getDocs(collection(db, 'planning'));
-            plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            plannings = querySnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(planning => planning.projectId !== hiddenProjectId); // Filtrera bort projektet här
 
             // Fyll rullgardinsmenyn med anställda och "Elektriker"
             populateEmployeeSelect(plannings);
@@ -68,17 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
-            // Om Elektriker är vald, visa endast projekten för elektrikern och inte intern tid
+            // Om Elektriker är vald, visa endast projekten för elektrikern och inte det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.electricianStartDate && 
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
         } else if (selectedEmployee === "") {
-            // Visa alla projekt utan elektrikerns datum och intern tid
+            // Visa alla projekt utan det dolda projektet
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
-            // Filtrera efter specifik anställd och dölja intern tid
+            // Filtrera efter specifik anställd och dölja det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.employees.includes(selectedEmployee) && 
                 planning.projectId !== hiddenProjectId
@@ -107,22 +112,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
+                    // Hantera start- och slutdatum för elektrikern
                     const startDate = new Date(planning.electricianStartDate);
                     const endDate = new Date(planning.electricianEndDate);
-
+                    
+                    // Om start och slutdatum är samma, justera slutdatum så det syns korrekt
                     if (startDate.getTime() === endDate.getTime()) {
                         endDate.setDate(endDate.getDate() + 1);
                     }
 
+                    // Visa endast elektrikerns datum med justerat slutdatum om nödvändigt
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianStartDate,
-                        end_date: endDate.toISOString().split('T')[0],
+                        end_date: endDate.toISOString().split('T')[0], // Formatera slutdatumet korrekt
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700" 
+                        color: "#FFD700" // Färg för elektrikerns uppgift
                     });
                 } else {
+                    // Visa alla anställdas schema utan elektrikerns datum
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
@@ -137,17 +146,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return [];
         }));
 
-        gantt.clearAll(); 
+        gantt.clearAll(); // Rensa tidigare laddade data
         gantt.parse({
-            data: tasks.flat(), 
+            data: tasks.flat(), // Platta ut arrayen så att uppgifterna visas på samma nivå
             links: []
         });
 
+        // Lägg till en klickhändelse på varje uppgift om användaren kan redigera
         if (canEdit) {
             gantt.attachEvent("onTaskClick", function(id, e) {
                 const task = gantt.getTask(id);
                 showEditModal(task);
-                return false; 
+                return false; // Förhindra standard navigering
             });
         }
     }
