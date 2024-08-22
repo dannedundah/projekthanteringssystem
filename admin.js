@@ -1,8 +1,10 @@
-import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js'; // Importera från din konfigurationsfil
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; // Importera deleteDoc direkt från Firebase SDK
+import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-let allUsers = []; // Håll koll på alla användare
-let allProjects = []; // Håll koll på alla projekt
+let allUsers = [];
+let allProjects = [];
+let isUserManagementVisible = false; // För att hålla koll på synligheten av användarhantering
+let isProjectManagementVisible = false; // För att hålla koll på synligheten av projekthantering
 
 document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
@@ -17,17 +19,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
 export async function loadUserManagement() {
     const adminContent = document.getElementById('admin-content');
-    adminContent.innerHTML = '<h2>Hantera användare</h2><div id="user-list"></div>';
 
+    // Kontrollera om användarhanteringen redan är synlig
+    if (isUserManagementVisible) {
+        adminContent.innerHTML = ''; // Rensa innehållet för att dölja det
+        isUserManagementVisible = false;
+        return;
+    }
+
+    // Om det inte är synligt, ladda innehållet
+    adminContent.innerHTML = '<h2>Hantera användare</h2><div id="user-list"></div>';
     const userList = document.getElementById('user-list');
     const filterDropdown = document.getElementById('user-filter');
-    filterDropdown.style.display = 'block'; // Visa filter dropdown
+    filterDropdown.style.display = 'block';
 
     const usersSnapshot = await getDocs(collection(db, 'users'));
+    allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderUsers(allUsers);
 
-    allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Spara alla användare
+    isUserManagementVisible = true; // Markera som synligt
+    isProjectManagementVisible = false; // Se till att den andra modulen är dold
+}
 
-    renderUsers(allUsers); // Initial render för alla användare
+export async function loadProjectManagement() {
+    const adminContent = document.getElementById('admin-content');
+
+    // Kontrollera om projekthanteringen redan är synlig
+    if (isProjectManagementVisible) {
+        adminContent.innerHTML = ''; // Rensa innehållet för att dölja det
+        isProjectManagementVisible = false;
+        return;
+    }
+
+    // Om det inte är synligt, ladda innehållet
+    adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
+    const projectList = document.getElementById('project-list');
+    const searchField = document.getElementById('project-search');
+    searchField.style.display = 'block';
+
+    const projectsSnapshot = await getDocs(collection(db, 'projects'));
+    allProjects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderProjects(allProjects);
+
+    isProjectManagementVisible = true; // Markera som synligt
+    isUserManagementVisible = false; // Se till att den andra modulen är dold
 }
 
 export function filterUsers(filter) {
@@ -40,21 +75,6 @@ export function filterUsers(filter) {
     }
 
     renderUsers(filteredUsers);
-}
-
-export async function loadProjectManagement() {
-    const adminContent = document.getElementById('admin-content');
-    adminContent.innerHTML = '<h2>Hantera projekt</h2><div id="project-list"></div>';
-
-    const projectList = document.getElementById('project-list');
-    const searchField = document.getElementById('project-search');
-    searchField.style.display = 'block'; // Visa sökfältet
-
-    const projectsSnapshot = await getDocs(collection(db, 'projects'));
-
-    allProjects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Spara alla projekt
-
-    renderProjects(allProjects); // Initial render för alla projekt
 }
 
 export function searchProjects(query) {
