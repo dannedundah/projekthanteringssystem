@@ -3,9 +3,7 @@ import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateCh
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
     const employeeSelect = document.getElementById('employee-select');
-    const filterElectricianBtn = document.getElementById('filter-electrician-btn');
     let plannings = [];
-    let isElectricianFilterActive = false;
     let canEdit = false;
 
     // Kontrollera vem som är inloggad och ladda planeringen
@@ -33,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Fyll rullgardinsmenyn med anställda
+            // Fyll rullgardinsmenyn med anställda och "Elektriker"
             populateEmployeeSelect(plannings);
 
             // Rendera hela Gantt-diagrammet som standard
@@ -45,15 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 filterAndRenderGantt(selectedEmployee);
             });
 
-            // Lägg till en eventlistener för filter-knappen
-            filterElectricianBtn.addEventListener('click', () => {
-                isElectricianFilterActive = !isElectricianFilterActive;
-                filterElectricianBtn.textContent = isElectricianFilterActive
-                    ? "Visa alla scheman"
-                    : "Visa endast datum för elektriker";
-                filterAndRenderGantt(employeeSelect.value);
-            });
-
         } catch (error) {
             console.error('Error fetching plannings:', error);
         }
@@ -61,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateEmployeeSelect(plannings) {
         const employees = new Set();
+        employees.add("Elektriker"); // Lägg till "Elektriker" som ett alternativ
+
         plannings.forEach(planning => {
             planning.employees.forEach(employee => employees.add(employee));
         });
@@ -76,14 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function filterAndRenderGantt(selectedEmployee) {
         let filteredPlannings = plannings;
 
-        if (selectedEmployee !== "") {
+        if (selectedEmployee === "Elektriker") {
+            filteredPlannings = filteredPlannings.filter(planning => planning.electricianDate);
+        } else if (selectedEmployee !== "") {
             filteredPlannings = filteredPlannings.filter(planning => 
                 planning.employees.includes(selectedEmployee)
             );
-        }
-
-        if (isElectricianFilterActive) {
-            filteredPlannings = filteredPlannings.filter(planning => planning.electricianDate);
         }
 
         renderGanttChart(filteredPlannings);
@@ -113,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                 }];
 
-                // Lägg till elektrikerns datum som en separat händelse på samma rad
+                // Lägg till elektrikerns datum som en separat uppgift om "Elektriker" är valt
                 if (planning.electricianDate) {
                     taskList.push({
                         id: planning.id + '-electrician',
@@ -121,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: planning.electricianDate,
                         end_date: planning.electricianDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700" // Gult som skiljer sig från andra uppgifter
+                        color: "#FFD700" // Gult för att skilja sig från andra uppgifter
                     });
                 }
 
