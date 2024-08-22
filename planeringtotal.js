@@ -99,37 +99,40 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialisera Gantt-diagrammet
         gantt.init("gantt-chart");
 
-        // Ladda data i Gantt-diagrammet
-        gantt.parse({
-            data: await Promise.all(plannings.map(async planning => {
-                const projectDocRef = doc(db, 'projects', planning.projectId);
-                const projectDoc = await getDoc(projectDocRef);
-                if (projectDoc.exists()) {
-                    const projectData = projectDoc.data();
-                    const tasks = [{
-                        id: planning.id,
-                        text: projectData.address || 'Ej specificerad',
-                        start_date: planning.startDate,
-                        end_date: planning.endDate,
+        // Hämta och bearbeta data för att ladda Gantt-diagrammet
+        const tasks = await Promise.all(plannings.map(async planning => {
+            const projectDocRef = doc(db, 'projects', planning.projectId);
+            const projectDoc = await getDoc(projectDocRef);
+            if (projectDoc.exists()) {
+                const projectData = projectDoc.data();
+                const taskList = [{
+                    id: planning.id,
+                    text: projectData.address || 'Ej specificerad',
+                    start_date: planning.startDate,
+                    end_date: planning.endDate,
+                    detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                }];
+
+                // Lägg till elektrikerns datum som en separat händelse på samma rad
+                if (planning.electricianDate) {
+                    taskList.push({
+                        id: planning.id + '-electrician',
+                        text: 'Elektriker',
+                        start_date: planning.electricianDate,
+                        end_date: planning.electricianDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                    }];
-
-                    // Lägg till elektrikerns datum som en separat händelse på samma rad
-                    if (planning.electricianDate) {
-                        tasks.push({
-                            id: planning.id + '-electrician',
-                            text: 'Elektriker: ' + planning.electricianDate,
-                            start_date: planning.electricianDate,
-                            end_date: planning.electricianDate,
-                            detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                            color: "#FFD700" // Gult som skiljer sig från andra uppgifter
-                        });
-                    }
-
-                    return tasks;
+                        color: "#FFD700" // Gult som skiljer sig från andra uppgifter
+                    });
                 }
-                return null;
-            }).flat()), // Platta ut arrayen så att uppgifterna visas på samma nivå
+
+                return taskList;
+            }
+            return [];
+        }));
+
+        gantt.clearAll(); // Rensa tidigare laddade data
+        gantt.parse({
+            data: tasks.flat(), // Platta ut arrayen så att uppgifterna visas på samma nivå
             links: []
         });
 
