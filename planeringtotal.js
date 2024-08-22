@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedEmployee === "Elektriker") {
             // Om Elektriker är vald, visa endast projekten för elektrikern
-            filteredPlannings = plannings.filter(planning => planning.electricianDate);
+            filteredPlannings = plannings.filter(planning => planning.electricianStartDate && planning.electricianEndDate);
         } else if (selectedEmployee === "") {
             // Visa alla projekt utan elektrikerns datum
             filteredPlannings = plannings;
@@ -100,13 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    // Visa endast elektrikerns datum med duration 1 dag
+                    // Visa endast elektrikerns datum med korrekt duration baserat på start- och slutdatum
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
-                        start_date: planning.electricianDate,
-                        end_date: planning.electricianDate,
-                        duration: 1, // Sätt varaktigheten till 1 dag
+                        start_date: planning.electricianStartDate,
+                        end_date: planning.electricianEndDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700" // Färg för elektrikerns uppgift
                     });
