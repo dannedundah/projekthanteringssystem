@@ -30,9 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializePage() {
         try {
-            // Hämta all planering
+            // Hämta all planering och filtrera bort det dolda projektet
             const querySnapshot = await getDocs(collection(db, 'planning'));
-            plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            plannings = querySnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(planning => planning.projectId !== hiddenProjectId); // Filtrera bort projektet här
 
             // Fyll rullgardinsmenyn med anställda och "Elektriker"
             populateEmployeeSelect(plannings);
@@ -71,17 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
-            // Om Elektriker är vald, visa endast projekten för elektrikern och inte intern tid
+            // Om Elektriker är vald, visa endast projekten för elektrikern och inte det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.electricianStartDate && 
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
         } else if (selectedEmployee === "") {
-            // Visa alla projekt utan elektrikerns datum och intern tid
+            // Visa alla projekt utan det dolda projektet
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
-            // Filtrera efter specifik anställd och dölja intern tid
+            // Filtrera efter specifik anställd och dölja det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.employees.includes(selectedEmployee) && 
                 planning.projectId !== hiddenProjectId
