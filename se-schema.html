@@ -11,48 +11,35 @@
 <body>
     <div class="container">
         <h1>Mitt Schema</h1>
-        <input type="text" id="search-input" placeholder="Sök projekt..." />
-        <table class="gantt-table">
-            <thead>
-                <tr>
-                    <th>Projekt</th>
-                    <th>Startdatum</th>
-                    <th>Slutdatum</th>
-                    <th>Datum Elektriker</th>
-                    <th>Anställda</th>
-                </tr>
-            </thead>
-            <tbody id="gantt-table-body"></tbody>
-        </table>
+        <div id="gantt-chart"></div> <!-- Här visas Gantt-diagrammet -->
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
-
-    <script type="module">
-        import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        
-        const db = getFirestore();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // Kontrollera om användaren är aktiv
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists() && userDoc.data().active) {
-                        // Användaren är inloggad och aktiv
-                        console.log('User is active:', user);
-                    } else {
-                        // Användaren är inloggad men inte aktiv
-                        await signOut(auth);
-                        alert('Din användare är inte aktiv. Kontakta administratören.');
-                        window.location.href = 'login.html';
-                    }
-                } else {
-                    // Användaren är inte inloggad
-                    window.location.href = 'login.html';
-                }
-            });
-        });
-    </script>
 </body>
 </html>
+<script type="module">
+    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    
+    const db = getFirestore();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Kontrollera om användaren är aktiv
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().active) {
+                    // Användaren är inloggad och aktiv
+                    console.log('User is active:', user);
+                } else {
+                    // Användaren är inloggad men inte aktiv
+                    await signOut(auth);
+                    alert('Din användare är inte aktiv. Kontakta administratören.');
+                    window.location.href = 'login.html';
+                }
+            } else {
+                // Användaren är inte inloggad
+                window.location.href = 'login.html';
+            }
+        });
+    });
+</script>
