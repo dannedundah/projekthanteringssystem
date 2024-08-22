@@ -174,21 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.createElement('div');
         modal.classList.add('modal');
         modal.innerHTML = `
-            <div class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-        <h3>Uppdatera Projekt: [Projektets Namn]</h3>
-        <label for="start-date">Startdatum:</label>
-        <input type="date" id="start-date" value="[Startdatum]">
-        <label for="end-date">Slutdatum:</label>
-        <input type="date" id="end-date" value="[Slutdatum]">
-        <div class="modal-footer">
-            <button class="save-button" onclick="saveTaskDates('[Task ID]')">Spara</button>
-            <button class="cancel-button" onclick="this.parentElement.parentElement.parentElement.remove()">Avbryt</button>
-        </div>
-    </div>
-</div>
-
+            <div class="modal-content">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <h3>Ändra Datum</h3>
+                <label for="start-date">Startdatum:</label>
+                <input type="date" id="start-date" value="${formatDate(task.start_date)}">
+                <label for="end-date">Slutdatum:</label>
+                <input type="date" id="end-date" value="${formatDate(task.end_date)}">
+                <div class="modal-footer">
+                    <button class="save-button" onclick="saveTaskDates('${task.id}')">Spara</button>
+                    <button class="cancel-button" onclick="this.parentElement.parentElement.parentElement.remove()">Avbryt</button>
+                </div>
+            </div>
         `;
         document.body.appendChild(modal);
     }
