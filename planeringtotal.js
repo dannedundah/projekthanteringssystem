@@ -65,17 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function filterAndRenderGantt(selectedEmployee) {
-        let filteredPlannings = plannings;
+        let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
-            filteredPlannings = filteredPlannings.filter(planning => planning.electricianDate);
-        } else if (selectedEmployee !== "") {
-            filteredPlannings = filteredPlannings.filter(planning => 
-                planning.employees.includes(selectedEmployee)
-            );
+            // Om Elektriker är vald, visa endast projekten för elektrikern
+            filteredPlannings = plannings.filter(planning => planning.electricianDate);
+        } else if (selectedEmployee === "") {
+            // Visa alla projekt utan elektrikerns datum
+            filteredPlannings = plannings.filter(planning => !planning.electricianDate || planning.employees.includes(selectedEmployee));
         } else {
-            // För alla anställda, exkludera elektrikerns datum
-            filteredPlannings = filteredPlannings.filter(planning => !planning.electricianDate);
+            // Filtrera efter specifik anställd
+            filteredPlannings = plannings.filter(planning => planning.employees.includes(selectedEmployee));
         }
 
         renderGanttChart(filteredPlannings);
@@ -97,24 +97,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectDoc = await getDoc(projectDocRef);
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
-                const taskList = [{
-                    id: planning.id,
-                    text: projectData.address || 'Ej specificerad',
-                    start_date: planning.startDate,
-                    end_date: planning.endDate,
-                    detailsLink: `projekt-detalj.html?id=${planning.projectId}`
-                }];
+                const taskList = [];
 
-                // Om Elektriker är vald, inkludera elektrikerns datum
-                if (employeeSelect.value === "Elektriker" && planning.electricianDate) {
+                if (employeeSelect.value === "Elektriker") {
+                    // Visa endast elektrikerns datum
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: "Elektriker - " + projectData.address,
+                        text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianDate,
                         end_date: planning.electricianDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700" // Färg för elektrikerns uppgift
                     });
+                } else {
+                    // Visa alla anställdas schema utan elektrikerns datum
+                    if (!planning.electricianDate) {
+                        taskList.push({
+                            id: planning.id,
+                            text: projectData.address || 'Ej specificerad',
+                            start_date: planning.startDate,
+                            end_date: planning.endDate,
+                            detailsLink: `projekt-detalj.html?id=${planning.projectId}`
+                        });
+                    }
                 }
 
                 return taskList;
