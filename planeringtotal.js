@@ -6,10 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let plannings = [];
     let canEdit = false;
 
-    // Här anger du ID för det projekt som ska döljas
     const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
-    // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDocRef = doc(db, 'users', user.uid);
@@ -30,19 +28,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializePage() {
         try {
-            // Hämta all planering och filtrera bort det dolda projektet
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs
                 .map(doc => ({ id: doc.id, ...doc.data() }))
-                .filter(planning => planning.projectId !== hiddenProjectId); // Filtrera bort projektet här
+                .filter(planning => planning.projectId !== hiddenProjectId);
 
-            // Fyll rullgardinsmenyn med anställda och "Elektriker"
             populateEmployeeSelect(plannings);
-
-            // Rendera hela Gantt-diagrammet som standard
             renderGanttChart(plannings);
 
-            // Lägg till en eventlistener för rullgardinsmenyn
             employeeSelect.addEventListener('change', () => {
                 const selectedEmployee = employeeSelect.value;
                 filterAndRenderGantt(selectedEmployee);
@@ -55,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateEmployeeSelect(plannings) {
         const employees = new Set();
-        employees.add("Elektriker"); // Lägg till "Elektriker" som ett alternativ
+        employees.add("Elektriker");
 
         plannings.forEach(planning => {
             planning.employees.forEach(employee => employees.add(employee));
@@ -73,17 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
-            // Om Elektriker är vald, visa endast projekten för elektrikern och inte det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.electricianStartDate && 
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
         } else if (selectedEmployee === "") {
-            // Visa alla projekt utan det dolda projektet
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
-            // Filtrera efter specifik anställd och dölja det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.employees.includes(selectedEmployee) && 
                 planning.projectId !== hiddenProjectId
@@ -94,16 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderGanttChart(plannings) {
-        ganttChartContainer.innerHTML = ''; // Rensa befintligt innehåll
-        
-        // Konfigurera Gantt-diagrammet
-        gantt.config.xml_date = "%Y-%m-%d"; // Ange datumformatet
-        gantt.config.readonly = !canEdit; // Gör diagrammet redigerbart för adminanvändare
+        ganttChartContainer.innerHTML = '';
 
-        // Initialisera Gantt-diagrammet
+        gantt.config.xml_date = "%Y-%m-%d";
+        gantt.config.readonly = !canEdit;
+
         gantt.init("gantt-chart");
 
-        // Hämta och bearbeta data för att ladda Gantt-diagrammet
         const tasks = await Promise.all(plannings.map(async planning => {
             const projectDocRef = doc(db, 'projects', planning.projectId);
             const projectDoc = await getDoc(projectDocRef);
@@ -112,26 +99,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    // Hantera start- och slutdatum för elektrikern
                     const startDate = new Date(planning.electricianStartDate);
                     const endDate = new Date(planning.electricianEndDate);
-                    
-                    // Om start och slutdatum är samma, justera slutdatum så det syns korrekt
+
                     if (startDate.getTime() === endDate.getTime()) {
                         endDate.setDate(endDate.getDate() + 1);
                     }
 
-                    // Visa endast elektrikerns datum med justerat slutdatum om nödvändigt
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianStartDate,
-                        end_date: endDate.toISOString().split('T')[0], // Formatera slutdatumet korrekt
+                        end_date: endDate.toISOString().split('T')[0],
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700" // Färg för elektrikerns uppgift
+                        color: "#FFD700"
                     });
                 } else {
-                    // Visa alla anställdas schema utan elektrikerns datum
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
@@ -146,19 +129,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return [];
         }));
 
-        gantt.clearAll(); // Rensa tidigare laddade data
+        gantt.clearAll();
         gantt.parse({
-            data: tasks.flat(), // Platta ut arrayen så att uppgifterna visas på samma nivå
+            data: tasks.flat(),
             links: []
         });
 
-        // Lägg till en klickhändelse på varje uppgift om användaren kan redigera
         if (canEdit) {
             gantt.attachEvent("onTaskClick", function(id, e) {
                 const task = gantt.getTask(id);
                 if (e.target.closest('.gantt_task_row')) {
                     showEditModal(task);
-                    return false; // Förhindra standard navigering
+                    return false;
                 }
                 if (e.target.closest('.gantt_tree_content')) {
                     window.location.href = task.detailsLink;
@@ -177,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEditModal(task) {
-        // Funktion för att formatera datumet till "yyyy-MM-dd"
         function formatDate(date) {
             const d = new Date(date);
             let month = '' + (d.getMonth() + 1);
@@ -200,7 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="date" id="start-date" value="${formatDate(task.start_date)}">
                 <label for="end-date">Slutdatum:</label>
                 <input type="date" id="end-date" value="${formatDate(task.end_date)}">
-                <button onclick="saveTaskDates('${task.id}')">Spara</button>
+                <div class="modal-footer">
+                    <button class="save-button" onclick="saveTaskDates('${task.id}')">Spara</button>
+                    <button class="cancel-button" onclick="this.parentElement.parentElement.parentElement.remove()">Avbryt</button>
+                </div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -210,19 +194,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
 
-        // Uppdatera Firestore
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
         await updateDoc(planningRef, {
             startDate: startDate,
             endDate: endDate
         });
 
-        // Uppdatera Gantt-diagrammet
         gantt.getTask(taskId).start_date = startDate;
         gantt.getTask(taskId).end_date = endDate;
         gantt.updateTask(taskId);
 
-        // Stäng modalen
         document.querySelector('.modal').remove();
     }
 });
