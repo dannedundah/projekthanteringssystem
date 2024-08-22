@@ -171,40 +171,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return [year, month, day].join('-');
         }
 
-        const modal = document.createElement('div');
-        modal.classList.add('modal');
-        modal.innerHTML = `
-            <div class="modal-content">
-                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                <h3>Ändra Datum</h3>
-                <label for="start-date">Startdatum:</label>
-                <input type="date" id="start-date" value="${formatDate(task.start_date)}">
-                <label for="end-date">Slutdatum:</label>
-                <input type="date" id="end-date" value="${formatDate(task.end_date)}">
-                <div class="modal-footer">
-                    <button class="save-button" onclick="saveTaskDates('${task.id}')">Spara</button>
-                    <button class="cancel-button" onclick="this.parentElement.parentElement.parentElement.remove()">Avbryt</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+        const modal = document.getElementById('edit-modal');
+        document.getElementById('start-date').value = formatDate(task.start_date);
+        document.getElementById('end-date').value = formatDate(task.end_date);
+        modal.style.display = 'block';
+
+        window.currentTaskId = task.id;
     }
 
-    async function saveTaskDates(taskId) {
+    async function saveTaskDates() {
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
 
-        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        const planningRef = doc(db, 'planning', window.currentTaskId.replace('-electrician', ''));
         await updateDoc(planningRef, {
             startDate: startDate,
             endDate: endDate
         });
 
-        gantt.getTask(taskId).start_date = startDate;
-        gantt.getTask(taskId).end_date = endDate;
-        gantt.updateTask(taskId);
+        gantt.getTask(window.currentTaskId).start_date = startDate;
+        gantt.getTask(window.currentTaskId).end_date = endDate;
+        gantt.updateTask(window.currentTaskId);
 
-        document.querySelector('.modal').remove();
+        document.getElementById('edit-modal').style.display = 'none';
     }
 });
 
