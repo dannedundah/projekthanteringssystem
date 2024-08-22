@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             populateEmployeeSelect(plannings);
 
             // Rendera hela Gantt-diagrammet som standard
+            renderProjectsTable(plannings);
             renderGanttChart(plannings);
 
             // Lägg till en eventlistener för rullgardinsmenyn
@@ -90,7 +91,34 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
+        renderProjectsTable(filteredPlannings);
         renderGanttChart(filteredPlannings);
+    }
+
+    function renderProjectsTable(plannings) {
+        const projectListContainer = document.getElementById('project-list'); // Antag att detta är ID för vänstra tabellen
+        projectListContainer.innerHTML = ''; // Rensa befintligt innehåll
+
+        plannings.forEach(planning => {
+            const row = document.createElement('div');
+            row.classList.add('project-row');
+            row.innerHTML = `
+                <span class="project-name">${planning.projectName}</span>
+                <span class="start-date">${planning.startDate}</span>
+                <span class="duration">${calculateDuration(planning.startDate, planning.endDate)}</span>
+            `;
+            row.addEventListener('click', () => {
+                window.location.href = `projekt-detalj.html?id=${planning.projectId}`;
+            });
+            projectListContainer.appendChild(row);
+        });
+    }
+
+    function calculateDuration(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)); // Antal dagar
+        return duration;
     }
 
     async function renderGanttChart(plannings) {
@@ -127,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianStartDate,
                         end_date: endDate.toISOString().split('T')[0], // Formatera slutdatumet korrekt
-                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700" // Färg för elektrikerns uppgift
                     });
                 } else {
