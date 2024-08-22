@@ -62,14 +62,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderGanttChart(ganttData) {
-        ganttChartContainer.innerHTML = ''; // Töm tidigare innehåll
+        ganttChartContainer.innerHTML = ''; // Töm tidigare innehåll om det behövs
+        
+        // Konfigurera Gantt-diagrammet
+        gantt.config.xml_date = "%Y-%m-%d"; // Ange datumformatet
 
-        // Här kan du använda en Gantt-diagramsbibliotek (t.ex. DHTMLX Gantt) för att rendera diagrammet
-        ganttData.forEach(task => {
-            const taskElement = document.createElement('div');
-            taskElement.classList.add('gantt-task');
-            taskElement.innerHTML = `<a href="${task.detailsLink}">${task.text}</a> (${task.start_date} - ${task.end_date})`;
-            ganttChartContainer.appendChild(taskElement);
+        // Anpassa utseendet och beteendet på Gantt-diagrammet här om nödvändigt
+        gantt.init("gantt-chart"); // Initialisera Gantt-diagrammet i rätt container
+        
+        // Ladda data i Gantt-diagrammet
+        gantt.parse({
+            data: ganttData.map(task => ({
+                id: task.id,
+                text: task.text,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                detailsLink: task.detailsLink
+            })),
+            links: []
         });
     }
 });
