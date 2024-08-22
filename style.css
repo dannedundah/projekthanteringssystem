@@ -124,18 +124,18 @@ select, button {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.7); /* Ändra till en något mörkare bakgrund */
+    background-color: rgba(0,0,0,0.7); 
 }
 
 .modal-content {
-    background-color: #fff; /* Vit bakgrund för modal */
+    background-color: #fff; 
     margin: auto;
     padding: 20px;
-    border-radius: 10px; /* Rundade hörn */
+    border-radius: 10px; 
     display: block;
     width: 80%;
-    max-width: 800px; /* Minska maxbredden något */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Liten skugga för djup */
+    max-width: 800px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .close {
@@ -148,13 +148,13 @@ select, button {
 }
 
 .close:hover {
-    color: #bbb; /* Gör den lite ljusare vid hover */
+    color: #bbb; 
 }
 
 /* Stil för inputfält i modalen */
 .modal-content input[type="date"] {
-    width: calc(50% - 10px); /* Justera storlek för att rymmas bättre */
-    margin-right: 10px; /* Lite mellanrum mellan fälten */
+    width: calc(50% - 10px); 
+    margin-right: 10px;
     padding: 8px;
     font-size: 16px;
     border-radius: 5px;
@@ -365,10 +365,10 @@ button.remove-button:hover {
 }
 
 .category-list.expanded {
-    max-height: 300px; /* Justerbart beroende på hur många projekt du förväntar dig */
-    overflow-y: auto; /* Lägg till vertikal rullning om innehållet överstiger max-höjden */
+    max-height: 300px; 
+    overflow-y: auto; 
     opacity: 1;
-    border: 1px solid #ddd; /* Valfritt: Lägg till en ram för att visa rullningsområdet */
+    border: 1px solid #ddd;
 }
 
 .project-item {
