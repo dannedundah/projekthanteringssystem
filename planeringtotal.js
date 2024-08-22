@@ -100,12 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    // Visa endast elektrikerns datum
+                    // Visa endast elektrikerns datum med duration 1 dag
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianDate,
                         end_date: planning.electricianDate,
+                        duration: 1, // Sätt varaktigheten till 1 dag
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700" // Färg för elektrikerns uppgift
                     });
