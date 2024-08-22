@@ -27,6 +27,7 @@ async function loadUserManagement() {
     renderUsers(allUsers);
 }
 
+// Exportera funktionen och gör den globalt tillgänglig
 export function filterUsers(filter) {
     let filteredUsers = allUsers;
 
@@ -38,6 +39,9 @@ export function filterUsers(filter) {
 
     renderUsers(filteredUsers);
 }
+
+// Lägg till funktionen till `window` för att göra den globalt tillgänglig
+window.filterUsers = filterUsers;
 
 function renderUsers(users) {
     const userList = document.getElementById('user-list');

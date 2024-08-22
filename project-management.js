@@ -27,12 +27,16 @@ async function loadProjectManagement() {
     renderProjects(allProjects);
 }
 
+// Exportera funktionen och gör den globalt tillgänglig
 export function searchProjects(query) {
     const filteredProjects = allProjects.filter(project =>
         project.address.toLowerCase().includes(query.toLowerCase())
     );
     renderProjects(filteredProjects);
 }
+
+// Lägg till funktionen till `window` för att göra den globalt tillgänglig
+window.searchProjects = searchProjects;
 
 function renderProjects(projects) {
     const projectList = document.getElementById('project-list');
