@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     start_date: planning.startDate,
                     end_date: planning.endDate,
                     detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                    // Lägg till en planering för elektrikern på samma rad, med en speciell markering
                     progress: planning.electricianDate ? (new Date(planning.electricianDate) - new Date(planning.startDate)) / (new Date(planning.endDate) - new Date(planning.startDate)) : 1
                 }];
 
