@@ -1,111 +1,117 @@
-import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-import { db, collection, getDocs, getDoc, doc } from './firebase-config.js';
+import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    const ganttChartContainer = document.getElementById('gantt-chart');
+    const employeeSelect = document.getElementById('employee-select');
+    let plannings = [];
+
+    // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Kontrollera om användaren är aktiv
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists() && userDoc.data().active) {
-                // Användaren är inloggad och aktiv
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
                 initializePage();
             } else {
-                // Användaren är inloggad men inte aktiv
-                await signOut(auth);
-                alert('Din användare är inte aktiv. Kontakta administratören.');
-                window.location.href = 'login.html';
+                console.error('User document not found.');
             }
         } else {
-            // Användaren är inte inloggad
-            window.location.href = 'login.html';
+            console.error('User not logged in');
+            navigateTo('login.html');
         }
     });
 
     async function initializePage() {
-        const ganttTableBody = document.getElementById('gantt-table-body');
-        const searchInput = document.getElementById('search-input');
-
-        if (!ganttTableBody) {
-            console.error("Element with ID 'gantt-table-body' not found.");
-            return;
-        }
-
-        let plannings = [];
         try {
+            // Hämta all planering
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Logga alla plannings för att se statusar
-            console.log('Alla plannings:', plannings);
+            // Fyll rullgardinsmenyn med anställda
+            populateEmployeeSelect(plannings);
 
-            // Filtrera bort projekt där slutdatum är mer än en månad gammalt eller med specifikt projekt-ID
-            const currentDate = new Date();
-            plannings = plannings.filter(planning => {
-                const endDate = new Date(planning.endDate);
-                const oneMonthAgo = new Date();
-                oneMonthAgo.setMonth(currentDate.getMonth() - 1);
+            // Rendera hela Gantt-diagrammet som standard
+            renderGanttChart(plannings);
 
-                return endDate >= oneMonthAgo && planning.projectId !== 'moBgPPK2jgyZaeBnqza1';
+            // Lägg till en eventlistener för rullgardinsmenyn
+            employeeSelect.addEventListener('change', () => {
+                const selectedEmployee = employeeSelect.value;
+                filterAndRenderGantt(selectedEmployee);
             });
 
-            console.log('Filtrerade plannings:', plannings);
-
-            renderGanttChart(plannings); // Render initial chart
         } catch (error) {
             console.error('Error fetching plannings:', error);
         }
+    }
 
-        // Event listener för sökinput
-        searchInput.addEventListener('input', async () => {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            const filteredPlannings = [];
-
-            for (const planning of plannings) {
-                try {
-                    const projectDocRef = doc(db, 'projects', planning.projectId);
-                    const projectDoc = await getDoc(projectDocRef);
-                    if (projectDoc.exists()) {
-                        const projectData = projectDoc.data();
-                        if (projectData.address && projectData.address.toLowerCase().includes(searchTerm)) {
-                            filteredPlannings.push(planning);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error fetching project details:', error);
-                }
-            }
-
-            renderGanttChart(filteredPlannings); // Re-render chart with filtered data
+    function populateEmployeeSelect(plannings) {
+        const employees = new Set();
+        plannings.forEach(planning => {
+            planning.employees.forEach(employee => employees.add(employee));
         });
 
-        async function renderGanttChart(plannings) {
-            ganttTableBody.innerHTML = ''; // Rensa befintligt innehåll
+        employees.forEach(employee => {
+            const option = document.createElement('option');
+            option.value = employee;
+            option.textContent = employee;
+            employeeSelect.appendChild(option);
+        });
+    }
 
-            // Sortera plannings efter startdatum i stigande ordning
-            plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
-            for (const planning of plannings) {
-                try {
-                    const projectDocRef = doc(db, 'projects', planning.projectId);
-                    const projectDoc = await getDoc(projectDocRef);
-                    if (projectDoc.exists()) {
-                        const projectData = projectDoc.data();
-                        const address = projectData.address || 'Ej specificerad';
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td><a href="projekt-detalj.html?id=${planning.projectId}">${address}</a></td>
-                            <td>${planning.startDate}</td>
-                            <td>${planning.endDate}</td>
-                            <td>${planning.electricianDate || 'Ej specificerad'}</td>
-                            <td>${planning.employees.join(', ')}</td>
-                        `;
-                        ganttTableBody.appendChild(row);
-                    }
-                } catch (error) {
-                    console.error('Error fetching project details:', error);
-                }
-            }
+    function filterAndRenderGantt(selectedEmployee) {
+        if (selectedEmployee === "") {
+            // Visa alla anställdas schema
+            renderGanttChart(plannings);
+        } else {
+            // Filtrera planeringen för att bara visa den valda anställdas schema
+            const filteredPlannings = plannings.filter(planning => 
+                planning.employees.includes(selectedEmployee)
+            );
+            renderGanttChart(filteredPlannings);
         }
+    }
+
+    async function renderGanttChart(plannings) {
+        ganttChartContainer.innerHTML = ''; // Rensa befintligt innehåll
+        
+        // Konfigurera Gantt-diagrammet
+        gantt.config.xml_date = "%Y-%m-%d"; // Ange datumformatet
+
+        // Gör Gantt-diagrammet read-only
+        gantt.config.readonly = true;
+
+        // Initialisera Gantt-diagrammet
+        gantt.init("gantt-chart");
+
+        // Ladda data i Gantt-diagrammet
+        gantt.parse({
+            data: await Promise.all(plannings.map(async planning => {
+                const projectDocRef = doc(db, 'projects', planning.projectId);
+                const projectDoc = await getDoc(projectDocRef);
+                if (projectDoc.exists()) {
+                    const projectData = projectDoc.data();
+                    return {
+                        id: planning.id,
+                        text: `${projectData.address || 'Ej specificerad'} (Elektriker: ${planning.electricianDate || 'Ej specificerad'})`,
+                        start_date: planning.startDate,
+                        end_date: planning.endDate,
+                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                    };
+                }
+                return null;
+            })),
+            links: []
+        });
+
+        // Lägg till en klickhändelse på varje uppgift
+        gantt.attachEvent("onTaskClick", function(id, e) {
+            const task = gantt.getTask(id);
+            if (task && task.detailsLink) {
+                window.location.href = task.detailsLink;
+            }
+            return true;
+        });
     }
 });
 
