@@ -100,12 +100,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    // Visa endast elektrikerns datum med korrekt duration baserat på start- och slutdatum
+                    // Beräkna duration baserat på start- och slutdatum
+                    const startDate = new Date(planning.electricianStartDate);
+                    const endDate = new Date(planning.electricianEndDate);
+                    let duration = (endDate - startDate) / (1000 * 60 * 60 * 24); // Antal dagar mellan start och slut
+
+                    // Om duration är 0, sätt till 1 dag
+                    if (duration < 1) {
+                        duration = 1;
+                    }
+
+                    // Visa endast elektrikerns datum med korrekt duration
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianStartDate,
                         end_date: planning.electricianEndDate,
+                        duration: duration,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700" // Färg för elektrikerns uppgift
                     });
