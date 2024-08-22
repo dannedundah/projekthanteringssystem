@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let plannings = [];
     let canEdit = false;
 
+    // Här anger du ID för det projekt som ska döljas
+    const hiddenProjectId = "SPECIFIKT_PROJEKT_ID"; // Byt ut mot det faktiska projekt-ID:t
+
     // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -69,13 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedEmployee === "Elektriker") {
             // Om Elektriker är vald, visa endast projekten för elektrikern och inte intern tid
-            filteredPlannings = plannings.filter(planning => planning.electricianStartDate && planning.electricianEndDate && !planning.isInternal);
+            filteredPlannings = plannings.filter(planning => 
+                planning.electricianStartDate && 
+                planning.electricianEndDate && 
+                planning.projectId !== hiddenProjectId
+            );
         } else if (selectedEmployee === "") {
             // Visa alla projekt utan elektrikerns datum och intern tid
-            filteredPlannings = plannings.filter(planning => !planning.isInternal);
+            filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
             // Filtrera efter specifik anställd och dölja intern tid
-            filteredPlannings = plannings.filter(planning => planning.employees.includes(selectedEmployee) && !planning.isInternal);
+            filteredPlannings = plannings.filter(planning => 
+                planning.employees.includes(selectedEmployee) && 
+                planning.projectId !== hiddenProjectId
+            );
         }
 
         renderGanttChart(filteredPlannings);
