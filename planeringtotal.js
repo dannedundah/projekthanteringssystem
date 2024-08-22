@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
