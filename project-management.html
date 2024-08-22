@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hantera Projekt</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/project-management.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Hantera projekt</h2>
+        <div id="project-list"></div>
+
+        <div id="project-search" style="display:none; margin-top: 10px;">
+            <label for="search">Sök projekt (adress):</label>
+            <input type="text" id="search" placeholder="Skriv adress..." oninput="searchProjects(this.value)">
+        </div>
+
+        <button onclick="navigateTo('admin.html')">Tillbaka</button>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hantera Användare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/user-management.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Hantera användare</h2>
+        <div id="user-list"></div>
+
+        <div id="user-filter" style="display:none;">
+            <label for="filter">Filtrera användare:</label>
+            <select id="filter" onchange="filterUsers(this.value)">
+                <option value="all">Alla</option>
+                <option value="active">Aktiva</option>
+                <option value="inactive">Inaktiva</option>
+            </select>
+        </div>
+
+        <button onclick="navigateTo('admin.html')">Tillbaka</button>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>

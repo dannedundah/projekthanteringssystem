@@ -4,47 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <script type="module">
-        import { loadUserManagement, loadProjectManagement, filterUsers, searchProjects } from './admin.js'; // Importera funktionerna från admin.js
-        window.loadUserManagement = loadUserManagement;
-        window.loadProjectManagement = loadProjectManagement;
-        window.filterUsers = filterUsers;
-        window.searchProjects = searchProjects;
-    </script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <h1>Admin Dashboard</h1>
         
-        <!-- Valmöjligheter för admin -->
+        <!-- Navigeringsknappar -->
         <div id="admin-options">
-            <button onclick="loadUserManagement()">Hantera användare</button>
-            <button onclick="loadProjectManagement()">Hantera projekt</button>
-        </div>
-
-        <!-- Filter för användare -->
-        <div id="user-filter" style="display:none;">
-            <label for="filter">Filtrera användare:</label>
-            <select id="filter" onchange="filterUsers(this.value)">
-                <option value="all">Alla</option>
-                <option value="active">Aktiva</option>
-                <option value="inactive">Inaktiva</option>
-            </select>
-        </div>
-
-        <!-- Sökfält för projekt -->
-        <div id="project-search" style="display:none; margin-top: 10px;">
-            <label for="search">Sök projekt (adress):</label>
-            <input type="text" id="search" placeholder="Skriv adress..." oninput="searchProjects(this.value)">
-        </div>
-
-        <!-- Dynamiskt innehåll -->
-        <div id="admin-content">
-            <!-- Innehåll för hantering kommer att laddas här -->
+            <button onclick="navigateTo('user-management.html')">Hantera användare</button>
+            <button onclick="navigateTo('project-management.html')">Hantera projekt</button>
         </div>
 
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
