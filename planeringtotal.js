@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             filteredPlannings = filteredPlannings.filter(planning => 
                 planning.employees.includes(selectedEmployee)
             );
+        } else {
+            // För alla anställda, exkludera elektrikerns datum
+            filteredPlannings = filteredPlannings.filter(planning => !planning.electricianDate);
         }
 
         renderGanttChart(filteredPlannings);
@@ -102,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     detailsLink: `projekt-detalj.html?id=${planning.projectId}`
                 }];
 
-                // Om elektrikerns datum finns, skapa en andra uppgift på samma rad för att representera elektrikern
-                if (planning.electricianDate) {
+                // Om Elektriker är vald, inkludera elektrikerns datum
+                if (employeeSelect.value === "Elektriker" && planning.electricianDate) {
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: "Elektriker - " + projectData.address,
