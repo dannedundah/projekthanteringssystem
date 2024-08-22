@@ -14,21 +14,6 @@
 </head>
 <body>
     <div class="container">
-        <div id="edit-modal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="document.getElementById('edit-modal').style.display='none'">&times;</span>
-                <h3>Uppdatera Projekt</h3>
-                <label for="start-date">Startdatum:</label>
-                <input type="date" id="start-date">
-                <label for="end-date">Slutdatum:</label>
-                <input type="date" id="end-date">
-                <div class="modal-footer">
-                    <button class="save-button" onclick="saveTaskDates()">Spara</button>
-                    <button class="cancel-button" onclick="document.getElementById('edit-modal').style.display='none'">Avbryt</button>
-                </div>
-            </div>
-        </div>
-        
         <h1>Planering Total</h1>
         <select id="employee-select">
             <option value="">Alla anställda</option>
