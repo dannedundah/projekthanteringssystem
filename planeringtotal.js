@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             filteredPlannings = plannings.filter(planning => planning.electricianDate);
         } else if (selectedEmployee === "") {
             // Visa alla projekt utan elektrikerns datum
-            filteredPlannings = plannings.filter(planning => !planning.electricianDate || planning.employees.includes(selectedEmployee));
+            filteredPlannings = plannings;
         } else {
             // Filtrera efter specifik anställd
             filteredPlannings = plannings.filter(planning => planning.employees.includes(selectedEmployee));
@@ -111,15 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 } else {
                     // Visa alla anställdas schema utan elektrikerns datum
-                    if (!planning.electricianDate) {
-                        taskList.push({
-                            id: planning.id,
-                            text: projectData.address || 'Ej specificerad',
-                            start_date: planning.startDate,
-                            end_date: planning.endDate,
-                            detailsLink: `projekt-detalj.html?id=${planning.projectId}`
-                        });
-                    }
+                    taskList.push({
+                        id: planning.id,
+                        text: projectData.address || 'Ej specificerad',
+                        start_date: planning.startDate,
+                        end_date: planning.endDate,
+                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`
+                    });
                 }
 
                 return taskList;
