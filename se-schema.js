@@ -81,6 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
             })),
             links: []
         });
+
+        // Lägg till en klickhändelse på varje uppgift
+        gantt.attachEvent("onTaskClick", function(id, e) {
+            const task = gantt.getTask(id);
+            if (task && task.detailsLink) {
+                window.location.href = task.detailsLink;
+            }
+            return true;
+        });
     }
 });
 
