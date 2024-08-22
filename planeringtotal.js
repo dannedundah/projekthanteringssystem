@@ -163,6 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEditModal(task) {
+        // Funktion för att formatera datumet till "yyyy-MM-dd"
+        function formatDate(date) {
+            const d = new Date(date);
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            const year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
         const modal = document.createElement('div');
         modal.classList.add('modal');
         modal.innerHTML = `
@@ -170,9 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
                 <h3>Uppdatera Projekt: ${task.text}</h3>
                 <label for="start-date">Startdatum:</label>
-                <input type="date" id="start-date" value="${task.start_date}">
+                <input type="date" id="start-date" value="${formatDate(task.start_date)}">
                 <label for="end-date">Slutdatum:</label>
-                <input type="date" id="end-date" value="${task.end_date}">
+                <input type="date" id="end-date" value="${formatDate(task.end_date)}">
                 <button onclick="saveTaskDates('${task.id}')">Spara</button>
             </div>
         `;
