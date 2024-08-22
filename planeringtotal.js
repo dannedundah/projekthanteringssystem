@@ -99,17 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     text: projectData.address || 'Ej specificerad',
                     start_date: planning.startDate,
                     end_date: planning.endDate,
-                    detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                    progress: planning.electricianDate ? (new Date(planning.electricianDate) - new Date(planning.startDate)) / (new Date(planning.endDate) - new Date(planning.startDate)) : 1
+                    detailsLink: `projekt-detalj.html?id=${planning.projectId}`
                 }];
 
-                // Om elektrikerns datum finns, markera det på samma rad
+                // Om elektrikerns datum finns, skapa en andra uppgift på samma rad för att representera elektrikern
                 if (planning.electricianDate) {
-                    gantt.addMarker({
-                        start_date: new Date(planning.electricianDate),
-                        css: "electrician-marker", // Lägg till en CSS-klass för specialfärg
-                        title: "Elektriker",
-                        text: "Elektriker"
+                    taskList.push({
+                        id: planning.id + '-electrician',
+                        text: "Elektriker - " + projectData.address,
+                        start_date: planning.electricianDate,
+                        end_date: planning.electricianDate,
+                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                        color: "#FFD700" // Färg för elektrikerns uppgift
                     });
                 }
 
