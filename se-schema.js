@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Konfigurera Gantt-diagrammet
         gantt.config.xml_date = "%Y-%m-%d"; // Ange datumformatet
 
+        // Gör Gantt-diagrammet read-only
+        gantt.config.readonly = true;
+
         // Anpassa utseendet och beteendet på Gantt-diagrammet här om nödvändigt
         gantt.init("gantt-chart"); // Initialisera Gantt-diagrammet i rätt container
         
