@@ -187,6 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+
+        // Apply inline styles to ensure correct appearance
+        modal.style.backgroundColor = "#fff";
+        modal.style.padding = "20px";
+        modal.style.borderRadius = "10px";
+
         document.body.appendChild(modal);
     }
 
