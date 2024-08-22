@@ -94,26 +94,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectDoc = await getDoc(projectDocRef);
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
-
-                // Skapa uppgift för montörernas arbete
                 const taskList = [{
                     id: planning.id,
                     text: projectData.address || 'Ej specificerad',
                     start_date: planning.startDate,
                     end_date: planning.endDate,
                     detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                    // Lägg till en planering för elektrikern på samma rad, med en speciell markering
+                    progress: planning.electricianDate ? (new Date(planning.electricianDate) - new Date(planning.startDate)) / (new Date(planning.endDate) - new Date(planning.startDate)) : 1
                 }];
 
-                // Lägg till elektrikerns datum som en milstolpe på samma rad
+                // Om elektrikerns datum finns, markera det på samma rad
                 if (planning.electricianDate) {
-                    taskList.push({
-                        id: planning.id + '-electrician',
-                        text: "Elektriker",
-                        start_date: planning.electricianDate,
-                        end_date: planning.electricianDate,
-                        type: "milestone", // Markerar det som en milstolpe
-                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700", // Gult för att skilja sig från andra uppgifter
+                    gantt.addMarker({
+                        start_date: new Date(planning.electricianDate),
+                        css: "electrician-marker", // Lägg till en CSS-klass för specialfärg
+                        title: "Elektriker",
+                        text: "Elektriker"
                     });
                 }
 

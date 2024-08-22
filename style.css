@@ -325,3 +325,9 @@ button.remove-button:hover {
     border-bottom: 1px solid #ddd;
     list-style-type: none;
 }
+
+/* Stil för elektrikermarker */
+.electrician-marker {
+    background-color: #FFD700;
+    height: 20px;
+}
