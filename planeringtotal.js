@@ -104,15 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                 }];
 
-                // Lägg till elektrikerns datum som en separat uppgift om "Elektriker" är valt
+                // Lägg till elektrikerns datum som en milstolpe på samma rad
                 if (planning.electricianDate) {
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: projectData.address + " - Elektriker",
+                        text: "Elektriker",
                         start_date: planning.electricianDate,
                         end_date: planning.electricianDate,
+                        type: "milestone", // Markerar det som en milstolpe
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700" // Gult för att skilja sig från andra uppgifter
+                        color: "#FFD700", // Gult för att skilja sig från andra uppgifter
                     });
                 }
 
