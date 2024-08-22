@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let canEdit = false;
 
     // Här anger du ID för det projekt som ska döljas
-    const hiddenProjectId = "SPECIFIKT_PROJEKT_ID"; // Byt ut mot det faktiska projekt-ID:t
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
     // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
