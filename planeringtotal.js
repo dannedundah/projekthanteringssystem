@@ -1,13 +1,10 @@
-import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
     const employeeSelect = document.getElementById('employee-select');
     let plannings = [];
     let canEdit = false;
-
-    // Här anger du ID för det projekt som ska döljas
-    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
     // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
@@ -30,11 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializePage() {
         try {
-            // Hämta all planering och filtrera bort det dolda projektet
+            // Hämta all planering
             const querySnapshot = await getDocs(collection(db, 'planning'));
-            plannings = querySnapshot.docs
-                .map(doc => ({ id: doc.id, ...doc.data() }))
-                .filter(planning => planning.projectId !== hiddenProjectId); // Filtrera bort projektet här
+            plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             // Fyll rullgardinsmenyn med anställda och "Elektriker"
             populateEmployeeSelect(plannings);
@@ -73,17 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
-            // Om Elektriker är vald, visa endast projekten för elektrikern och inte det dolda projektet
+            // Om Elektriker är vald, visa endast projekten för elektrikern och inte intern tid
             filteredPlannings = plannings.filter(planning => 
                 planning.electricianStartDate && 
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
         } else if (selectedEmployee === "") {
-            // Visa alla projekt utan det dolda projektet
+            // Visa alla projekt utan elektrikerns datum och intern tid
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
-            // Filtrera efter specifik anställd och dölja det dolda projektet
+            // Filtrera efter specifik anställd och dölja intern tid
             filteredPlannings = plannings.filter(planning => 
                 planning.employees.includes(selectedEmployee) && 
                 planning.projectId !== hiddenProjectId
@@ -112,26 +107,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    // Hantera start- och slutdatum för elektrikern
                     const startDate = new Date(planning.electricianStartDate);
                     const endDate = new Date(planning.electricianEndDate);
-                    
-                    // Om start och slutdatum är samma, justera slutdatum så det syns korrekt
+
                     if (startDate.getTime() === endDate.getTime()) {
                         endDate.setDate(endDate.getDate() + 1);
                     }
 
-                    // Visa endast elektrikerns datum med justerat slutdatum om nödvändigt
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: planning.electricianStartDate,
-                        end_date: endDate.toISOString().split('T')[0], // Formatera slutdatumet korrekt
+                        end_date: endDate.toISOString().split('T')[0],
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700" // Färg för elektrikerns uppgift
+                        color: "#FFD700" 
                     });
                 } else {
-                    // Visa alla anställdas schema utan elektrikerns datum
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
@@ -146,20 +137,56 @@ document.addEventListener('DOMContentLoaded', () => {
             return [];
         }));
 
-        gantt.clearAll(); // Rensa tidigare laddade data
+        gantt.clearAll(); 
         gantt.parse({
-            data: tasks.flat(), // Platta ut arrayen så att uppgifterna visas på samma nivå
+            data: tasks.flat(), 
             links: []
         });
 
-        // Lägg till en klickhändelse på varje uppgift
-        gantt.attachEvent("onTaskClick", function(id, e) {
-            const task = gantt.getTask(id);
-            if (task && task.detailsLink) {
-                window.location.href = task.detailsLink;
-            }
-            return true;
+        if (canEdit) {
+            gantt.attachEvent("onTaskClick", function(id, e) {
+                const task = gantt.getTask(id);
+                showEditModal(task);
+                return false; 
+            });
+        }
+    }
+
+    function showEditModal(task) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <h3>Uppdatera Projekt: ${task.text}</h3>
+                <label for="start-date">Startdatum:</label>
+                <input type="date" id="start-date" value="${task.start_date}">
+                <label for="end-date">Slutdatum:</label>
+                <input type="date" id="end-date" value="${task.end_date}">
+                <button onclick="saveTaskDates('${task.id}')">Spara</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async function saveTaskDates(taskId) {
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        // Uppdatera Firestore
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        await updateDoc(planningRef, {
+            startDate: startDate,
+            endDate: endDate
         });
+
+        // Uppdatera Gantt-diagrammet
+        gantt.getTask(taskId).start_date = startDate;
+        gantt.getTask(taskId).end_date = endDate;
+        gantt.updateTask(taskId);
+
+        // Stäng modalen
+        document.querySelector('.modal').remove();
     }
 });
 
