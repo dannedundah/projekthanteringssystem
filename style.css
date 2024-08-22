@@ -142,9 +142,8 @@ select, button {
     position: absolute;
     top: 15px;
     right: 25px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
+    color: #333;
+    font-size: 24px;
     cursor: pointer;
 }
 
@@ -162,20 +161,38 @@ select, button {
     border: 1px solid #ccc;
 }
 
-.modal-content button {
+/* Stil för knappar i modalen */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
     margin-top: 20px;
+}
+
+.save-button, .cancel-button {
     padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
     font-size: 16px;
+    border-radius: 5px;
+    border: none;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-.modal-content button:hover {
+.save-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.save-button:hover {
     background-color: #218838;
+}
+
+.cancel-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #c82333;
 }
 
 /* Stil för thumbnails */

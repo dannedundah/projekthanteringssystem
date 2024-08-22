@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.innerHTML = `
             <div class="modal-content">
                 <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                <h3>Uppdatera Projekt: ${task.text}</h3>
+                <h3>Ändra Datum</h3>
                 <label for="start-date">Startdatum:</label>
                 <input type="date" id="start-date" value="${formatDate(task.start_date)}">
                 <label for="end-date">Slutdatum:</label>
