@@ -68,14 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
-            // Om Elektriker är vald, visa endast projekten för elektrikern
-            filteredPlannings = plannings.filter(planning => planning.electricianStartDate && planning.electricianEndDate);
+            // Om Elektriker är vald, visa endast projekten för elektrikern och inte intern tid
+            filteredPlannings = plannings.filter(planning => planning.electricianStartDate && planning.electricianEndDate && !planning.isInternal);
         } else if (selectedEmployee === "") {
-            // Visa alla projekt utan elektrikerns datum
-            filteredPlannings = plannings;
+            // Visa alla projekt utan elektrikerns datum och intern tid
+            filteredPlannings = plannings.filter(planning => !planning.isInternal);
         } else {
-            // Filtrera efter specifik anställd
-            filteredPlannings = plannings.filter(planning => planning.employees.includes(selectedEmployee));
+            // Filtrera efter specifik anställd och dölja intern tid
+            filteredPlannings = plannings.filter(planning => planning.employees.includes(selectedEmployee) && !planning.isInternal);
         }
 
         renderGanttChart(filteredPlannings);
