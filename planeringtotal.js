@@ -94,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectDoc = await getDoc(projectDocRef);
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
+
+                // Skapa uppgift för montörernas arbete
                 const taskList = [{
                     id: planning.id,
                     text: projectData.address || 'Ej specificerad',
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (planning.electricianDate) {
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: 'Elektriker',
+                        text: projectData.address + " - Elektriker",
                         start_date: planning.electricianDate,
                         end_date: planning.electricianDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
