@@ -134,7 +134,7 @@ select, button {
     border-radius: 10px; /* Rundade hörn */
     display: block;
     width: 80%;
-    max-width: 500px; /* Minska maxbredden något */
+    max-width: 800px; /* Minska maxbredden något */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Liten skugga för djup */
 }
 
