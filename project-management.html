@@ -10,12 +10,15 @@
 <body>
     <div class="container">
         <h2>Hantera projekt</h2>
-        <div id="project-list"></div>
 
+        <!-- Flytta sökdelen högst upp -->
         <div id="project-search" style="display:none; margin-top: 10px;">
             <label for="search">Sök projekt (adress):</label>
             <input type="text" id="search" placeholder="Skriv adress..." oninput="searchProjects(this.value)">
         </div>
+
+        <!-- Projektlistan kommer nedanför sökfältet -->
+        <div id="project-list"></div>
 
         <button onclick="navigateTo('admin.html')">Tillbaka</button>
     </div>

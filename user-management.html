@@ -10,8 +10,8 @@
 <body>
     <div class="container">
         <h2>Hantera användare</h2>
-        <div id="user-list"></div>
 
+        <!-- Flytta filtreringsdelen högst upp -->
         <div id="user-filter" style="display:none;">
             <label for="filter">Filtrera användare:</label>
             <select id="filter" onchange="filterUsers(this.value)">
@@ -20,6 +20,9 @@
                 <option value="inactive">Inaktiva</option>
             </select>
         </div>
+
+        <!-- Användarlistan kommer nedanför filtret -->
+        <div id="user-list"></div>
 
         <button onclick="navigateTo('admin.html')">Tillbaka</button>
     </div>
