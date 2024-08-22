@@ -54,7 +54,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const projectId = projectDropdown.value.trim();
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
-        const electricianDate = document.getElementById('electrician-date').value;
+        const electricianStartDate = document.getElementById('electrician-start-date').value;
+        const electricianEndDate = document.getElementById('electrician-end-date').value;
         const employees = [
             employee1Dropdown.value,
             employee2Dropdown.value,
@@ -66,7 +67,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             projectId,
             startDate,
             endDate,
-            electricianDate,
+            electricianStartDate,
+            electricianEndDate,
             employees,
         };
 
