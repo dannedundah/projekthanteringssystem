@@ -86,6 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGanttChart(filteredPlannings);
     }
 
+    function formatDateToString(date) {
+        if (typeof date === 'string') {
+            return date;
+        }
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     async function renderGanttChart(plannings) {
         ganttChartContainer.innerHTML = '';
 
@@ -102,27 +113,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    const startDate = new Date(planning.electricianStartDate);
-                    const endDate = new Date(planning.electricianEndDate);
-
-                    if (startDate.getTime() === endDate.getTime()) {
-                        endDate.setDate(endDate.getDate() + 1);
-                    }
+                    const startDate = formatDateToString(planning.electricianStartDate);
+                    const endDate = formatDateToString(planning.electricianEndDate);
 
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
-                        start_date: planning.electricianStartDate,
-                        end_date: endDate.toISOString().split('T')[0],
+                        start_date: startDate,
+                        end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700"
                     });
                 } else {
+                    const startDate = formatDateToString(planning.startDate);
+                    const endDate = formatDateToString(planning.endDate);
+
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
-                        start_date: planning.startDate,
-                        end_date: planning.endDate,
+                        start_date: startDate,
+                        end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`
                     });
                 }
@@ -138,16 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        // Hantera klick på vänster (trädet) delen av Gantt-schemat
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
-            // Endast tillåt navigering när man klickar på vänsterkolumnen (trädet)
             if (e.target.closest('.gantt_row_task')) {
-                // Här hindrar vi navigering om klicket är på högra sidan (Gantt-schemat)
+                // Förhindra navigering när man klickar på högersidan (Gantt-diagrammet)
                 e.preventDefault();
                 return false;
             } else if (e.target.closest('.gantt_tree_content')) {
-                // Om man klickar på vänsterkolumnen (trädet) navigeras till detaljsidan
+                // Tillåt navigering från vänsterkolumnen (trädet)
                 window.location.href = task.detailsLink;
                 return false;
             }
