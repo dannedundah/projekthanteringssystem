@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
@@ -152,14 +152,78 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        // Lägg till en klickhändelse på varje uppgift
-        gantt.attachEvent("onTaskClick", function(id, e) {
-            const task = gantt.getTask(id);
-            if (task && task.detailsLink) {
-                window.location.href = task.detailsLink;
-            }
-            return true;
+        // Lägg till en klickhändelse på varje uppgift om användaren kan redigera
+        if (canEdit) {
+            gantt.attachEvent("onTaskClick", function(id, e) {
+                const task = gantt.getTask(id);
+                if (e.target.closest('.gantt_task_row')) {
+                    showEditModal(task);
+                    return false; // Förhindra standard navigering
+                }
+                if (e.target.closest('.gantt_tree_content')) {
+                    window.location.href = task.detailsLink;
+                    return false;
+                }
+            });
+        } else {
+            gantt.attachEvent("onTaskClick", function(id, e) {
+                if (e.target.closest('.gantt_tree_content')) {
+                    const task = gantt.getTask(id);
+                    window.location.href = task.detailsLink;
+                    return false;
+                }
+            });
+        }
+    }
+
+    function showEditModal(task) {
+        // Funktion för att formatera datumet till "yyyy-MM-dd"
+        function formatDate(date) {
+            const d = new Date(date);
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            const year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <h3>Uppdatera Projekt: ${task.text}</h3>
+                <label for="start-date">Startdatum:</label>
+                <input type="date" id="start-date" value="${formatDate(task.start_date)}">
+                <label for="end-date">Slutdatum:</label>
+                <input type="date" id="end-date" value="${formatDate(task.end_date)}">
+                <button onclick="saveTaskDates('${task.id}')">Spara</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async function saveTaskDates(taskId) {
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        // Uppdatera Firestore
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        await updateDoc(planningRef, {
+            startDate: startDate,
+            endDate: endDate
         });
+
+        // Uppdatera Gantt-diagrammet
+        gantt.getTask(taskId).start_date = startDate;
+        gantt.getTask(taskId).end_date = endDate;
+        gantt.updateTask(taskId);
+
+        // Stäng modalen
+        document.querySelector('.modal').remove();
     }
 });
 
