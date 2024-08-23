@@ -28,7 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initializePage() {
         // Ta bort DHTMLX Gantt-modalen från DOM
         const ganttModals = document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover');
-        ganttModals.forEach(modal => modal.remove());
+        ganttModals.forEach(modal => {
+            console.log('Removing existing DHTMLX modal:', modal);
+            modal.remove();
+        });
 
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
@@ -140,9 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (canEdit) {
             gantt.attachEvent("onTaskClick", function(id, e) {
+                console.log('Task clicked:', id);
                 const task = gantt.getTask(id);
                 if (e.target.closest('.gantt_task_row')) {
-                    console.log('Task row clicked, showing modal');
                     showEditModal(task);
                     return false;
                 }
@@ -163,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEditModal(task) {
-        console.log('showEditModal called', task); // Kontrollera att denna logg syns
+        console.log('showEditModal called:', task); // Kontrollera att denna logg syns
         const modal = document.createElement('div');
         modal.classList.add('modal');
         modal.innerHTML = `
@@ -181,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.body.appendChild(modal);
-        console.log('Modal created and added to the DOM'); // Kontrollera att denna logg syns
+        console.log('Modal added to DOM'); // Kontrollera att denna logg syns
     }
 
     async function saveTaskDates(taskId) {
