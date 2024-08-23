@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gantt.attachEvent("onTaskClick", function(id, e) {
                 const task = gantt.getTask(id);
                 if (e.target.closest('.gantt_task_row')) {
+                    console.log('Task row clicked, showing modal');
                     showEditModal(task);
                     return false;
                 }
@@ -162,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEditModal(task) {
+        console.log('showEditModal called', task); // Kontrollera att denna logg syns
         const modal = document.createElement('div');
         modal.classList.add('modal');
         modal.innerHTML = `
@@ -179,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.body.appendChild(modal);
+        console.log('Modal created and added to the DOM'); // Kontrollera att denna logg syns
     }
 
     async function saveTaskDates(taskId) {
