@@ -26,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function initializePage() {
+        // Ta bort DHTMLX Gantt-modalen från DOM
+        const ganttModals = document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover');
+        ganttModals.forEach(modal => modal.remove());
+
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs
@@ -134,28 +138,20 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        if (canEdit) {
-            gantt.attachEvent("onTaskClick", function(id, e) {
-                const task = gantt.getTask(id);
+        // Hantera klick på vänster (trädet) delen av Gantt-schemat
+        gantt.attachEvent("onTaskClick", function(id, e) {
+            const task = gantt.getTask(id);
+            // Endast tillåt navigering när man klickar på vänsterkolumnen (trädet)
+            if (e.target.closest('.gantt_row_task')) {
+                // Här hindrar vi navigering om klicket är på högra sidan (Gantt-schemat)
+                e.preventDefault();
+                return false;
+            } else if (e.target.closest('.gantt_tree_content')) {
+                // Om man klickar på vänsterkolumnen (trädet) navigeras till detaljsidan
                 window.location.href = task.detailsLink;
                 return false;
-            });
-
-            gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
-                const task = gantt.getTask(id);
-                const planningRef = doc(db, 'planning', id.replace('-electrician', ''));
-                await updateDoc(planningRef, {
-                    startDate: task.start_date,
-                    endDate: task.end_date
-                });
-            });
-        } else {
-            gantt.attachEvent("onTaskClick", function(id, e) {
-                const task = gantt.getTask(id);
-                window.location.href = task.detailsLink;
-                return false;
-            });
-        }
+            }
+        });
     }
 });
 
