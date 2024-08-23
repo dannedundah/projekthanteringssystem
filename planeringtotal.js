@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
@@ -6,14 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let plannings = [];
     let canEdit = false;
 
+    // Här anger du ID för det projekt som ska döljas
     const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
+    // Kontrollera vem som är inloggad och ladda planeringen
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDocRef = doc(db, 'users', user.uid);
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
+                const userData = userDoc.data();
                 canEdit = ["daniel@delidel.se", "sofie@delidel.se", "leia@delidel.se"].includes(user.email);
                 initializePage();
             } else {
@@ -26,19 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function initializePage() {
-        // Ta bort DHTMLX Gantt-modalen från DOM
-        const ganttModals = document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover');
-        ganttModals.forEach(modal => modal.remove());
-
         try {
+            // Hämta all planering och filtrera bort det dolda projektet
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs
                 .map(doc => ({ id: doc.id, ...doc.data() }))
-                .filter(planning => planning.projectId !== hiddenProjectId);
+                .filter(planning => planning.projectId !== hiddenProjectId); // Filtrera bort projektet här
 
+            // Fyll rullgardinsmenyn med anställda och "Elektriker"
             populateEmployeeSelect(plannings);
+
+            // Rendera hela Gantt-diagrammet som standard
             renderGanttChart(plannings);
 
+            // Lägg till en eventlistener för rullgardinsmenyn
             employeeSelect.addEventListener('change', () => {
                 const selectedEmployee = employeeSelect.value;
                 filterAndRenderGantt(selectedEmployee);
@@ -51,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateEmployeeSelect(plannings) {
         const employees = new Set();
-        employees.add("Elektriker");
+        employees.add("Elektriker"); // Lägg till "Elektriker" som ett alternativ
 
         plannings.forEach(planning => {
             planning.employees.forEach(employee => employees.add(employee));
@@ -69,14 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedEmployee === "Elektriker") {
+            // Om Elektriker är vald, visa endast projekten för elektrikern och inte det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.electricianStartDate && 
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
         } else if (selectedEmployee === "") {
+            // Visa alla projekt utan det dolda projektet
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
+            // Filtrera efter specifik anställd och dölja det dolda projektet
             filteredPlannings = plannings.filter(planning => 
                 planning.employees.includes(selectedEmployee) && 
                 planning.projectId !== hiddenProjectId
@@ -86,40 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGanttChart(filteredPlannings);
     }
 
-    function formatDateToString(date) {
-        if (!date) {
-            console.error("Invalid date:", date);
-            return null;
-        }
-        
-        // Hanterar Firebase Timestamp-objekt
-        if (date.seconds) {
-            const d = new Date(date.seconds * 1000); // Konvertera från sekunder till millisekunder
-            return d.toISOString().split('T')[0]; // Returnera i formatet "YYYY-MM-DD"
-        }
-
-        // Om datum redan är en sträng i korrekt format
-        if (typeof date === 'string') {
-            return date;
-        }
-
-        // Hantera vanliga Date-objekt
-        const d = new Date(date);
-        if (isNaN(d)) {
-            console.error("Invalid date:", date);
-            return null;
-        }
-        return d.toISOString().split('T')[0];
-    }
-
     async function renderGanttChart(plannings) {
-        ganttChartContainer.innerHTML = '';
+        ganttChartContainer.innerHTML = ''; // Rensa befintligt innehåll
+        
+        // Konfigurera Gantt-diagrammet
+        gantt.config.xml_date = "%Y-%m-%d"; // Ange datumformatet
+        gantt.config.readonly = !canEdit; // Gör diagrammet redigerbart för adminanvändare
 
-        gantt.config.xml_date = "%Y-%m-%d";
-        gantt.config.readonly = !canEdit;
-
+        // Initialisera Gantt-diagrammet
         gantt.init("gantt-chart");
 
+        // Hämta och bearbeta data för att ladda Gantt-diagrammet
         const tasks = await Promise.all(plannings.map(async planning => {
             const projectDocRef = doc(db, 'projects', planning.projectId);
             const projectDoc = await getDoc(projectDocRef);
@@ -128,36 +112,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskList = [];
 
                 if (employeeSelect.value === "Elektriker") {
-                    const startDate = formatDateToString(planning.electricianStartDate);
-                    const endDate = formatDateToString(planning.electricianEndDate);
-
-                    if (!startDate || !endDate) {
-                        console.error("Invalid start or end date for planning:", planning);
-                        return [];
+                    // Hantera start- och slutdatum för elektrikern
+                    const startDate = new Date(planning.electricianStartDate);
+                    const endDate = new Date(planning.electricianEndDate);
+                    
+                    // Om start och slutdatum är samma, justera slutdatum så det syns korrekt
+                    if (startDate.getTime() === endDate.getTime()) {
+                        endDate.setDate(endDate.getDate() + 1);
                     }
 
+                    // Visa endast elektrikerns datum med justerat slutdatum om nödvändigt
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
-                        start_date: startDate,
-                        end_date: endDate,
+                        start_date: planning.electricianStartDate,
+                        end_date: endDate.toISOString().split('T')[0], // Formatera slutdatumet korrekt
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700"
+                        color: "#FFD700" // Färg för elektrikerns uppgift
                     });
                 } else {
-                    const startDate = formatDateToString(planning.startDate);
-                    const endDate = formatDateToString(planning.endDate);
-
-                    if (!startDate || !endDate) {
-                        console.error("Invalid start or end date for planning:", planning);
-                        return [];
-                    }
-
+                    // Visa alla anställdas schema utan elektrikerns datum
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
-                        start_date: startDate,
-                        end_date: endDate,
+                        start_date: planning.startDate,
+                        end_date: planning.endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`
                     });
                 }
@@ -167,22 +146,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return [];
         }));
 
-        gantt.clearAll();
+        gantt.clearAll(); // Rensa tidigare laddade data
         gantt.parse({
-            data: tasks.flat(),
+            data: tasks.flat(), // Platta ut arrayen så att uppgifterna visas på samma nivå
             links: []
         });
 
+        // Lägg till en klickhändelse på varje uppgift
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
-            if (e.target.closest('.gantt_row_task')) {
-                // Förhindra navigering när man klickar på högersidan (Gantt-diagrammet)
-                return false;
-            } else if (e.target.closest('.gantt_cell')) {
-                // Tillåt navigering från vänsterkolumnen (trädet)
+            if (task && task.detailsLink) {
                 window.location.href = task.detailsLink;
-                return false;
             }
+            return true;
         });
     }
 });
