@@ -26,13 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function initializePage() {
-        // Ta bort DHTMLX Gantt-modalen från DOM och blockera nya
-        const ganttModals = document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover');
-        ganttModals.forEach(modal => modal.remove());
-
-        gantt.attachEvent("onLightbox", function(id) {
-            return false; // Förhindra visning av den inbyggda modalen
-        });
+        // Blockera DHTMLX Gantt-modalen och ta bort eventuella existerande
+        gantt.attachEvent("onLightbox", function() { return false; });
+        gantt.config.lightbox.sections = []; // Blockera DHTMLX Gantt modalen
+        document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover').forEach(modal => modal.remove());
 
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
@@ -95,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
-        gantt.config.lightbox.sections = []; // Blockera DHTMLX Gantt modalen
 
         gantt.init("gantt-chart");
 
@@ -146,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (canEdit) {
             gantt.attachEvent("onTaskClick", function(id, e) {
                 const task = gantt.getTask(id);
-                console.log("task clicked"); // Felsökningslogg
                 if (e.target.closest('.gantt_task_row')) {
                     showEditModal(task);
                     return false;
