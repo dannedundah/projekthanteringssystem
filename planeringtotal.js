@@ -177,9 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const task = gantt.getTask(id);
             if (e.target.closest('.gantt_row_task')) {
                 // Förhindra navigering när man klickar på högersidan (Gantt-diagrammet)
-                e.preventDefault();
                 return false;
-            } else if (e.target.closest('.gantt_tree_content')) {
+            } else if (e.target.closest('.gantt_cell')) {
                 // Tillåt navigering från vänsterkolumnen (trädet)
                 window.location.href = task.detailsLink;
                 return false;
