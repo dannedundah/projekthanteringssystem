@@ -26,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function initializePage() {
+        // Ta bort DHTMLX Gantt-modalen från DOM
+        const ganttModals = document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover');
+        ganttModals.forEach(modal => modal.remove());
+
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs
