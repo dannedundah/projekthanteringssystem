@@ -26,11 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function initializePage() {
-        // Blockera DHTMLX Gantt-modalen och ta bort eventuella existerande
-        gantt.attachEvent("onLightbox", function() { return false; });
-        gantt.config.lightbox.sections = []; // Blockera DHTMLX Gantt modalen
-        document.querySelectorAll('.gantt_cal_light, .gantt_cal_cover').forEach(modal => modal.remove());
-
         try {
             const querySnapshot = await getDocs(collection(db, 'planning'));
             plannings = querySnapshot.docs
@@ -142,65 +137,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (canEdit) {
             gantt.attachEvent("onTaskClick", function(id, e) {
                 const task = gantt.getTask(id);
-                if (e.target.closest('.gantt_task_row')) {
-                    showEditModal(task);
-                    return false;
-                }
-                if (e.target.closest('.gantt_tree_content')) {
-                    window.location.href = task.detailsLink;
-                    return false;
-                }
+                window.location.href = task.detailsLink;
+                return false;
+            });
+
+            gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+                const task = gantt.getTask(id);
+                const planningRef = doc(db, 'planning', id.replace('-electrician', ''));
+                await updateDoc(planningRef, {
+                    startDate: task.start_date,
+                    endDate: task.end_date
+                });
             });
         } else {
             gantt.attachEvent("onTaskClick", function(id, e) {
-                if (e.target.closest('.gantt_tree_content')) {
-                    const task = gantt.getTask(id);
-                    window.location.href = task.detailsLink;
-                    return false;
-                }
+                const task = gantt.getTask(id);
+                window.location.href = task.detailsLink;
+                return false;
             });
         }
-    }
-
-    function showEditModal(task) {
-        console.log('showEditModal called:', task); // Kontrollera att denna logg syns
-        const modal = document.createElement('div');
-        modal.classList.add('modal');
-        modal.innerHTML = `
-            <div class="modal-content">
-                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                <h3>Ändra Datum</h3>
-                <label for="start-date">Startdatum:</label>
-                <input type="date" id="start-date" value="${task.start_date}">
-                <label for="end-date">Slutdatum:</label>
-                <input type="date" id="end-date" value="${task.end_date}">
-                <div class="modal-footer">
-                    <button class="save-button" onclick="saveTaskDates('${task.id}')">Spara</button>
-                    <button class="cancel-button" onclick="this.parentElement.parentElement.parentElement.remove()">Avbryt</button>
-                </div>
-            </div>
-        `;
-        setTimeout(() => {
-            document.body.appendChild(modal);
-            console.log('Modal added to DOM:', document.querySelector('.modal')); // Kontrollera att denna logg syns
-        }, 100); // 100ms fördröjning
-    }
-
-    async function saveTaskDates(taskId) {
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-
-        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
-        await updateDoc(planningRef, {
-            startDate: startDate,
-            endDate: endDate
-        });
-
-        gantt.getTask(taskId).start_date = startDate;
-        gantt.getTask(taskId).end_date = endDate;
-        gantt.updateTask(taskId);
-
-        document.querySelector('.modal').remove();
     }
 });
 
