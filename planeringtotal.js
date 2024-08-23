@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
-                const userData = userDoc.data();
                 canEdit = ["daniel@delidel.se", "sofie@delidel.se", "leia@delidel.se"].includes(user.email);
                 initializePage();
             } else {
@@ -159,18 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEditModal(task) {
-        function formatDate(date) {
-            const d = new Date(date);
-            let month = '' + (d.getMonth() + 1);
-            let day = '' + d.getDate();
-            const year = d.getFullYear();
-
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-
-            return [year, month, day].join('-');
-        }
-
         const modal = document.createElement('div');
         modal.classList.add('modal');
         modal.innerHTML = `
@@ -178,16 +165,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
                 <h3>Ändra Datum</h3>
                 <label for="start-date">Startdatum:</label>
-                <input type="date" id="start-date" value="${formatDate(task.start_date)}">
+                <input type="date" id="start-date" value="${task.start_date}">
                 <label for="end-date">Slutdatum:</label>
-                <input type="date" id="end-date" value="${formatDate(task.end_date)}">
+                <input type="date" id="end-date" value="${task.end_date}">
                 <div class="modal-footer">
                     <button class="save-button" onclick="saveTaskDates('${task.id}')">Spara</button>
                     <button class="cancel-button" onclick="this.parentElement.parentElement.parentElement.remove()">Avbryt</button>
                 </div>
             </div>
         `;
-
         document.body.appendChild(modal);
     }
 

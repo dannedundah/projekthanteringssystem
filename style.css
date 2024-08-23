@@ -38,7 +38,6 @@ button:hover {
     background-color: #cc6600;
 }
 
-/* Stil för specifika aktivera/inaktivera knappar */
 button.activate {
     background-color: #28a745;
     color: white;
@@ -57,7 +56,6 @@ button.deactivate:hover {
     background-color: #c82333;
 }
 
-/* Formulärstilar */
 form {
     margin-bottom: 20px;
 }
@@ -74,7 +72,6 @@ select, button {
     box-sizing: border-box;
 }
 
-/* Stil för Gantt-tabell */
 #gantt-chart {
     margin-top: 20px;
     overflow-x: auto;
@@ -100,7 +97,6 @@ select, button {
     white-space: nowrap;
 }
 
-/* Stil för bildgalleriet */
 #image-gallery img {
     width: 100px;
     height: auto;
@@ -113,7 +109,6 @@ select, button {
     transform: scale(1.1);
 }
 
-/* Stil för modal fönster */
 .modal {
     display: flex;
     position: fixed;
@@ -152,7 +147,6 @@ select, button {
     color: #bbb; 
 }
 
-/* Stil för inputfält i modalen */
 .modal-content input[type="date"] {
     width: calc(100% - 20px); 
     padding: 10px;
@@ -162,7 +156,6 @@ select, button {
     font-size: 16px;
 }
 
-/* Stil för knappar i modalen */
 .modal-footer {
     display: flex;
     justify-content: space-between;
@@ -196,7 +189,6 @@ select, button {
     background-color: #c82333;
 }
 
-/* Stil för thumbnails */
 .thumbnail {
     max-width: 100px;
     max-height: 100px;
@@ -205,7 +197,6 @@ select, button {
     border: 1px solid #ccc;
 }
 
-/* Stil för fil länkar */
 .file-link {
     display: block;
     margin: 5px 0;
@@ -213,7 +204,6 @@ select, button {
     text-decoration: underline;
 }
 
-/* Modal för bilder */
 #image-modal {
     display: none;
     position: fixed;
@@ -250,7 +240,6 @@ select, button {
     cursor: pointer;
 }
 
-/* Kalenderstilar */
 .calendar-container {
     display: inline-block;
     text-align: center;
@@ -311,7 +300,6 @@ table#calendar td.reported {
     color: white;
 }
 
-/* Rapport status tabell */
 #report-status-table {
     margin-top: 20px;
 }
@@ -331,7 +319,6 @@ table#calendar td.reported {
     background-color: #f4f4f4;
 }
 
-/* Uppdaterad CSS för "Ta bort"-knappen */
 button.remove-button {
     background-color: #ff4c4c;
     color: white;
@@ -347,7 +334,6 @@ button.remove-button:hover {
     background-color: #e04444;
 }
 
-/* Stil för projektkategorier */
 .project-category h3 {
     cursor: pointer;
     margin: 0;
@@ -378,7 +364,6 @@ button.remove-button:hover {
     list-style-type: none;
 }
 
-/* Stil för elektrikermarker */
 .electrician-marker {
     background-color: #FFD700;
     height: 20px;
