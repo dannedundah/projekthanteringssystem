@@ -91,6 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return date;
         }
         const d = new Date(date);
+        if (isNaN(d)) {
+            console.error("Invalid date:", date);
+            return null;
+        }
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
@@ -116,6 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const startDate = formatDateToString(planning.electricianStartDate);
                     const endDate = formatDateToString(planning.electricianEndDate);
 
+                    if (!startDate || !endDate) {
+                        console.error("Invalid start or end date for planning:", planning);
+                        return [];
+                    }
+
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
@@ -127,6 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const startDate = formatDateToString(planning.startDate);
                     const endDate = formatDateToString(planning.endDate);
+
+                    if (!startDate || !endDate) {
+                        console.error("Invalid start or end date for planning:", planning);
+                        return [];
+                    }
 
                     taskList.push({
                         id: planning.id,
