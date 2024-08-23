@@ -87,18 +87,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatDateToString(date) {
+        if (!date) {
+            console.error("Invalid date:", date);
+            return null;
+        }
+        
+        // Hanterar Firebase Timestamp-objekt
+        if (date.seconds) {
+            const d = new Date(date.seconds * 1000); // Konvertera från sekunder till millisekunder
+            return d.toISOString().split('T')[0]; // Returnera i formatet "YYYY-MM-DD"
+        }
+
+        // Om datum redan är en sträng i korrekt format
         if (typeof date === 'string') {
             return date;
         }
+
+        // Hantera vanliga Date-objekt
         const d = new Date(date);
         if (isNaN(d)) {
             console.error("Invalid date:", date);
             return null;
         }
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+        return d.toISOString().split('T')[0];
     }
 
     async function renderGanttChart(plannings) {
