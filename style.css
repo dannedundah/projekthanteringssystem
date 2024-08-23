@@ -368,3 +368,59 @@ button.remove-button:hover {
     background-color: #FFD700 !important;
     height: 20px !important;
 }
+
+/* Överstyra DHTMLX Gantt's Modal CSS */
+.gantt_cal_light, .gantt_cal_cover {
+    display: none !important;
+}
+
+/* Överstyra layouten för DHTMLX Gantt modal om den visas */
+.gantt_cal_light {
+    width: 400px !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+    background-color: #fff !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+.gantt_cal_header {
+    font-size: 18px !important;
+    color: #333 !important;
+}
+
+.gantt_cal_date, .gantt_cal_options {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.gantt_cal_ltext input, .gantt_cal_rtext input {
+    width: 100% !important;
+    padding: 10px !important;
+    border-radius: 5px !important;
+    border: 1px solid #ccc !important;
+}
+
+.gantt_cal_footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding-top: 20px !important;
+}
+
+.gantt_cal_save {
+    background-color: #28a745 !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+}
+
+.gantt_cal_cancel {
+    background-color: #dc3545 !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+}
