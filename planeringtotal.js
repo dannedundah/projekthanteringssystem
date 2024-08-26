@@ -134,13 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'planerad':
                         taskColor = 'blue';
                         break;
-                    case 'pågående arbete':
-                        taskColor = 'pink';
-                        break;
-                    case 'redo för el':
+                    case 'solceller klart':
                         taskColor = 'yellow';
                         break;
-                    case 'elinstallation klar':
+                    case 'elektriker klar':
                         taskColor = 'purple';
                         break;
                     case 'driftsatt':

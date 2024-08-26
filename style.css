@@ -286,38 +286,27 @@ button.remove-button:hover {
     border-radius: 5px;
     display: inline-block;
 }
-/* Färger för olika projektstatus */
-.project-status-ny {
-    background-color: white;
-    color: black;
+/* Projektstatusfärger i Gantt */
+.gantt-task-white .gantt_task_content {
+    background-color: white !important;
 }
 
-.project-status-planerad {
-    background-color: blue;
-    color: white;
+.gantt-task-blue .gantt_task_content {
+    background-color: blue !important;
 }
 
-.project-status-pagaende {
-    background-color: pink;
-    color: black;
+.gantt-task-yellow .gantt_task_content {
+    background-color: yellow !important;
 }
 
-.project-status-redo-el {
-    background-color: yellow;
-    color: black;
+.gantt-task-purple .gantt_task_content {
+    background-color: purple !important;
 }
 
-.project-status-el-klar {
-    background-color: purple;
-    color: white;
+.gantt-task-green .gantt_task_content {
+    background-color: green !important;
 }
 
-.project-status-driftsatt {
-    background-color: green;
-    color: white;
-}
-
-.project-status-fakturerad {
-    background-color: black;
-    color: white;
+.gantt-task-black .gantt_task_content {
+    background-color: black !important;
 }
