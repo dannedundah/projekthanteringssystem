@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -39,30 +39,11 @@ const fetchProjects = async () => {
   }
 };
 
-// Check authentication state and handle permissions
-onAuthStateChanged(auth, async (user) => {
+// Check authentication state
+onAuthStateChanged(auth, (user) => {
   if (user) {
     // User is signed in, fetch projects
     fetchProjects();
-
-    // Fetch user role and handle module visibility
-    const userRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
-
-    if (userData.role === 'Montör') {
-      // Show Montör modules
-      document.getElementById('montor-module').style.display = 'block';
-    } else if (userData.role === 'Säljare') {
-      // Show Säljare modules
-      document.getElementById('saljare-module').style.display = 'block';
-    } else if (userData.role === 'Service') {
-      // Show Service modules
-      document.getElementById('service-module').style.display = 'block';
-    } else if (userData.role === 'Admin') {
-      // Show Admin modules
-      document.getElementById('admin-module').style.display = 'block';
-    }
   } else {
     console.log("No user is signed in.");
     // Optionally redirect to login page
