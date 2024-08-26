@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        renderGanttChart(filteredPlannings);
+        renderGanttChart(filteredPlannings, selectedEmployee === "Elektriker");
     }
 
     function formatDateToString(date) {
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return d.toISOString().split('T')[0];
     }
 
-    async function renderGanttChart(plannings) {
+    async function renderGanttChart(plannings, isElectricianView = false) {
         ganttChartContainer.innerHTML = '';
 
         gantt.config.xml_date = "%Y-%m-%d";
@@ -120,21 +120,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 const projectData = projectDoc.data();
                 const taskList = [];
 
-                const startDate = formatDateToString(planning.startDate);
-                const endDate = formatDateToString(planning.endDate);
+                if (isElectricianView) {
+                    const startDate = formatDateToString(planning.electricianStartDate);
+                    const endDate = formatDateToString(planning.electricianEndDate);
 
-                if (!startDate || !endDate) {
-                    console.error("Invalid start or end date for planning:", planning);
-                    return [];
+                    if (!startDate || !endDate) {
+                        console.error("Invalid start or end date for planning:", planning);
+                        return [];
+                    }
+
+                    taskList.push({
+                        id: planning.id + '-electrician',
+                        text: projectData.address || 'Ej specificerad',
+                        start_date: startDate,
+                        end_date: endDate,
+                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                        color: "#FFD700"
+                    });
+                } else {
+                    const startDate = formatDateToString(planning.startDate);
+                    const endDate = formatDateToString(planning.endDate);
+
+                    if (!startDate || !endDate) {
+                        console.error("Invalid start or end date for planning:", planning);
+                        return [];
+                    }
+
+                    taskList.push({
+                        id: planning.id,
+                        text: projectData.address || 'Ej specificerad',
+                        start_date: startDate,
+                        end_date: endDate,
+                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`
+                    });
                 }
-
-                taskList.push({
-                    id: planning.id,
-                    text: projectData.address || 'Ej specificerad',
-                    start_date: startDate,
-                    end_date: endDate,
-                    detailsLink: `projekt-detalj.html?id=${planning.projectId}`
-                });
 
                 return taskList;
             }
@@ -150,11 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
             if (e.target.closest('.gantt_cell')) {
-                // Endast navigering från vänsterkolumnen (trädet)
                 window.location.href = task.detailsLink;
                 return false;
             }
-            return true; // Gör ingenting om man klickar på högersidan
+            return true;
         });
     }
 });
