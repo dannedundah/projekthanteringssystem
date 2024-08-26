@@ -88,30 +88,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
         
+        // Om date är en Firestore-timestamp, omvandla till Date-objekt
         if (date.seconds) {
             const d = new Date(date.seconds * 1000);
             return d.toISOString().split('T')[0];
         }
 
+        // Om date är en ISO-sträng, returnera den direkt
         if (typeof date === 'string') {
             return date;
         }
 
-        const d = new Date(date);
-        if (isNaN(d)) {
-            console.error("Invalid date:", date);
-            return null;
-        }
+        // Om date är en vanlig Date-objekt
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         return d.toISOString().split('T')[0];
-    }
-
-    function adjustEndDateForSingleDay(startDate, endDate) {
-        if (startDate === endDate) {
-            const end = new Date(endDate);
-            end.setDate(end.getDate() + 1);
-            return end.toISOString().split('T')[0];
-        }
-        return endDate;
     }
 
     async function renderGanttChart(plannings, isElectricianView = false) {
@@ -198,14 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveTaskDates(taskId) {
         const task = gantt.getTask(taskId);
-        const startDate = formatDateToString(task.start_date);
-        const endDate = formatDateToString(task.end_date);
+        
+        // Omvandla datumet till en UTC ISO-sträng vid midnatt
+        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
+        const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
+        
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+        const formattedEndDate = endDate.toISOString().split('T')[0];
 
         // Uppdatera Firestore
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
         await updateDoc(planningRef, {
-            startDate: startDate,
-            endDate: endDate
+            startDate: formattedStartDate,
+            endDate: formattedEndDate
         });
     }
 
