@@ -186,9 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         });
 
-        // Spara ändringar vid ändring av uppgifts datum
-        gantt.attachEvent("onAfterTaskUpdate", function(id, item) {
-            saveTaskDates(id);
+        gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
+            return true; // Se till att projektet stannar där det släpps
+        });
+
+        gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+            await saveTaskDates(id);
+            showConfirmationPopup("Projekt uppdaterat!");
         });
     }
 
@@ -203,6 +207,24 @@ document.addEventListener('DOMContentLoaded', () => {
             startDate: startDate,
             endDate: endDate
         });
+    }
+
+    function showConfirmationPopup(message) {
+        const popup = document.createElement('div');
+        popup.classList.add('confirmation-popup');
+        popup.textContent = message;
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            popup.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.remove();
+            }, 300);
+        }, 3000);
     }
 });
 
