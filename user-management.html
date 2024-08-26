@@ -12,19 +12,6 @@
     <div class="container">
         <h2>Hantera Användare och Behörigheter</h2>
 
-        <!-- Filtreringsdelen -->
-        <div id="user-filter" style="display:none;">
-            <label for="filter">Filtrera användare:</label>
-            <select id="filter" onchange="filterUsers(this.value)">
-                <option value="all">Alla</option>
-                <option value="active">Aktiva</option>
-                <option value="inactive">Inaktiva</option>
-            </select>
-        </div>
-
-        <!-- Användarlistan -->
-        <div id="user-list"></div>
-
         <!-- Roll- och behörighetstabell -->
         <table id="roles-table">
             <thead>
@@ -32,11 +19,12 @@
                     <th>Namn</th>
                     <th>E-post</th>
                     <th>Behörighet</th>
+                    <th>Status</th> <!-- Ny kolumn för status -->
                     <th>Uppdatera</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Dynamisk lista över användare och deras behörigheter -->
+                <!-- Dynamisk lista över användare, deras behörigheter och status -->
             </tbody>
         </table>
 

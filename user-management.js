@@ -18,57 +18,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadUserManagement() {
-    const userList = document.getElementById('user-list');
-    const filterDropdown = document.getElementById('user-filter');
     const rolesTableBody = document.getElementById('roles-table').querySelector('tbody');
     
-    filterDropdown.style.display = 'block';
-
     const usersSnapshot = await getDocs(collection(db, 'users'));
     allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderUsers(allUsers);
 
-    // Rendera även roll- och behörighetstabellen
+    // Rendera användare och deras behörighet och status
     rolesTableBody.innerHTML = '';
     allUsers.forEach(user => addUserRow(user.id, user));
-}
-
-function renderUsers(users) {
-    const userList = document.getElementById('user-list');
-    userList.innerHTML = ''; // Rensa befintlig lista
-
-    users.forEach(user => {
-        const userItem = document.createElement('div');
-        userItem.className = 'user-item';
-
-        const statusButtonClass = user.active ? 'deactivate' : 'activate';
-        const statusButtonText = user.active ? 'Inaktivera' : 'Aktivera';
-
-        userItem.innerHTML = `
-            <p><strong>Namn:</strong> ${user.firstName} ${user.lastName}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <p><strong>Status:</strong> ${user.active ? 'Aktiv' : 'Inaktiv'}</p>
-            <button class="user-action ${statusButtonClass}" onclick="toggleUserStatus('${user.id}', ${user.active})">
-                ${statusButtonText}
-            </button>
-            <button class="user-action remove-button" onclick="deleteUser('${user.id}')">Ta bort</button>
-            <hr>
-        `;
-
-        userList.appendChild(userItem);
-    });
-}
-
-window.toggleUserStatus = async (userId, currentStatus) => {
-    const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, { active: !currentStatus });
-    loadUserManagement(); // Ladda om användarlistan efter uppdatering
-}
-
-window.deleteUser = async (userId) => {
-    const userRef = doc(db, 'users', userId);
-    await deleteDoc(userRef);
-    loadUserManagement(); // Ladda om användarlistan efter borttagning
 }
 
 function addUserRow(uid, userData) {
@@ -86,25 +43,34 @@ function addUserRow(uid, userData) {
                 <option value="Service" ${userData.role === 'Service' ? 'selected' : ''}>Service</option>
             </select>
         </td>
+        <td>
+            <select data-uid="${uid}" class="status-select">
+                <option value="active" ${userData.active ? 'selected' : ''}>Aktiv</option>
+                <option value="inactive" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
+            </select>
+        </td>
         <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
     `;
     document.getElementById('roles-table').querySelector('tbody').appendChild(row);
 }
 
-// Event listener för att uppdatera rollen
+// Event listener för att uppdatera roll och status
 document.getElementById('roles-table').addEventListener('click', async (e) => {
     if (e.target.classList.contains('update-role-btn')) {
         const uid = e.target.getAttribute('data-uid');
-        const selectElement = document.querySelector(`select[data-uid="${uid}"]`);
-        const newRole = selectElement.value;
+        const selectRoleElement = document.querySelector(`select.role-select[data-uid="${uid}"]`);
+        const selectStatusElement = document.querySelector(`select.status-select[data-uid="${uid}"]`);
+
+        const newRole = selectRoleElement.value;
+        const newStatus = selectStatusElement.value === 'active';
 
         try {
             const userRef = doc(db, 'users', uid);
-            await updateDoc(userRef, { role: newRole });
-            alert('Behörighet uppdaterad!');
+            await updateDoc(userRef, { role: newRole, active: newStatus });
+            alert('Användaruppgifter uppdaterade!');
         } catch (error) {
-            console.error('Error updating role:', error);
-            alert('Kunde inte uppdatera behörigheten.');
+            console.error('Error updating user data:', error);
+            alert('Kunde inte uppdatera användaruppgifterna.');
         }
     }
 });
