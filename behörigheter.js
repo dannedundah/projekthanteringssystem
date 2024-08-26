@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rolesTableBody = document.getElementById('roles-table').querySelector('tbody');
 
     try {
-        // Hämta alla användare från Firestore
         const querySnapshot = await getDocs(collection(db, 'users'));
         querySnapshot.forEach(doc => {
             const userData = doc.data();
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         rolesTableBody.appendChild(row);
     }
 
-    // Event listener för att uppdatera rollen
     rolesTableBody.addEventListener('click', async (e) => {
         if (e.target.classList.contains('update-role-btn')) {
             const uid = e.target.getAttribute('data-uid');

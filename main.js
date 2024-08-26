@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,31 +18,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Function to fetch projects
-const fetchProjects = async () => {
-  console.log('Fetching projects...');
-  try {
-    const querySnapshot = await getDocs(collection(db, "projects"));
-    const projects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    console.log('Projects:', projects);
-
-    // Handle displaying projects in your UI
-    const projectContainer = document.getElementById('project-list');
-    if (projectContainer) {
-      projectContainer.innerHTML = ''; // Clear previous content
-      projects.forEach(project => {
-        const li = document.createElement('li');
-        li.textContent = project.name; // Customize as needed
-        projectContainer.appendChild(li);
-      });
-    } else {
-      console.error("Element with id 'project-list' not found.");
-    }
-  } catch (error) {
-    console.error("Error fetching projects: ", error);
-  }
-};
-
 // Check authentication state and fetch user data
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -53,18 +28,22 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userDoc.data();
         console.log("User data:", userData);
 
-        // Additional logic based on user data (roles, permissions, etc.)
-        fetchProjects();
+        // Kontrollera om användaren är admin
+        if (userData.role === 'Admin') {
+          document.getElementById('admin-module').style.display = 'block';
+        } else {
+          alert("Du har inte behörighet att se denna sida.");
+          window.location.href = 'login.html';
+        }
       } else {
         console.log("No user document found.");
+        window.location.href = 'login.html';
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   } else {
     console.log("No user is signed in.");
-    // Optionally redirect to login page
     window.location.href = 'login.html';
   }
 });
-
