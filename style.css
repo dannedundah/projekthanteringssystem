@@ -286,9 +286,10 @@ button.remove-button:hover {
     border-radius: 5px;
     display: inline-block;
 }
-/* Projektstatusfärger i Gantt */
 .gantt-task-white .gantt_task_content {
     background-color: white !important;
+    color: black !important;
+    border: 1px solid #ddd; /* Tunn kantlinje för att markera uppgiften */
 }
 
 .gantt-task-blue .gantt_task_content {
@@ -297,6 +298,8 @@ button.remove-button:hover {
 
 .gantt-task-yellow .gantt_task_content {
     background-color: yellow !important;
+    color: black !important;
+    border: 1px solid #ddd; /* Tunn kantlinje för att markera uppgiften */
 }
 
 .gantt-task-purple .gantt_task_content {
