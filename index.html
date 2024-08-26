@@ -18,12 +18,14 @@
                     showElement('time-reporting-btn');
                     showElement('export-time-report-btn');
                     
-                    // Skapa och lägg till admin-länken
-                    const adminLink = document.createElement('a');
-                    adminLink.href = 'admin.html';
-                    adminLink.textContent = 'Admin Dashboard';
-                    adminLink.className = 'btn btn-admin'; // CSS-klass för styling
-                    document.body.appendChild(adminLink);
+                    // Skapa och lägg till admin-länken om den inte redan finns
+                    if (!document.querySelector('.btn-admin')) {
+                        const adminLink = document.createElement('a');
+                        adminLink.href = 'admin.html';
+                        adminLink.textContent = 'Admin Dashboard';
+                        adminLink.className = 'btn btn-admin'; // CSS-klass för styling
+                        document.body.appendChild(adminLink);
+                    }
                     
                 } else if (userRole === 'Montör') {
                     showElement('view-schedule-btn');
@@ -43,6 +45,8 @@
                 console.error('Ingen roll hittades för användaren.');
                 window.location.href = 'login.html';
             }
+        } else {
+            window.location.href = 'login.html';
         }
     });
 
