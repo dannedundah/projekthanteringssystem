@@ -24,7 +24,7 @@
     import { auth, onAuthStateChanged } from './firebase-config.js';
     
     onAuthStateChanged(auth, (user) => {
-        if (user && user.email === 'daniel@delidel.se', 'leia@delidel.se', 'sofie@delidel.se') {
+        if (user && user.email === 'daniel@delidel.se') {
             const adminLink = document.createElement('a');
             adminLink.href = 'admin.html';
             adminLink.textContent = 'Admin Dashboard';
