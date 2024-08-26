@@ -88,20 +88,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
         
-        // Om date är en Firestore-timestamp, omvandla till Date-objekt
         if (date.seconds) {
             const d = new Date(date.seconds * 1000);
             return d.toISOString().split('T')[0];
         }
 
-        // Om date är en ISO-sträng, returnera den direkt
         if (typeof date === 'string') {
             return date;
         }
 
-        // Om date är en vanlig Date-objekt
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         return d.toISOString().split('T')[0];
+    }
+
+    function adjustEndDateForSingleDay(startDate, endDate) {
+        if (startDate === endDate) {
+            const end = new Date(endDate);
+            end.setDate(end.getDate() + 1);
+            return end.toISOString().split('T')[0];
+        }
+        return endDate;
     }
 
     async function renderGanttChart(plannings, isElectricianView = false) {
