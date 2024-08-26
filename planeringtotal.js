@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
@@ -184,6 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 return false;
             }
             return true;
+        });
+
+        // Spara ändringar vid ändring av uppgifts datum
+        gantt.attachEvent("onAfterTaskUpdate", function(id, item) {
+            saveTaskDates(id);
+        });
+    }
+
+    async function saveTaskDates(taskId) {
+        const task = gantt.getTask(taskId);
+        const startDate = formatDateToString(task.start_date);
+        const endDate = formatDateToString(task.end_date);
+
+        // Uppdatera Firestore
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        await updateDoc(planningRef, {
+            startDate: startDate,
+            endDate: endDate
         });
     }
 });
