@@ -125,6 +125,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const projectData = projectDoc.data();
                 const taskList = [];
 
+                // Bestäm färg baserat på status
+                let taskColor;
+                switch (projectData.status.trim().toLowerCase()) {
+                    case 'ny':
+                        taskColor = 'white';
+                        break;
+                    case 'planerad':
+                        taskColor = 'blue';
+                        break;
+                    case 'pågående arbete':
+                        taskColor = 'pink';
+                        break;
+                    case 'redo för el':
+                        taskColor = 'yellow';
+                        break;
+                    case 'elinstallation klar':
+                        taskColor = 'purple';
+                        break;
+                    case 'driftsatt':
+                        taskColor = 'green';
+                        break;
+                    case 'fakturerad':
+                        taskColor = 'black';
+                        break;
+                    default:
+                        taskColor = 'grey'; // Defaultfärg om status inte matchar
+                }
+
                 if (isElectricianView) {
                     const startDate = formatDateToString(planning.electricianStartDate);
                     let endDate = formatDateToString(planning.electricianEndDate);
@@ -158,7 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         text: projectData.address || 'Ej specificerad',
                         start_date: startDate,
                         end_date: endDate,
-                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`
+                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                        color: taskColor
                     });
                 }
 

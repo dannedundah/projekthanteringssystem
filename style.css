@@ -286,3 +286,38 @@ button.remove-button:hover {
     border-radius: 5px;
     display: inline-block;
 }
+/* Färger för olika projektstatus */
+.project-status-ny {
+    background-color: white;
+    color: black;
+}
+
+.project-status-planerad {
+    background-color: blue;
+    color: white;
+}
+
+.project-status-pagaende {
+    background-color: pink;
+    color: black;
+}
+
+.project-status-redo-el {
+    background-color: yellow;
+    color: black;
+}
+
+.project-status-el-klar {
+    background-color: purple;
+    color: white;
+}
+
+.project-status-driftsatt {
+    background-color: green;
+    color: white;
+}
+
+.project-status-fakturerad {
+    background-color: black;
+    color: white;
+}
