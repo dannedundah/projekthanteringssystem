@@ -10,33 +10,31 @@
 
             if (userRole) {
                 if (userRole === 'Admin') {
-                    showElement('add-project-btn');
-                    showElement('planning-btn');
-                    showElement('view-schedule-btn');
-                    showElement('status-btn');
-                    showElement('planning-total-btn');
-                    showElement('time-reporting-btn');
-                    showElement('export-time-report-btn');
+                    document.getElementById('add-project-btn').style.display = 'block';
+                    document.getElementById('planning-btn').style.display = 'block';
+                    document.getElementById('view-schedule-btn').style.display = 'block';
+                    document.getElementById('status-btn').style.display = 'block';
+                    document.getElementById('planning-total-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
+                    document.getElementById('export-time-report-btn').style.display = 'block';
                     
-                    // Skapa och lägg till admin-länken om den inte redan finns
-                    if (!document.querySelector('.btn-admin')) {
-                        const adminLink = document.createElement('a');
-                        adminLink.href = 'admin.html';
-                        adminLink.textContent = 'Admin Dashboard';
-                        adminLink.className = 'btn btn-admin'; // CSS-klass för styling
-                        document.body.appendChild(adminLink);
-                    }
+                    // Skapa och lägg till admin-länken
+                    const adminLink = document.createElement('a');
+                    adminLink.href = 'admin.html';
+                    adminLink.textContent = 'Admin Dashboard';
+                    adminLink.className = 'btn btn-admin'; // CSS-klass för styling
+                    document.body.appendChild(adminLink);
                     
                 } else if (userRole === 'Montör') {
-                    showElement('view-schedule-btn');
-                    showElement('time-reporting-btn');
+                    document.getElementById('view-schedule-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
                 } else if (userRole === 'Säljare') {
-                    showElement('planning-total-btn');
-                    showElement('time-reporting-btn');
+                    document.getElementById('planning-total-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
                 } else if (userRole === 'Service') {
-                    showElement('planning-total-btn');
-                    showElement('time-reporting-btn');
-                    showElement('status-btn');
+                    document.getElementById('planning-total-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
+                    document.getElementById('status-btn').style.display = 'block';
                 } else {
                     alert('Du har inte behörighet att se denna sida.');
                     window.location.href = 'login.html';
@@ -45,8 +43,6 @@
                 console.error('Ingen roll hittades för användaren.');
                 window.location.href = 'login.html';
             }
-        } else {
-            window.location.href = 'login.html';
         }
     });
 
@@ -63,13 +59,6 @@
         } catch (error) {
             console.error("Fel vid hämtning av användarens roll:", error);
             return null;
-        }
-    }
-
-    function showElement(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.style.display = 'block';
         }
     }
 </script>
