@@ -35,6 +35,41 @@
         function navigateTo(page) {
             window.location.href = page;
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Anta att användarlistan och deras status hämtas och bearbetas här
+            const users = [
+                { name: 'Daniel', email: 'daniel@exempel.com', role: 'Admin', status: 'active' },
+                { name: 'Sofie', email: 'sofie@exempel.com', role: 'Montör', status: 'inactive' },
+                // Lägg till fler användare efter behov
+            ];
+
+            const rolesTableBody = document.querySelector('#roles-table tbody');
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+                const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
+                const statusText = user.status === 'active' ? 'Aktiv' : 'Inaktiv';
+
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <select>
+                            <option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                            <option value="Montör" ${user.role === 'Montör' ? 'selected' : ''}>Montör</option>
+                            <option value="Säljare" ${user.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
+                            <option value="Service" ${user.role === 'Service' ? 'selected' : ''}>Service</option>
+                        </select>
+                    </td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td><button class="update-role-btn">Uppdatera</button></td>
+                `;
+
+                rolesTableBody.appendChild(row);
+            });
+        });
     </script>
 </body>
 </html>
