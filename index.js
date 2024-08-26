@@ -22,36 +22,8 @@ const db = getFirestore();
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
-    const addProjectBtn = document.getElementById('add-project-btn');
-    const planningBtn = document.getElementById('planning-btn');
-    const viewScheduleBtn = document.getElementById('view-schedule-btn');
-    const statusBtn = document.getElementById('status-btn');
-    const planningTotalBtn = document.getElementById('planning-total-btn');
-    const timeReportingBtn = document.getElementById('time-reporting-btn'); // New button
-    const exportTimeReportBtn = document.getElementById('export-time-report-btn'); // Button for exporting time reports
     const logoutBtn = document.getElementById('logout-btn');
 
-    if (addProjectBtn) {
-        addProjectBtn.addEventListener('click', () => navigateTo('läggatillprojekt.html'));
-    }
-    if (planningBtn) {
-        planningBtn.addEventListener('click', () => navigateTo('planering.html'));
-    }
-    if (viewScheduleBtn) {
-        viewScheduleBtn.addEventListener('click', () => navigateTo('se-schema.html'));
-    }
-    if (statusBtn) {
-        statusBtn.addEventListener('click', () => navigateTo('status.html'));
-    }
-    if (planningTotalBtn) {
-        planningTotalBtn.addEventListener('click', () => navigateTo('planeringtotal.html'));
-    }
-    if (timeReportingBtn) {
-        timeReportingBtn.addEventListener('click', () => navigateTo('tidrapportering.html')); // New event listener
-    }
-    if (exportTimeReportBtn) {
-        exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html')); // New event listener for exporting time reports
-    }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
     }

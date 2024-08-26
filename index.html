@@ -11,57 +11,29 @@
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
-        <button id="add-project-btn">Lägg till nytt projekt</button>
-        <button id="planning-btn">Planering</button>
-        <button id="view-schedule-btn">Se mitt schema</button>
-        <button id="status-btn">Status</button>
-        <button id="planning-total-btn">Planering Total</button>
-        <button id="time-reporting-btn">Tidrapportering</button> <!-- New button added -->
-        <button id="export-time-report-btn">Dra ut tidsrapport</button>
-        <button id="logout-btn">Logga ut</button>
-        <!-- Lägg till admin länk om inloggad användare är admin -->
-<script type="module">
-    import { auth, onAuthStateChanged } from './firebase-config.js';
-    
-    onAuthStateChanged(auth, (user) => {
-        if (user && user.email === 'daniel@delidel.se') {
-            const adminLink = document.createElement('a');
-            adminLink.href = 'admin.html';
-            adminLink.textContent = 'Admin Dashboard';
-            document.body.appendChild(adminLink);
-        }
-    });
-</script>
+        
+        <!-- Moduler för olika roller -->
+        <div id="admin-module" style="display:none;">
+            <button onclick="navigateTo('admin.html')">Admin Dashboard</button>
+        </div>
+        <div id="montor-module" style="display:none;">
+            <button onclick="navigateTo('se-schema.html')">Se Mitt Schema</button>
+            <button onclick="navigateTo('tidrapportering.html')">Tidrapportering</button>
+            <button onclick="navigateTo('projekt-detalj.html')">Projekt Detalj</button>
+        </div>
+        <div id="saljare-module" style="display:none;">
+            <button onclick="navigateTo('planeringtotal.html')">Planering Total</button>
+            <button onclick="navigateTo('tidrapportering.html')">Tidrapportering</button>
+        </div>
+        <div id="service-module" style="display:none;">
+            <button onclick="navigateTo('planeringtotal.html')">Planering Total</button>
+            <button onclick="navigateTo('tidrapportering.html')">Tidrapportering</button>
+            <button onclick="navigateTo('projekt-detalj.html')">Projekt Detalj</button>
+        </div>
 
+        <button id="logout-btn">Logga ut</button>
     </div>
+
+    <script type="module" src="main.js"></script>
 </body>
 </html>
-<script type="module">
-    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-    
-    const db = getFirestore();
-
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Kontrollera om användaren är aktiv
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().active) {
-                    // Användaren är inloggad och aktiv
-                    console.log('User is active:', user);
-                } else {
-                    // Användaren är inloggad men inte aktiv
-                    await signOut(auth);
-                    alert('Din användare är inte aktiv. Kontakta administratören.');
-                    window.location.href = 'login.html';
-                }
-            } else {
-                // Användaren är inte inloggad
-                window.location.href = 'login.html';
-            }
-        });
-    });
-</script>
-
-
