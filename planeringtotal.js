@@ -195,19 +195,25 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveTaskDates(taskId) {
         const task = gantt.getTask(taskId);
         
-        // Omvandla datumet till en UTC ISO-sträng vid midnatt
         const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
         const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
         
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
-        // Uppdatera Firestore
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
-        await updateDoc(planningRef, {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate
-        });
+
+        if (taskId.endsWith('-electrician')) {
+            await updateDoc(planningRef, {
+                electricianStartDate: formattedStartDate,
+                electricianEndDate: formattedEndDate
+            });
+        } else {
+            await updateDoc(planningRef, {
+                startDate: formattedStartDate,
+                endDate: formattedEndDate
+            });
+        }
     }
 
     function showConfirmationPopup(message) {
