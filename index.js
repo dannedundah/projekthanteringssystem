@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -12,16 +12,13 @@ const firebaseConfig = {
   measurementId: "G-8HMD30CFYS"
 };
 
-// Initialize Firebase only if it hasn't been initialized already
-let app;
+// Kontrollera om appen redan är initierad
 if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
-} else {
-    app = getApp(); // Use the already initialized app
+    initializeApp(firebaseConfig);
 }
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+const auth = getAuth();
+const db = getFirestore();
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -82,9 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function navigateTo(page) {
     window.location.href = page;
 }
-
-// Make navigateTo globally accessible
-window.navigateTo = navigateTo;
 
 async function logout() {
     try {

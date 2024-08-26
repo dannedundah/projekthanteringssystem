@@ -11,27 +11,70 @@
 <body>
     <div class="container">
         <h1>Projekthanteringssystem</h1>
-        
-        <!-- Moduler för olika roller -->
-        <div id="admin-module" style="display:none;">
-            <button onclick="navigateTo('admin.html')">Admin Dashboard</button>
-        </div>
-        <div id="montor-module" style="display:none;">
-            <button onclick="navigateTo('se-schema.html')">Se Mitt Schema</button>
-            <button onclick="navigateTo('tidrapportering.html')">Tidrapportering</button>
-        </div>
-        <div id="saljare-module" style="display:none;">
-            <button onclick="navigateTo('planeringtotal.html')">Planering Total</button>
-            <button onclick="navigateTo('tidrapportering.html')">Tidrapportering</button>
-        </div>
-        <div id="service-module" style="display:none;">
-            <button onclick="navigateTo('planeringtotal.html')">Planering Total</button>
-            <button onclick="navigateTo('tidrapportering.html')">Tidrapportering</button>
-        </div>
-
+        <button id="add-project-btn" style="display:none;">Lägg till nytt projekt</button>
+        <button id="planning-btn" style="display:none;">Planering</button>
+        <button id="view-schedule-btn" style="display:none;">Se mitt schema</button>
+        <button id="status-btn" style="display:none;">Status</button>
+        <button id="planning-total-btn" style="display:none;">Planering Total</button>
+        <button id="time-reporting-btn" style="display:none;">Tidrapportering</button>
+        <button id="export-time-report-btn" style="display:none;">Dra ut tidsrapport</button>
         <button id="logout-btn">Logga ut</button>
-    </div>
+        <!-- Lägg till admin länk om inloggad användare är admin -->
+        <script type="module">
+            import { auth, onAuthStateChanged } from './firebase-config.js';
 
-    <script type="module" src="main.js"></script>
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const userEmail = user.email;
+                    const userRole = await getUserRole(user.uid);
+
+                    // Admin får tillgång till alla moduler
+                    if (userRole === 'Admin') {
+                        document.getElementById('add-project-btn').style.display = 'block';
+                        document.getElementById('planning-btn').style.display = 'block';
+                        document.getElementById('view-schedule-btn').style.display = 'block';
+                        document.getElementById('status-btn').style.display = 'block';
+                        document.getElementById('planning-total-btn').style.display = 'block';
+                        document.getElementById('time-reporting-btn').style.display = 'block';
+                        document.getElementById('export-time-report-btn').style.display = 'block';
+                        
+                        // Länk till adminpanelen
+                        const adminLink = document.createElement('a');
+                        adminLink.href = 'admin.html';
+                        adminLink.textContent = 'Admin Dashboard';
+                        document.body.appendChild(adminLink);
+                    } else if (userRole === 'Montör') {
+                        // Montör har begränsad tillgång
+                        document.getElementById('view-schedule-btn').style.display = 'block';
+                        document.getElementById('time-reporting-btn').style.display = 'block';
+                        document.getElementById('status-btn').style.display = 'block';
+                    } else if (userRole === 'Säljare') {
+                        // Säljare har begränsad tillgång
+                        document.getElementById('planning-total-btn').style.display = 'block';
+                        document.getElementById('time-reporting-btn').style.display = 'block';
+                    } else if (userRole === 'Service') {
+                        // Service har begränsad tillgång
+                        document.getElementById('planning-total-btn').style.display = 'block';
+                        document.getElementById('time-reporting-btn').style.display = 'block';
+                        document.getElementById('status-btn').style.display = 'block';
+                    } else {
+                        alert('Du har inte behörighet att se denna sida.');
+                        window.location.href = 'login.html';
+                    }
+                }
+            });
+
+            async function getUserRole(uid) {
+                const userRef = doc(db, 'users', uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    return userDoc.data().role;
+                } else {
+                    console.error("No such document!");
+                    return null;
+                }
+            }
+        </script>
+    </div>
 </body>
 </html>
