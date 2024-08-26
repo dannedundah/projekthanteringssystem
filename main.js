@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -28,30 +28,24 @@ onAuthStateChanged(auth, async (user) => {
         const userData = userDoc.data();
         console.log("User data:", userData);
 
-        // Kontrollera om användaren är "daniel@delidel.se" och se till att han alltid är admin
-        if (user.email === 'daniel@delidel.se') {
-          if (userData.role !== 'Admin') {
-            // Uppdatera rollen till Admin om det inte redan är Admin
-            await updateDoc(userRef, { role: 'Admin' });
-            console.log("Role for daniel@delidel.se updated to Admin.");
-          }
-          document.getElementById('admin-module').style.display = 'block';
-        } else if (userData.role === 'Admin') {
+        // Kontrollera om användaren är admin
+        if (userData.role === 'Admin') {
+          // Visa admin-modulerna
           document.getElementById('admin-module').style.display = 'block';
         } else {
-          alert("Du har inte behörighet att se denna sida.");
-          window.location.href = 'login.html';
+          // Om användaren inte är admin, visa ett meddelande och omdirigera till startsidan
+          alert('Du har inte behörighet att se denna sida.');
+          window.location.href = 'index.html';
         }
       } else {
         console.log("No user document found.");
-        window.location.href = 'login.html';
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
-      window.location.href = 'login.html';
     }
   } else {
     console.log("No user is signed in.");
+    // Optionally redirect to login page
     window.location.href = 'login.html';
   }
 });
