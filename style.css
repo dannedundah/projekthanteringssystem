@@ -316,18 +316,4 @@ button.remove-button:hover {
     background-color: black !important;
     color: white !important;
 }
-.btn-admin {
-    display: block;
-    padding: 10px;
-    margin: 10px 0;
-    background-color: #ff7f00;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 14px;
-}
 
-.btn-admin:hover {
-    background-color: #cc6600;
-}
