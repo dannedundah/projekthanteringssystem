@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hantera Användare</title>
+    <title>Hantera Användare och Behörigheter</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="auth-check.js"></script>
     <script type="module" src="user-management.js"></script>
 </head>
 <body>
     <div class="container">
-        <h2>Hantera användare</h2>
+        <h2>Hantera Användare och Behörigheter</h2>
 
-        <!-- Flytta filtreringsdelen högst upp -->
+        <!-- Filtreringsdelen -->
         <div id="user-filter" style="display:none;">
             <label for="filter">Filtrera användare:</label>
             <select id="filter" onchange="filterUsers(this.value)">
@@ -21,8 +22,23 @@
             </select>
         </div>
 
-        <!-- Användarlistan kommer nedanför filtret -->
+        <!-- Användarlistan -->
         <div id="user-list"></div>
+
+        <!-- Roll- och behörighetstabell -->
+        <table id="roles-table">
+            <thead>
+                <tr>
+                    <th>Namn</th>
+                    <th>E-post</th>
+                    <th>Behörighet</th>
+                    <th>Uppdatera</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamisk lista över användare och deras behörigheter -->
+            </tbody>
+        </table>
 
         <button onclick="navigateTo('admin.html')">Tillbaka</button>
     </div>
@@ -32,7 +48,5 @@
             window.location.href = page;
         }
     </script>
-    <script type="module" src="auth-check.js"></script>
-
 </body>
 </html>
