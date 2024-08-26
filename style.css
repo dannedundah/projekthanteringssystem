@@ -286,10 +286,9 @@ button.remove-button:hover {
     border-radius: 5px;
     display: inline-block;
 }
-.gantt-task-white .gantt_task_content {
+#gantt-chart .gantt-task-white .gantt_task_content {
     background-color: white !important;
     color: black !important;
-    border: 1px solid #ddd !important;
 }
 
 .gantt-task-blue .gantt_task_content {
