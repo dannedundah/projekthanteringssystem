@@ -40,12 +40,7 @@
                         document.getElementById('planning-total-btn').style.display = 'block';
                         document.getElementById('time-reporting-btn').style.display = 'block';
                         document.getElementById('export-time-report-btn').style.display = 'block';
-                        
-                        // Länk till adminpanelen
-                        const adminLink = document.createElement('a');
-                        adminLink.href = 'admin.html';
-                        adminLink.textContent = 'Admin Dashboard';
-                        document.body.appendChild(adminLink);
+                
                     } else if (userRole === 'Montör') {
                         // Montör har begränsad tillgång
                         document.getElementById('view-schedule-btn').style.display = 'block';
