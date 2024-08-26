@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -27,26 +27,44 @@ const fetchProjects = async () => {
     console.log('Projects:', projects);
 
     // Handle displaying projects in your UI
-    const projectContainer = document.getElementById('project-list'); // Assuming you have an element with this ID
-    projectContainer.innerHTML = ''; // Clear previous content
-    projects.forEach(project => {
-      const li = document.createElement('li');
-      li.textContent = project.name; // Customize as needed
-      projectContainer.appendChild(li);
-    });
+    const projectContainer = document.getElementById('project-list');
+    if (projectContainer) {
+      projectContainer.innerHTML = ''; // Clear previous content
+      projects.forEach(project => {
+        const li = document.createElement('li');
+        li.textContent = project.name; // Customize as needed
+        projectContainer.appendChild(li);
+      });
+    } else {
+      console.error("Element with id 'project-list' not found.");
+    }
   } catch (error) {
     console.error("Error fetching projects: ", error);
   }
 };
 
-// Check authentication state
-onAuthStateChanged(auth, (user) => {
+// Check authentication state and fetch user data
+onAuthStateChanged(auth, async (user) => {
   if (user) {
-    // User is signed in, fetch projects
-    fetchProjects();
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        console.log("User data:", userData);
+
+        // Additional logic based on user data (roles, permissions, etc.)
+        fetchProjects();
+      } else {
+        console.log("No user document found.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   } else {
     console.log("No user is signed in.");
     // Optionally redirect to login page
     window.location.href = 'login.html';
   }
 });
+
