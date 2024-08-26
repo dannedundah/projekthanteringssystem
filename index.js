@@ -62,7 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Kontrollera om användaren är aktiv
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists() && userDoc.data().active) {
-                console.log('User is signed in and active:', user);
+                const userRole = userDoc.data().role;
+                // Hantera rollbaserad åtkomst
+                handleRoleBasedAccess(userRole);
             } else {
                 // Om användaren inte är aktiv, logga ut dem
                 await signOut(auth);
@@ -75,6 +77,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+function handleRoleBasedAccess(role) {
+    if (role === 'Admin') {
+        document.getElementById('add-project-btn').style.display = 'block';
+        document.getElementById('planning-btn').style.display = 'block';
+        document.getElementById('view-schedule-btn').style.display = 'block';
+        document.getElementById('status-btn').style.display = 'block';
+        document.getElementById('planning-total-btn').style.display = 'block';
+        document.getElementById('time-reporting-btn').style.display = 'block';
+        document.getElementById('export-time-report-btn').style.display = 'block';
+
+        // Länk till adminpanelen
+        const adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.textContent = 'Admin Dashboard';
+        document.body.appendChild(adminLink);
+    } else if (role === 'Montör') {
+        document.getElementById('view-schedule-btn').style.display = 'block';
+        document.getElementById('time-reporting-btn').style.display = 'block';
+    } else if (role === 'Säljare') {
+        document.getElementById('planning-total-btn').style.display = 'block';
+        document.getElementById('time-reporting-btn').style.display = 'block';
+    } else if (role === 'Service') {
+        document.getElementById('planning-total-btn').style.display = 'block';
+        document.getElementById('time-reporting-btn').style.display = 'block';
+        document.getElementById('status-btn').style.display = 'block';
+    } else {
+        alert('Du har inte behörighet att se denna sida.');
+        window.location.href = 'login.html';
+    }
+}
 
 function navigateTo(page) {
     window.location.href = page;
