@@ -286,8 +286,8 @@ button.remove-button:hover {
     border-radius: 5px;
     display: inline-block;
 }
-#gantt-chart .gantt-task-white .gantt_task_content {
-    background-color: white !important;
+#gantt-chart .gantt-task-pink .gantt_task_content {
+    background-color: pink !important;
     color: black !important;
 }
 
@@ -296,9 +296,9 @@ button.remove-button:hover {
     color: white !important;
 }
 
-.gantt-task-yellow .gantt_task_content {
-    background-color: yellow !important;
-    color: black !important;
+.gantt-task-brown .gantt_task_content {
+    background-color: brown !important;
+    color: white !important;
     border: 1px solid #ddd !important;
 }
 
@@ -316,4 +316,3 @@ button.remove-button:hover {
     background-color: black !important;
     color: white !important;
 }
-

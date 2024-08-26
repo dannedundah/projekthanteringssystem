@@ -129,13 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let taskColor;
                 switch (projectData.status.trim().toLowerCase()) {
                     case 'ny':
-                        taskColor = 'white';
+                        taskColor = 'pink';
                         break;
                     case 'planerad':
                         taskColor = 'blue';
                         break;
                     case 'solceller klart':
-                        taskColor = 'yellow';
+                        taskColor = 'brown';
                         break;
                     case 'elektriker klar':
                         taskColor = 'purple';
