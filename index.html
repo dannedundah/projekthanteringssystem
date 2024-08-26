@@ -22,6 +22,9 @@
         <!-- Lägg till admin länk om inloggad användare är admin -->
         <script type="module">
             import { auth, onAuthStateChanged } from './firebase-config.js';
+            import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+            const db = getFirestore();
 
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -47,7 +50,6 @@
                         // Montör har begränsad tillgång
                         document.getElementById('view-schedule-btn').style.display = 'block';
                         document.getElementById('time-reporting-btn').style.display = 'block';
-                        document.getElementById('status-btn').style.display = 'block';
                     } else if (userRole === 'Säljare') {
                         // Säljare har begränsad tillgång
                         document.getElementById('planning-total-btn').style.display = 'block';
