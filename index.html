@@ -1,77 +1,64 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekthanteringssystem</title>
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="index.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Projekthanteringssystem</h1>
-        <button id="add-project-btn" style="display:none;">Lägg till nytt projekt</button>
-        <button id="planning-btn" style="display:none;">Planering</button>
-        <button id="view-schedule-btn" style="display:none;">Se mitt schema</button>
-        <button id="status-btn" style="display:none;">Status</button>
-        <button id="planning-total-btn" style="display:none;">Planering Total</button>
-        <button id="time-reporting-btn" style="display:none;">Tidrapportering</button>
-        <button id="export-time-report-btn" style="display:none;">Dra ut tidsrapport</button>
-        <button id="logout-btn">Logga ut</button>
-        <!-- Lägg till admin länk om inloggad användare är admin -->
-        <script type="module">
-            import { auth, onAuthStateChanged } from './firebase-config.js';
-            import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+<script type="module">
+    import { auth, onAuthStateChanged } from './firebase-config.js';
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-            const db = getFirestore();
+    const db = getFirestore();
 
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    const userEmail = user.email;
-                    const userRole = await getUserRole(user.uid);
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRole = await getUserRole(user.uid);
 
-                    // Admin får tillgång till alla moduler
-                    if (userRole === 'Admin') {
-                        document.getElementById('add-project-btn').style.display = 'block';
-                        document.getElementById('planning-btn').style.display = 'block';
-                        document.getElementById('view-schedule-btn').style.display = 'block';
-                        document.getElementById('status-btn').style.display = 'block';
-                        document.getElementById('planning-total-btn').style.display = 'block';
-                        document.getElementById('time-reporting-btn').style.display = 'block';
-                        document.getElementById('export-time-report-btn').style.display = 'block';
-                
-                    } else if (userRole === 'Montör') {
-                        // Montör har begränsad tillgång
-                        document.getElementById('view-schedule-btn').style.display = 'block';
-                        document.getElementById('time-reporting-btn').style.display = 'block';
-                    } else if (userRole === 'Säljare') {
-                        // Säljare har begränsad tillgång
-                        document.getElementById('planning-total-btn').style.display = 'block';
-                        document.getElementById('time-reporting-btn').style.display = 'block';
-                    } else if (userRole === 'Service') {
-                        // Service har begränsad tillgång
-                        document.getElementById('planning-total-btn').style.display = 'block';
-                        document.getElementById('time-reporting-btn').style.display = 'block';
-                        document.getElementById('status-btn').style.display = 'block';
-                    } else {
-                        alert('Du har inte behörighet att se denna sida.');
-                        window.location.href = 'login.html';
-                    }
-                }
-            });
-
-            async function getUserRole(uid) {
-                const userRef = doc(db, 'users', uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    return userDoc.data().role;
+            if (userRole) {
+                if (userRole === 'Admin') {
+                    document.getElementById('add-project-btn').style.display = 'block';
+                    document.getElementById('planning-btn').style.display = 'block';
+                    document.getElementById('view-schedule-btn').style.display = 'block';
+                    document.getElementById('status-btn').style.display = 'block';
+                    document.getElementById('planning-total-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
+                    document.getElementById('export-time-report-btn').style.display = 'block';
+                    
+                    // Skapa och lägg till admin-länken
+                    const adminLink = document.createElement('a');
+                    adminLink.href = 'admin.html';
+                    adminLink.textContent = 'Admin Dashboard';
+                    adminLink.className = 'btn btn-admin'; // CSS-klass för styling
+                    document.body.appendChild(adminLink);
+                    
+                } else if (userRole === 'Montör') {
+                    document.getElementById('view-schedule-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
+                } else if (userRole === 'Säljare') {
+                    document.getElementById('planning-total-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
+                } else if (userRole === 'Service') {
+                    document.getElementById('planning-total-btn').style.display = 'block';
+                    document.getElementById('time-reporting-btn').style.display = 'block';
+                    document.getElementById('status-btn').style.display = 'block';
                 } else {
-                    console.error("No such document!");
-                    return null;
+                    alert('Du har inte behörighet att se denna sida.');
+                    window.location.href = 'login.html';
                 }
+            } else {
+                console.error('Ingen roll hittades för användaren.');
+                window.location.href = 'login.html';
             }
-        </script>
-    </div>
-</body>
-</html>
+        }
+    });
+
+    async function getUserRole(uid) {
+        try {
+            const userRef = doc(db, 'users', uid);
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                return userDoc.data().role;
+            } else {
+                console.error("Inget dokument hittades för användaren!");
+                return null;
+            }
+        } catch (error) {
+            console.error("Fel vid hämtning av användarens roll:", error);
+            return null;
+        }
+    }
+</script>
