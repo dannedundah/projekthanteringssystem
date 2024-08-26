@@ -1,4 +1,4 @@
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -6,19 +6,22 @@ const firebaseConfig = {
   apiKey: "AIzaSyDYqBOra2wDjyPweyBGnkVMANsvLOx9pps",
   authDomain: "projekthanteringsystem.firebaseapp.com",
   projectId: "projekthanteringsystem",
-  storageBucket: "projekthanteringsystem",
+  storageBucket: "projekthanteringsystem.appspot.com",
   messagingSenderId: "87207954816",
   appId: "1:87207954816:web:167659270c0d6eee901965",
   measurementId: "G-8HMD30CFYS"
 };
 
-// Kontrollera om appen redan är initierad
+// Initialize Firebase only if it hasn't been initialized already
+let app;
 if (!getApps().length) {
-    initializeApp(firebaseConfig);
+    app = initializeApp(firebaseConfig);
+} else {
+    app = getApp(); // Use the already initialized app
 }
 
-const auth = getAuth();
-const db = getFirestore();
+const auth = getAuth(app);
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
