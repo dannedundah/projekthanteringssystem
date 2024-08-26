@@ -10,13 +10,13 @@
 
             if (userRole) {
                 if (userRole === 'Admin') {
-                    document.getElementById('add-project-btn').style.display = 'block';
-                    document.getElementById('planning-btn').style.display = 'block';
-                    document.getElementById('view-schedule-btn').style.display = 'block';
-                    document.getElementById('status-btn').style.display = 'block';
-                    document.getElementById('planning-total-btn').style.display = 'block';
-                    document.getElementById('time-reporting-btn').style.display = 'block';
-                    document.getElementById('export-time-report-btn').style.display = 'block';
+                    showElement('add-project-btn');
+                    showElement('planning-btn');
+                    showElement('view-schedule-btn');
+                    showElement('status-btn');
+                    showElement('planning-total-btn');
+                    showElement('time-reporting-btn');
+                    showElement('export-time-report-btn');
                     
                     // Skapa och lägg till admin-länken
                     const adminLink = document.createElement('a');
@@ -26,15 +26,15 @@
                     document.body.appendChild(adminLink);
                     
                 } else if (userRole === 'Montör') {
-                    document.getElementById('view-schedule-btn').style.display = 'block';
-                    document.getElementById('time-reporting-btn').style.display = 'block';
+                    showElement('view-schedule-btn');
+                    showElement('time-reporting-btn');
                 } else if (userRole === 'Säljare') {
-                    document.getElementById('planning-total-btn').style.display = 'block';
-                    document.getElementById('time-reporting-btn').style.display = 'block';
+                    showElement('planning-total-btn');
+                    showElement('time-reporting-btn');
                 } else if (userRole === 'Service') {
-                    document.getElementById('planning-total-btn').style.display = 'block';
-                    document.getElementById('time-reporting-btn').style.display = 'block';
-                    document.getElementById('status-btn').style.display = 'block';
+                    showElement('planning-total-btn');
+                    showElement('time-reporting-btn');
+                    showElement('status-btn');
                 } else {
                     alert('Du har inte behörighet att se denna sida.');
                     window.location.href = 'login.html';
@@ -59,6 +59,13 @@
         } catch (error) {
             console.error("Fel vid hämtning av användarens roll:", error);
             return null;
+        }
+    }
+
+    function showElement(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = 'block';
         }
     }
 </script>
