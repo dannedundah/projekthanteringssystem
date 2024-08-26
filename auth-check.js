@@ -1,4 +1,4 @@
-import { db, collection, query, where, getDocs, auth, signInWithEmailAndPassword } from './firebase-config.js';
+import { auth, onAuthStateChanged, signInWithEmailAndPassword } from './firebase-config.js';
 
 export async function loginUser(email, password) {
     try {
@@ -20,19 +20,13 @@ export async function loginUser(email, password) {
         console.error('Error logging in user:', error);
     }
 }
-// Funktion för att kontrollera om användaren är inloggad och aktiv
-onAuthStateChanged(auth, async (user) => {
+
+// Kontrollera om användaren är inloggad och omdirigera om inte
+onAuthStateChanged(auth, (user) => {
     if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists() && userDoc.data().active) {
-            console.log('User is active and authenticated.');
-        } else {
-            await signOut(auth);
-            alert('Din användare är inte aktiv eller har inte rätt behörighet. Kontakta administratören.');
-            window.location.href = 'login.html';
-        }
+        console.log('User is logged in:', user);
     } else {
-        console.log('No user is signed in.');
+        console.log('No user is signed in. Redirecting to login page.');
         window.location.href = 'login.html';
     }
 });
