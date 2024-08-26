@@ -33,7 +33,7 @@
                 <option value="Planerad">Planerad</option>
                 <option value="Solceller klart">Solceller klart</option>
                 <option value="Elektriker klar">Elektriker klar</option>
-                <option value="Driftsatt">Driftsatt</option> <!-- Korrigerad stavning -->
+                <option value="Driftsatt">Driftsatt</option>
                 <option value="Fakturerad">Fakturerad</option>
             </select>
             
@@ -45,6 +45,11 @@
 
         <!-- Display Images and Files -->
         <div id="file-gallery"></div>
+
+        <!-- Bekräftelsemeddelande som visas efter sparande -->
+        <div id="confirmation-message" style="display:none; color: green; font-weight: bold; margin-top: 10px;">
+            Ändringarna har sparats framgångsrikt!
+        </div>
 
         <button onclick="navigateTo('status.html')">Tillbaka</button>
     </div>
@@ -63,30 +68,3 @@
     </script>
 </body>
 </html>
-<script type="module">
-    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-    
-    const db = getFirestore();
-
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Kontrollera om användaren är aktiv
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().active) {
-                    // Användaren är inloggad och aktiv
-                    console.log('User is active:', user);
-                } else {
-                    // Användaren är inloggad men inte aktiv
-                    await signOut(auth);
-                    alert('Din användare är inte aktiv. Kontakta administratören.');
-                    window.location.href = 'login.html';
-                }
-            } else {
-                // Användaren är inte inloggad
-                window.location.href = 'login.html';
-            }
-        });
-    });
-</script>
