@@ -271,3 +271,18 @@ button.remove-button:hover {
     opacity: 1;
     transform: translateY(0);
 }
+.status-active {
+    color: white;
+    background-color: green;
+    padding: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.status-inactive {
+    color: white;
+    background-color: red;
+    padding: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}

@@ -31,6 +31,8 @@ async function loadUserManagement() {
 function addUserRow(uid, userData) {
     const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
 
+    const statusColorClass = userData.active ? 'status-active' : 'status-inactive';
+
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>${fullName}</td>
@@ -44,7 +46,7 @@ function addUserRow(uid, userData) {
             </select>
         </td>
         <td>
-            <select data-uid="${uid}" class="status-select">
+            <select data-uid="${uid}" class="status-select ${statusColorClass}">
                 <option value="active" ${userData.active ? 'selected' : ''}>Aktiv</option>
                 <option value="inactive" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
             </select>
