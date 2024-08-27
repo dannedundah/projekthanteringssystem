@@ -87,6 +87,10 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
         try {
             const userRef = doc(db, 'users', uid);
             await updateDoc(userRef, { role: newRole, team: newTeam, active: newStatus });
+
+            // Uppdatera teamets medlemslista
+            await updateTeamMembership(uid, newTeam);
+
             alert('Användaruppgifter uppdaterade!');
         } catch (error) {
             console.error('Error updating user data:', error);
@@ -94,3 +98,29 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
         }
     }
 });
+
+// Funktion för att uppdatera teamets medlemslista
+async function updateTeamMembership(userId, newTeamName) {
+    // Hämta alla team
+    const teamsSnapshot = await getDocs(collection(db, 'teams'));
+    const allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Ta bort användaren från sitt tidigare team
+    for (const team of allTeams) {
+        if (team.members && team.members.includes(userId)) {
+            const teamRef = doc(db, 'teams', team.id);
+            const updatedMembers = team.members.filter(member => member !== userId);
+            await updateDoc(teamRef, { members: updatedMembers });
+        }
+    }
+
+    // Lägg till användaren till det nya teamet
+    if (newTeamName) {
+        const newTeam = allTeams.find(team => team.name === newTeamName);
+        if (newTeam) {
+            const teamRef = doc(db, 'teams', newTeam.id);
+            const updatedMembers = [...(newTeam.members || []), userId];
+            await updateDoc(teamRef, { members: updatedMembers });
+        }
+    }
+}
