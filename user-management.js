@@ -41,7 +41,8 @@ function addUserRow(uid, userData) {
     const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
 
     const row = document.createElement('tr');
-
+    const statusClass = userData.active ? 'status-active' : 'status-inactive';
+    const statusText = userData.active ? 'Aktiv' : 'Inaktiv';
     row.innerHTML = `
         <td>${fullName}</td>
         <td>${userData.email || 'Ingen e-post'}</td>
