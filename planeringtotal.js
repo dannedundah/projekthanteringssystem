@@ -60,10 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
         teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; // Elektriker som separat kategori
 
         allTeams.forEach(team => {
-            const option = document.createElement('option');
-            option.value = team.name;
-            option.textContent = team.name;
-            teamSelect.appendChild(option);
+            if (team.name !== 'Team Admin') { // Dölj "Team Admin"
+                const option = document.createElement('option');
+                option.value = team.name;
+                option.textContent = team.name;
+                teamSelect.appendChild(option);
+            }
         });
     }
 
