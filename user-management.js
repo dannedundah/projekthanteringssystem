@@ -1,7 +1,7 @@
-import { db, collection, getDocs, updateDoc, doc, auth, onAuthStateChanged } from './firebase-config.js';
-import { deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './firebase-config.js';
 
 let allUsers = [];
+let allTeams = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     onAuthStateChanged(auth, (user) => {
@@ -19,11 +19,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadUserManagement() {
     const rolesTableBody = document.getElementById('roles-table').querySelector('tbody');
-    
+
+    // Ladda team från Firestore
+    const teamsSnapshot = await getDocs(collection(db, 'teams'));
+    allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
     const usersSnapshot = await getDocs(collection(db, 'users'));
     allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Rendera användare och deras behörighet och status
+    // Rendera användare och deras behörighet, status och team
     rolesTableBody.innerHTML = '';
     allUsers.forEach(user => addUserRow(user.id, user));
 }
@@ -31,9 +35,11 @@ async function loadUserManagement() {
 function addUserRow(uid, userData) {
     const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
 
-    const statusColorClass = userData.active ? 'status-active' : 'status-inactive';
-
     const row = document.createElement('tr');
+
+    const statusClass = userData.active ? 'status-active' : 'status-inactive';
+    const statusText = userData.active ? 'Aktiv' : 'Inaktiv';
+
     row.innerHTML = `
         <td>${fullName}</td>
         <td>${userData.email || 'Ingen e-post'}</td>
@@ -46,29 +52,30 @@ function addUserRow(uid, userData) {
             </select>
         </td>
         <td>
-            <select data-uid="${uid}" class="status-select ${statusColorClass}">
-                <option value="active" ${userData.active ? 'selected' : ''}>Aktiv</option>
-                <option value="inactive" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
+            <select data-uid="${uid}" class="team-select">
+                ${allTeams.map(team => `
+                    <option value="${team.name}" ${userData.team === team.name ? 'selected' : ''}>${team.name}</option>
+                `).join('')}
             </select>
         </td>
+        <td><span class="${statusClass}">${statusText}</span></td>
         <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
     `;
     document.getElementById('roles-table').querySelector('tbody').appendChild(row);
 }
 
-// Event listener för att uppdatera roll och status
+// Event listener för att uppdatera roll, team och status
 document.getElementById('roles-table').addEventListener('click', async (e) => {
     if (e.target.classList.contains('update-role-btn')) {
         const uid = e.target.getAttribute('data-uid');
         const selectRoleElement = document.querySelector(`select.role-select[data-uid="${uid}"]`);
-        const selectStatusElement = document.querySelector(`select.status-select[data-uid="${uid}"]`);
-
+        const selectTeamElement = document.querySelector(`select.team-select[data-uid="${uid}"]`);
         const newRole = selectRoleElement.value;
-        const newStatus = selectStatusElement.value === 'active';
+        const newTeam = selectTeamElement.value;
 
         try {
             const userRef = doc(db, 'users', uid);
-            await updateDoc(userRef, { role: newRole, active: newStatus });
+            await updateDoc(userRef, { role: newRole, team: newTeam });
             alert('Användaruppgifter uppdaterade!');
         } catch (error) {
             console.error('Error updating user data:', error);

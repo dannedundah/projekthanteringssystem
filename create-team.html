@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skapa Team</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="create-team.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Skapa och Hantera Team</h2>
+
+        <!-- Formulär för att skapa ett nytt team -->
+        <div id="create-team">
+            <h3>Skapa nytt team</h3>
+            <input type="text" id="new-team-name" placeholder="Ange teamnamn">
+            <button id="create-team-btn">Skapa Team</button>
+        </div>
+
+        <!-- Lista över befintliga team med möjlighet att ta bort dem -->
+        <div id="team-list">
+            <h3>Befintliga team</h3>
+            <ul id="teams">
+                <!-- Dynamisk lista över team -->
+            </ul>
+        </div>
+
+        <button onclick="navigateTo('admin.html')">Tillbaka</button>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>
