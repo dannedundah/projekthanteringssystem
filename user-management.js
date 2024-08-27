@@ -1,9 +1,4 @@
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Initiera auth och db
-const auth = getAuth();
-const db = getFirestore();
+import { db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './firebase-config.js';
 
 let allUsers = [];
 let allTeams = [];
@@ -42,9 +37,6 @@ function addUserRow(uid, userData) {
 
     const row = document.createElement('tr');
 
-    const statusClass = userData.active ? 'status-active' : 'status-inactive';
-    const statusText = userData.active ? 'Aktiv' : 'Inaktiv';
-
     row.innerHTML = `
         <td>${fullName}</td>
         <td>${userData.email || 'Ingen e-post'}</td>
@@ -63,7 +55,12 @@ function addUserRow(uid, userData) {
                 `).join('')}
             </select>
         </td>
-        <td><span class="${statusClass}">${statusText}</span></td>
+        <td>
+            <select data-uid="${uid}" class="status-select">
+                <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
+                <option value="false" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
+            </select>
+        </td>
         <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
     `;
     document.getElementById('roles-table').querySelector('tbody').appendChild(row);
@@ -75,12 +72,15 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
         const uid = e.target.getAttribute('data-uid');
         const selectRoleElement = document.querySelector(`select.role-select[data-uid="${uid}"]`);
         const selectTeamElement = document.querySelector(`select.team-select[data-uid="${uid}"]`);
+        const selectStatusElement = document.querySelector(`select.status-select[data-uid="${uid}"]`);
+
         const newRole = selectRoleElement.value;
         const newTeam = selectTeamElement.value;
+        const newStatus = selectStatusElement.value === 'true';
 
         try {
             const userRef = doc(db, 'users', uid);
-            await updateDoc(userRef, { role: newRole, team: newTeam });
+            await updateDoc(userRef, { role: newRole, team: newTeam, active: newStatus });
             alert('Användaruppgifter uppdaterade!');
         } catch (error) {
             console.error('Error updating user data:', error);
