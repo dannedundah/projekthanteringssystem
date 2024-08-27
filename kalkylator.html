@@ -24,22 +24,108 @@
 
         <label for="inverter1">Växelriktare 1:</label>
         <select id="inverter1">
-            <option value="17750">SH10 - 17,750 SEK</option>
-            <!-- Lägg till fler alternativ här om det behövs -->
+            <option value="SH10">SH10</option>
+            <option value="SH8">SH8</option>
+            <option value="SH6">SH6</option>
+            <option value="SH5">SH5</option>
+            <option value="SG125">SG125</option>
+            <option value="SG40">SG40</option>
+            <option value="SG33">SG33</option>
+            <option value="SG20">SG20</option>
+            <option value="SG17">SG17</option>
+            <option value="SG15">SG15</option>
+            <option value="SG12">SG12</option>
+            <option value="SG10">SG10</option>
+            <option value="SG8">SG8</option>
+            <option value="SG7">SG7</option>
+            <option value="SG6">SG6</option>
+            <option value="SG5">SG5</option>
+            <option value="Solax 12kW">Solax 12kW</option>
+            <option value="Emaldo">Emaldo</option>
+            <option value="SH15">SH15</option>
+            <option value="SH20">SH20</option>
+            <option value="Solis 15">Solis 15</option>
+            <option value="Solis 10">Solis 10</option>
+            <option value="Sigenergy 10">Sigenergy 10</option>
+            <option value="Sigenergy 12">Sigenergy 12</option>
+            <option value="Sigenergy 15">Sigenergy 15</option>
+            <option value="Sigenergy 17">Sigenergy 17</option>
+            <option value="Sigenergy 20">Sigenergy 20</option>
+            <option value="Sigenergy 25">Sigenergy 25</option>
         </select><br><br>
 
         <label for="inverter2">Växelriktare 2:</label>
         <select id="inverter2">
-            <option value="0">Ingen</option>
-            <option value="15000">SH5 - 15,000 SEK</option>
-            <!-- Lägg till fler alternativ här om det behövs -->
+            <option value="Ingen">Ingen</option>
+            <option value="SH10">SH10</option>
+            <option value="SH8">SH8</option>
+            <option value="SH6">SH6</option>
+            <option value="SH5">SH5</option>
+            <option value="SG125">SG125</option>
+            <option value="SG40">SG40</option>
+            <option value="SG33">SG33</option>
+            <option value="SG20">SG20</option>
+            <option value="SG17">SG17</option>
+            <option value="SG15">SG15</option>
+            <option value="SG12">SG12</option>
+            <option value="SG10">SG10</option>
+            <option value="SG8">SG8</option>
+            <option value="SG7">SG7</option>
+            <option value="SG6">SG6</option>
+            <option value="SG5">SG5</option>
+            <option value="Solax 12kW">Solax 12kW</option>
+            <option value="Emaldo">Emaldo</option>
+            <option value="SH15">SH15</option>
+            <option value="SH20">SH20</option>
+            <option value="Solis 15">Solis 15</option>
+            <option value="Solis 10">Solis 10</option>
+            <option value="Sigenergy 10">Sigenergy 10</option>
+            <option value="Sigenergy 12">Sigenergy 12</option>
+            <option value="Sigenergy 15">Sigenergy 15</option>
+            <option value="Sigenergy 17">Sigenergy 17</option>
+            <option value="Sigenergy 20">Sigenergy 20</option>
+            <option value="Sigenergy 25">Sigenergy 25</option>
         </select><br><br>
 
         <label for="battery">Batteri 1:</label>
         <select id="battery">
-            <option value="29721">Sigenery 8kWh - 29,721 SEK</option>
-            <!-- Lägg till fler alternativ här om det behövs -->
+            <option value="SBR096">SBR096</option>
+            <option value="SBR128">SBR128</option>
+            <option value="SBR160">SBR160</option>
+            <option value="SBR192">SBR192</option>
+            <option value="SBR224">SBR224</option>
+            <option value="SBR256">SBR256</option>
+            <option value="Solax 12kW">Solax 12kW</option>
+            <option value="Pylontech 15kWh">Pylontech 15kWh</option>
+            <option value="Pylontech 10kWh">Pylontech 10kWh</option>
+            <option value="Sigenergy 8kWh">Sigenergy 8kWh</option>
+            <option value="Sigenergy 16kWh">Sigenergy 16kWh</option>
+            <option value="Sigenergy 24kWh">Sigenergy 24kWh</option>
         </select><br><br>
+
+        <label for="charger">Laddbox:</label>
+        <input type="checkbox" id="charger"><br><br>
+
+        <label for="checkwatt">Checkwatt:</label>
+        <input type="checkbox" id="checkwatt"><br><br>
+
+        <label for="extraRoof">Antal extra takytor:</label>
+        <select id="extraRoof">
+            <option value="1st">1st</option>
+            <option value="2st">2st</option>
+            <option value="3st">3st</option>
+            <option value="4st">4st</option>
+            <option value="5st">5st</option>
+        </select><br><br>
+
+        <label for="horizontalPanels">Liggande paneler:</label>
+        <select id="horizontalPanels">
+            <option value="ja">Ja</option>
+            <option value="nej">Nej</option>
+        </select><br><br>
+
+        <label for="loadBalancer">Lastbalanserare:</label>
+        <input type="checkbox" id="loadBalancer"><br><br>
 
         <button type="submit">Beräkna Kostnad</button>
     </form>
