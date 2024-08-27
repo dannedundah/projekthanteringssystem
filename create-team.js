@@ -1,58 +1,45 @@
-import { db, collection, addDoc, getDocs, deleteDoc, doc } from './firebase-config.js';
+import { db, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const teamList = document.getElementById('teams');
-    const createTeamBtn = document.getElementById('create-team-btn');
+    const teamList = document.getElementById('team-list');
+    const createTeamForm = document.getElementById('create-team-form');
 
-    // Ladda befintliga team vid sidladdning
-    loadTeams();
+    // Ladda befintliga team
+    async function loadTeams() {
+        teamList.innerHTML = ''; // Töm teamlistan
+        const querySnapshot = await getDocs(collection(db, 'teams'));
+        querySnapshot.forEach((doc) => {
+            const team = doc.data();
+            const li = document.createElement('li');
+            li.textContent = team.name;
+            
+            // Lägg till en ta bort-knapp
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Ta bort';
+            deleteButton.onclick = async () => {
+                await deleteDoc(doc(db, 'teams', doc.id));
+                loadTeams(); // Ladda om teamlistan efter borttagning
+            };
+            li.appendChild(deleteButton);
 
-    createTeamBtn.addEventListener('click', async () => {
-        const newTeamName = document.getElementById('new-team-name').value.trim();
-        if (newTeamName) {
-            try {
-                await addDoc(collection(db, 'teams'), { name: newTeamName });
-                document.getElementById('new-team-name').value = '';
-                loadTeams(); // Ladda om teamlistan
-                alert('Nytt team skapat!');
-            } catch (error) {
-                console.error('Error creating team:', error);
-                alert('Ett fel uppstod vid skapandet av teamet.');
-            }
+            teamList.appendChild(li);
+        });
+    }
+
+    // Hantera formulärinlämning för att skapa nytt team
+    createTeamForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const teamName = document.getElementById('team-name').value.trim();
+
+        if (teamName) {
+            await addDoc(collection(db, 'teams'), { name: teamName });
+            document.getElementById('team-name').value = ''; // Töm inmatningsfältet
+            loadTeams(); // Ladda om teamlistan efter att ett nytt team har skapats
         } else {
             alert('Ange ett teamnamn.');
         }
     });
 
-    async function loadTeams() {
-        try {
-            teamList.innerHTML = '';
-            const querySnapshot = await getDocs(collection(db, 'teams'));
-            querySnapshot.forEach((doc) => {
-                const li = document.createElement('li');
-                li.textContent = doc.data().name;
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Ta bort';
-                deleteButton.classList.add('remove-button');
-                deleteButton.onclick = async () => await deleteTeam(doc.id);
-                li.appendChild(deleteButton);
-                teamList.appendChild(li);
-            });
-        } catch (error) {
-            console.error('Error loading teams:', error);
-        }
-    }
-
-    async function deleteTeam(teamId) {
-        if (confirm('Är du säker på att du vill ta bort detta team?')) {
-            try {
-                await deleteDoc(doc(db, 'teams', teamId));
-                loadTeams(); // Ladda om teamlistan
-                alert('Teamet har tagits bort!');
-            } catch (error) {
-                console.error('Error deleting team:', error);
-                alert('Ett fel uppstod vid borttagning av teamet.');
-            }
-        }
-    }
+    // Ladda team när sidan har laddats
+    loadTeams();
 });
