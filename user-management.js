@@ -1,4 +1,9 @@
-import { db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './firebase-config.js';
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+// Initiera auth och db
+const auth = getAuth();
+const db = getFirestore();
 
 let allUsers = [];
 let allTeams = [];
