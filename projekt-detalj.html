@@ -51,7 +51,8 @@
             Ändringarna har sparats framgångsrikt!
         </div>
 
-        <button onclick="navigateTo('status.html')">Tillbaka</button>
+        <!-- "Tillbaka"-knapp -->
+        <button id="back-button">Tillbaka</button>
     </div>
 
     <!-- Modal for image preview -->
@@ -62,9 +63,10 @@
     </div>
 
     <script>
-        function navigateTo(page) {
-            window.location.href = page;
-        }
+        // Navigera tillbaka till föregående sida
+        document.getElementById('back-button').addEventListener('click', () => {
+            window.history.back();
+        });
     </script>
 </body>
 </html>
