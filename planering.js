@@ -42,17 +42,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Clear existing employees
             employeeDropdown.innerHTML = '<option value="">Välj anställd</option>';
 
-            // Filter and display employees based on the selected team
-            teams.forEach(team => {
-                if (team.name === selectedTeam) {
-                    team.members.forEach(member => {
-                        const option = document.createElement('option');
-                        option.value = member;
-                        option.textContent = member;
-                        employeeDropdown.appendChild(option);
-                    });
-                }
-            });
+            // Find the selected team
+            const team = teams.find(t => t.name === selectedTeam);
+
+            if (team && Array.isArray(team.members)) {
+                // Populate employees if team and members exist
+                team.members.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member;
+                    option.textContent = member;
+                    employeeDropdown.appendChild(option);
+                });
+            } else {
+                console.warn(`Team ${selectedTeam} has no members or members are not defined.`);
+            }
         });
     } catch (error) {
         console.error('Error fetching data:', error);
