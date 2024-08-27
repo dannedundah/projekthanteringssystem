@@ -79,6 +79,16 @@ function toggleCategory(categoryId) {
     }
 }
 
+// Definiera navigateToProjectDetail för att hantera navigering till projektdetaljer
+function navigateToProjectDetail(projectId) {
+    window.location.href = `projekt-detalj.html?id=${projectId}`;
+}
+
 window.navigateTo = (page) => {
     window.location.href = page;
 };
+
+// Lägg till en event listener för tillbaka-knappen
+document.getElementById('back-button').addEventListener('click', () => {
+    navigateTo('index.html'); // Navigera till startsidan
+});
