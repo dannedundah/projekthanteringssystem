@@ -64,15 +64,21 @@ function addUserRow(uid, userData) {
             </select>
         </td>
         <td>
-            <span class="${statusClass}">${statusText}</span>
-            <select data-uid="${uid}" class="status-select" style="display: none;">
+            <select data-uid="${uid}" class="status-select">
                 <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
                 <option value="false" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
             </select>
+            <span class="${statusClass}" id="status-label-${uid}">${statusText}</span>
         </td>
         <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
     `;
     document.getElementById('roles-table').querySelector('tbody').appendChild(row);
+
+    // Lägg till event listener för att ändra statusfärgen när dropdown-värdet ändras
+    const statusSelect = row.querySelector(`select.status-select[data-uid="${uid}"]`);
+    statusSelect.addEventListener('change', () => {
+        updateStatusColor(uid, statusSelect.value === 'true');
+    });
 }
 
 // Event listener för att uppdatera roll, team och status
@@ -137,14 +143,14 @@ async function updateTeamMembership(userId, newTeamName) {
 
 // Funktion för att uppdatera färgen på statusen
 function updateStatusColor(uid, isActive) {
-    const statusSpan = document.querySelector(`select.status-select[data-uid="${uid}"]`).previousElementSibling;
+    const statusLabel = document.getElementById(`status-label-${uid}`);
     if (isActive) {
-        statusSpan.classList.remove('status-inactive');
-        statusSpan.classList.add('status-active');
-        statusSpan.textContent = 'Aktiv';
+        statusLabel.classList.remove('status-inactive');
+        statusLabel.classList.add('status-active');
+        statusLabel.textContent = 'Aktiv';
     } else {
-        statusSpan.classList.remove('status-active');
-        statusSpan.classList.add('status-inactive');
-        statusSpan.textContent = 'Inaktiv';
+        statusLabel.classList.remove('status-active');
+        statusLabel.classList.add('status-inactive');
+        statusLabel.textContent = 'Inaktiv';
     }
 }
