@@ -3,12 +3,10 @@ import { db, collection, getDocs, addDoc, query, where } from './firebase-config
 document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
     const projectDropdown = document.getElementById('project-id');
-    const employee1Dropdown = document.getElementById('employee-1');
-    const employee2Dropdown = document.getElementById('employee-2');
-    const employee3Dropdown = document.getElementById('employee-3');
-    const employee4Dropdown = document.getElementById('employee-4');
+    const teamDropdown = document.getElementById('team-id');
+    const employeeDropdown = document.getElementById('employee-id');
 
-    if (!projectDropdown || !employee1Dropdown || !employee2Dropdown || !employee3Dropdown || !employee4Dropdown) {
+    if (!projectDropdown || !teamDropdown || !employeeDropdown) {
         console.error('One or more dropdown elements are not found.');
         return;
     }
@@ -26,23 +24,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             projectDropdown.appendChild(option);
         });
 
-        // Fetch registered users
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Fetch teams
+        const teamsSnapshot = await getDocs(collection(db, 'teams'));
+        const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const createOption = (user) => {
+        teams.forEach(team => {
             const option = document.createElement('option');
-            option.value = `${user.firstName} ${user.lastName}`;
-            option.textContent = `${user.firstName} ${user.lastName}`;
-            return option;
-        };
+            option.value = team.name;
+            option.textContent = team.name;
+            teamDropdown.appendChild(option);
+        });
 
-        users.forEach(user => {
-            const option = createOption(user);
-            employee1Dropdown.appendChild(option.cloneNode(true));
-            employee2Dropdown.appendChild(option.cloneNode(true));
-            employee3Dropdown.appendChild(option.cloneNode(true));
-            employee4Dropdown.appendChild(option.cloneNode(true));
+        // Handle team selection to populate employees
+        teamDropdown.addEventListener('change', () => {
+            const selectedTeam = teamDropdown.value;
+
+            // Clear existing employees
+            employeeDropdown.innerHTML = '<option value="">Välj anställd</option>';
+
+            // Filter and display employees based on the selected team
+            teams.forEach(team => {
+                if (team.name === selectedTeam) {
+                    team.members.forEach(member => {
+                        const option = document.createElement('option');
+                        option.value = member;
+                        option.textContent = member;
+                        employeeDropdown.appendChild(option);
+                    });
+                }
+            });
         });
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -56,12 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const endDate = document.getElementById('end-date').value;
         const electricianStartDate = document.getElementById('electrician-start-date').value;
         const electricianEndDate = document.getElementById('electrician-end-date').value;
-        const employees = [
-            employee1Dropdown.value,
-            employee2Dropdown.value,
-            employee3Dropdown.value,
-            employee4Dropdown.value,
-        ].filter(employee => employee !== '');
+        const selectedTeam = teamDropdown.value;
+        const selectedEmployee = employeeDropdown.value;
 
         const planning = {
             projectId,
@@ -69,7 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             endDate,
             electricianStartDate,
             electricianEndDate,
-            employees,
+            team: selectedTeam,
+            employees: [selectedEmployee].filter(employee => employee !== ''),
         };
 
         try {

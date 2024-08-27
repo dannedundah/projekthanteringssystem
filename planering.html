@@ -27,23 +27,13 @@
             <label for="electrician-end-date">Elektriker Slutdatum:</label>
             <input type="date" id="electrician-end-date">
 
-            <label for="employee-1">Anställd 1:</label>
-            <select id="employee-1">
-                <option value="">Välj anställd</option>
+            <label for="team-id">Välj team:</label>
+            <select id="team-id">
+                <option value="">Välj team</option>
             </select>
 
-            <label for="employee-2">Anställd 2:</label>
-            <select id="employee-2">
-                <option value="">Välj anställd</option>
-            </select>
-
-            <label for="employee-3">Anställd 3:</label>
-            <select id="employee-3">
-                <option value="">Välj anställd</option>
-            </select>
-
-            <label for="employee-4">Anställd 4:</label>
-            <select id="employee-4">
+            <label for="employee-id">Anställd:</label>
+            <select id="employee-id">
                 <option value="">Välj anställd</option>
             </select>
 
@@ -53,30 +43,3 @@
     </div>
 </body>
 </html>
-<script type="module">
-    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-    
-    const db = getFirestore();
-
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Kontrollera om användaren är aktiv
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().active) {
-                    // Användaren är inloggad och aktiv
-                    console.log('User is active:', user);
-                } else {
-                    // Användaren är inloggad men inte aktiv
-                    await signOut(auth);
-                    alert('Din användare är inte aktiv. Kontakta administratören.');
-                    window.location.href = 'login.html';
-                }
-            } else {
-                // Användaren är inte inloggad
-                window.location.href = 'login.html';
-            }
-        });
-    });
-</script>
