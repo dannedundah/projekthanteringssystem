@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hantera Användare och Behörigheter</title>
+    <title>Hantera Användare, Behörigheter och Team</title>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="auth-check.js"></script>
     <script type="module" src="user-management.js"></script>
 </head>
 <body>
     <div class="container">
-        <h2>Hantera Användare och Behörigheter</h2>
+        <h2>Hantera Användare, Behörigheter och Team</h2>
+
+        <!-- Gränssnitt för att skapa nya team -->
+        <div id="create-team">
+            <h3>Skapa nytt team</h3>
+            <input type="text" id="new-team-name" placeholder="Teamnamn">
+            <button id="create-team-btn">Skapa Team</button>
+        </div>
 
         <!-- Roll- och behörighetstabell -->
         <table id="roles-table">
@@ -19,12 +26,13 @@
                     <th>Namn</th>
                     <th>E-post</th>
                     <th>Behörighet</th>
-                    <th>Status</th> <!-- Ny kolumn för status -->
+                    <th>Team</th> <!-- Ny kolumn för team -->
+                    <th>Status</th>
                     <th>Uppdatera</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Dynamisk lista över användare, deras behörigheter och status -->
+                <!-- Dynamisk lista över användare, deras behörigheter och team -->
             </tbody>
         </table>
 
@@ -37,38 +45,69 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Anta att användarlistan och deras status hämtas och bearbetas här
-            const users = [
-                { name: 'Daniel', email: 'daniel@exempel.com', role: 'Admin', status: 'active' },
-                { name: 'Sofie', email: 'sofie@exempel.com', role: 'Montör', status: 'inactive' },
+            const rolesTableBody = document.querySelector('#roles-table tbody');
+            const createTeamBtn = document.getElementById('create-team-btn');
+
+            // Anta att användarlistan och teamen hämtas och bearbetas här
+            let users = [
+                { name: 'Daniel', email: 'daniel@exempel.com', role: 'Admin', team: 'Team Rickard', status: 'active' },
+                { name: 'Sofie', email: 'sofie@exempel.com', role: 'Montör', team: 'Team Rickard', status: 'inactive' },
                 // Lägg till fler användare efter behov
             ];
 
-            const rolesTableBody = document.querySelector('#roles-table tbody');
-            
-            users.forEach(user => {
-                const row = document.createElement('tr');
+            let teams = ['Team Rickard', 'Team Anna']; // Existerande team
 
-                const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
-                const statusText = user.status === 'active' ? 'Aktiv' : 'Inaktiv';
+            // Funktion för att rendera användarlistan
+            function renderUsers() {
+                rolesTableBody.innerHTML = ''; // Rensa tabellen
 
-                row.innerHTML = `
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>
-                        <select>
-                            <option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option>
-                            <option value="Montör" ${user.role === 'Montör' ? 'selected' : ''}>Montör</option>
-                            <option value="Säljare" ${user.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
-                            <option value="Service" ${user.role === 'Service' ? 'selected' : ''}>Service</option>
-                        </select>
-                    </td>
-                    <td><span class="${statusClass}">${statusText}</span></td>
-                    <td><button class="update-role-btn">Uppdatera</button></td>
-                `;
+                users.forEach(user => {
+                    const row = document.createElement('tr');
 
-                rolesTableBody.appendChild(row);
+                    const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
+                    const statusText = user.status === 'active' ? 'Aktiv' : 'Inaktiv';
+
+                    row.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <select>
+                                <option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                                <option value="Montör" ${user.role === 'Montör' ? 'selected' : ''}>Montör</option>
+                                <option value="Säljare" ${user.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
+                                <option value="Service" ${user.role === 'Service' ? 'selected' : ''}>Service</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select>
+                                ${teams.map(team => `
+                                    <option value="${team}" ${user.team === team ? 'selected' : ''}>${team}</option>
+                                `).join('')}
+                            </select>
+                        </td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
+                        <td><button class="update-role-btn">Uppdatera</button></td>
+                    `;
+
+                    rolesTableBody.appendChild(row);
+                });
+            }
+
+            // Funktion för att skapa ett nytt team
+            createTeamBtn.addEventListener('click', () => {
+                const newTeamName = document.getElementById('new-team-name').value.trim();
+                if (newTeamName && !teams.includes(newTeamName)) {
+                    teams.push(newTeamName);
+                    document.getElementById('new-team-name').value = '';
+                    renderUsers(); // Uppdatera användarlistan för att inkludera det nya teamet
+                    alert('Nytt team skapat!');
+                } else {
+                    alert('Ange ett unikt teamnamn.');
+                }
             });
+
+            // Rendera användarlistan vid sidladdning
+            renderUsers();
         });
     </script>
 </body>
