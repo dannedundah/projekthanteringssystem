@@ -43,7 +43,6 @@ function addUserRow(uid, userData) {
 
     const row = document.createElement('tr');
     const statusClass = userData.active ? 'status-active' : 'status-inactive';
-    const statusText = userData.active ? 'Aktiv' : 'Inaktiv';
 
     row.innerHTML = `
         <td>${fullName}</td>
@@ -64,11 +63,10 @@ function addUserRow(uid, userData) {
             </select>
         </td>
         <td>
-            <select data-uid="${uid}" class="status-select">
+            <select data-uid="${uid}" class="status-select ${statusClass}">
                 <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
                 <option value="false" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
             </select>
-            <span class="${statusClass}" id="status-label-${uid}">${statusText}</span>
         </td>
         <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
     `;
@@ -76,8 +74,9 @@ function addUserRow(uid, userData) {
 
     // Lägg till event listener för att ändra statusfärgen när dropdown-värdet ändras
     const statusSelect = row.querySelector(`select.status-select[data-uid="${uid}"]`);
+    updateStatusColor(statusSelect, statusSelect.value === 'true');
     statusSelect.addEventListener('change', () => {
-        updateStatusColor(uid, statusSelect.value === 'true');
+        updateStatusColor(statusSelect, statusSelect.value === 'true');
     });
 }
 
@@ -99,9 +98,6 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
 
             // Uppdatera teamets medlemslista
             await updateTeamMembership(uid, newTeam);
-
-            // Uppdatera färgen på statusen
-            updateStatusColor(uid, newStatus);
 
             alert('Användaruppgifter uppdaterade!');
         } catch (error) {
@@ -142,15 +138,12 @@ async function updateTeamMembership(userId, newTeamName) {
 }
 
 // Funktion för att uppdatera färgen på statusen
-function updateStatusColor(uid, isActive) {
-    const statusLabel = document.getElementById(`status-label-${uid}`);
+function updateStatusColor(selectElement, isActive) {
     if (isActive) {
-        statusLabel.classList.remove('status-inactive');
-        statusLabel.classList.add('status-active');
-        statusLabel.textContent = 'Aktiv';
+        selectElement.classList.remove('status-inactive');
+        selectElement.classList.add('status-active');
     } else {
-        statusLabel.classList.remove('status-active');
-        statusLabel.classList.add('status-inactive');
-        statusLabel.textContent = 'Inaktiv';
+        selectElement.classList.remove('status-active');
+        selectElement.classList.add('status-inactive');
     }
 }
