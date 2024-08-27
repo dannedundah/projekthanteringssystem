@@ -1,105 +1,96 @@
-import { db, collection, getDocs, addDoc, query, where } from './firebase-config.js';
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+// Initiera auth och db
+const auth = getAuth();
+const db = getFirestore();
+
+let allUsers = [];
+let allTeams = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const planningForm = document.getElementById('planning-form');
-    const projectDropdown = document.getElementById('project-id');
-    const teamDropdown = document.getElementById('team-id');
-    const employeeDropdown = document.getElementById('employee-id');
+    onAuthStateChanged(auth, (user) => {
+        const allowedEmails = ['daniel@delidel.se', 'leia@delidel.se', 'sofie@delidel.se'];
 
-    if (!projectDropdown || !teamDropdown || !employeeDropdown) {
-        console.error('One or more dropdown elements are not found.');
-        return;
-    }
+        if (!user || !allowedEmails.includes(user.email)) {
+            alert('Du har inte behörighet att se denna sida.');
+            window.location.href = 'login.html';
+            return;
+        }
 
-    try {
-        // Fetch projects with status "Ny"
-        const projectsQuery = query(collection(db, 'projects'), where('status', '==', 'Ny'));
-        const projectsSnapshot = await getDocs(projectsQuery);
-        const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        loadUserManagement(); // Ladda användarhanteringen direkt när sidan laddas
+    });
+});
 
-        projects.forEach(project => {
-            const option = document.createElement('option');
-            option.value = project.id;
-            option.textContent = project.name;
-            projectDropdown.appendChild(option);
-        });
+async function loadUserManagement() {
+    const rolesTableBody = document.getElementById('roles-table').querySelector('tbody');
 
-        // Fetch teams
-        const teamsSnapshot = await getDocs(collection(db, 'teams'));
-        const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Ladda team från Firestore
+    const teamsSnapshot = await getDocs(collection(db, 'teams'));
+    allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        teams.forEach(team => {
-            const option = document.createElement('option');
-            option.value = team.name;
-            option.textContent = team.name;
-            teamDropdown.appendChild(option);
-        });
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Handle team selection to populate employees
-        teamDropdown.addEventListener('change', () => {
-            const selectedTeam = teamDropdown.value;
+    // Rendera användare och deras behörighet, status och team
+    rolesTableBody.innerHTML = '';
+    allUsers.forEach(user => addUserRow(user.id, user));
+}
 
-            // Clear existing employees
-            employeeDropdown.innerHTML = '<option value="">Välj anställd</option>';
+function addUserRow(uid, userData) {
+    const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
 
-            // Find the selected team
-            const team = teams.find(t => t.name === selectedTeam);
+    const row = document.createElement('tr');
+    const statusClass = userData.active ? 'status-active' : 'status-inactive';
+    const statusText = userData.active ? 'Aktiv' : 'Inaktiv';
+    row.innerHTML = `
+        <td>${fullName}</td>
+        <td>${userData.email || 'Ingen e-post'}</td>
+        <td>
+            <select data-uid="${uid}" class="role-select">
+                <option value="Admin" ${userData.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                <option value="Montör" ${userData.role === 'Montör' ? 'selected' : ''}>Montör</option>
+                <option value="Säljare" ${userData.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
+                <option value="Service" ${userData.role === 'Service' ? 'selected' : ''}>Service</option>
+            </select>
+        </td>
+        <td>
+            <select data-uid="${uid}" class="team-select">
+                ${allTeams.map(team => `
+                    <option value="${team.name}" ${userData.team === team.name ? 'selected' : ''}>${team.name}</option>
+                `).join('')}
+            </select>
+        </td>
+        <td>
+            <select data-uid="${uid}" class="status-select">
+                <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
+                <option value="false" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
+            </select>
+        </td>
+        <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
+    `;
+    document.getElementById('roles-table').querySelector('tbody').appendChild(row);
+}
 
-            if (team) {
-                console.log(`Team ${team.name} found with members:`, team.members);
-            } else {
-                console.error(`Team ${selectedTeam} not found.`);
-                return;
-            }
+// Event listener för att uppdatera roll, team och status
+document.getElementById('roles-table').addEventListener('click', async (e) => {
+    if (e.target.classList.contains('update-role-btn')) {
+        const uid = e.target.getAttribute('data-uid');
+        const selectRoleElement = document.querySelector(`select.role-select[data-uid="${uid}"]`);
+        const selectTeamElement = document.querySelector(`select.team-select[data-uid="${uid}"]`);
+        const selectStatusElement = document.querySelector(`select.status-select[data-uid="${uid}"]`);
 
-            if (Array.isArray(team.members)) {
-                // Populate employees if team and members exist
-                team.members.forEach(member => {
-                    const option = document.createElement('option');
-                    option.value = member;
-                    option.textContent = member;
-                    employeeDropdown.appendChild(option);
-                });
-            } else {
-                console.warn(`Team ${selectedTeam} has no members or members are not defined.`);
-            }
-        });
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-
-    planningForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const projectId = projectDropdown.value.trim();
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-        const electricianStartDate = document.getElementById('electrician-start-date').value;
-        const electricianEndDate = document.getElementById('electrician-end-date').value;
-        const selectedTeam = teamDropdown.value;
-        const selectedEmployee = employeeDropdown.value;
-
-        const planning = {
-            projectId,
-            startDate,
-            endDate,
-            electricianStartDate,
-            electricianEndDate,
-            team: selectedTeam,
-            employees: [selectedEmployee].filter(employee => employee !== ''),
-        };
+        const newRole = selectRoleElement.value;
+        const newTeam = selectTeamElement.value;
+        const newStatus = selectStatusElement.value === 'true';
 
         try {
-            await addDoc(collection(db, 'planning'), planning);
-            alert('Planering sparad!');
-            planningForm.reset();
+            const userRef = doc(db, 'users', uid);
+            await updateDoc(userRef, { role: newRole, team: newTeam, active: newStatus });
+            alert('Användaruppgifter uppdaterade!');
         } catch (error) {
-            console.error('Error saving planning:', error);
-            alert('Ett fel uppstod vid sparandet av planeringen.');
+            console.error('Error updating user data:', error);
+            alert('Kunde inte uppdatera användaruppgifterna.');
         }
-    });
-
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
+    }
 });
