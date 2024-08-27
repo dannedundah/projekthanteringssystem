@@ -1,9 +1,15 @@
-import { db, collection, getDocs, doc, getDoc, updateDoc, auth, onAuthStateChanged } from './firebase-config.js';
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+// Initiera auth och db
+const auth = getAuth();
+const db = getFirestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
-    const employeeSelect = document.getElementById('employee-select');
+    const teamSelect = document.getElementById('employee-select'); // Ändra namn på employeeSelect till teamSelect
     let plannings = [];
+    let allTeams = [];
     let canEdit = false;
 
     const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
@@ -15,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (userDoc.exists()) {
                 canEdit = ["daniel@delidel.se", "sofie@delidel.se", "leia@delidel.se"].includes(user.email);
-                initializePage();
+                await initializePage();
             } else {
                 console.error('User document not found.');
             }
@@ -32,12 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
-            populateEmployeeSelect(plannings);
+            // Ladda och fyll team dropdown
+            const teamsSnapshot = await getDocs(collection(db, 'teams'));
+            allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            populateTeamSelect();
             renderGanttChart(plannings);
 
-            employeeSelect.addEventListener('change', () => {
-                const selectedEmployee = employeeSelect.value;
-                filterAndRenderGantt(selectedEmployee);
+            teamSelect.addEventListener('change', () => {
+                const selectedTeam = teamSelect.value;
+                filterAndRenderGantt(selectedTeam);
             });
 
         } catch (error) {
@@ -45,69 +55,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function populateEmployeeSelect(plannings) {
-        const employees = new Set();
-        employees.add("Elektriker");
+    function populateTeamSelect() {
+        teamSelect.innerHTML = '<option value="">Alla team</option>';
+        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; // Elektriker som separat kategori
 
-        plannings.forEach(planning => {
-            planning.employees.forEach(employee => employees.add(employee));
-        });
-
-        employees.forEach(employee => {
+        allTeams.forEach(team => {
             const option = document.createElement('option');
-            option.value = employee;
-            option.textContent = employee;
-            employeeSelect.appendChild(option);
+            option.value = team.name;
+            option.textContent = team.name;
+            teamSelect.appendChild(option);
         });
     }
 
-    function filterAndRenderGantt(selectedEmployee) {
+    function filterAndRenderGantt(selectedTeam) {
         let filteredPlannings = [];
 
-        if (selectedEmployee === "Elektriker") {
+        if (selectedTeam === "Elektriker") {
             filteredPlannings = plannings.filter(planning => 
                 planning.electricianStartDate && 
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
-        } else if (selectedEmployee === "") {
+        } else if (selectedTeam === "") {
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
             filteredPlannings = plannings.filter(planning => 
-                planning.employees.includes(selectedEmployee) && 
+                planning.team === selectedTeam && 
                 planning.projectId !== hiddenProjectId
             );
         }
 
-        renderGanttChart(filteredPlannings, selectedEmployee === "Elektriker");
-    }
-
-    function formatDateToString(date) {
-        if (!date) {
-            console.error("Invalid date:", date);
-            return null;
-        }
-        
-        if (date.seconds) {
-            const d = new Date(date.seconds * 1000);
-            return d.toISOString().split('T')[0];
-        }
-
-        if (typeof date === 'string') {
-            return date;
-        }
-
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        return d.toISOString().split('T')[0];
-    }
-
-    function adjustEndDateForSingleDay(startDate, endDate) {
-        if (startDate === endDate) {
-            const end = new Date(endDate);
-            end.setDate(end.getDate() + 1);
-            return end.toISOString().split('T')[0];
-        }
-        return endDate;
+        renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
 
     async function renderGanttChart(plannings, isElectricianView = false) {
@@ -125,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const projectData = projectDoc.data();
                 const taskList = [];
 
-                // Bestäm färg baserat på status
                 let taskColor;
                 switch (projectData.status.trim().toLowerCase()) {
                     case 'ny':
@@ -147,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         taskColor = 'black';
                         break;
                     default:
-                        taskColor = 'grey'; // Defaultfärg om status inte matchar
+                        taskColor = 'grey'; 
                 }
 
                 if (isElectricianView) {
@@ -209,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
-            return true; // Se till att projektet stannar där det släpps
+            return true;
         });
 
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
@@ -218,12 +195,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function formatDateToString(date) {
+        if (!date) {
+            console.error("Invalid date:", date);
+            return null;
+        }
+
+        if (date.seconds) {
+            const d = new Date(date.seconds * 1000);
+            return d.toISOString().split('T')[0];
+        }
+
+        if (typeof date === 'string') {
+            return date;
+        }
+
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        return d.toISOString().split('T')[0];
+    }
+
+    function adjustEndDateForSingleDay(startDate, endDate) {
+        if (startDate === endDate) {
+            const end = new Date(endDate);
+            end.setDate(end.getDate() + 1);
+            return end.toISOString().split('T')[0];
+        }
+        return endDate;
+    }
+
     async function saveTaskDates(taskId) {
         const task = gantt.getTask(taskId);
-        
+
         const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
         const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
-        
+
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
