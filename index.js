@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
+    const calculatorBtn = document.getElementById('calculator-btn'); // Knapp för Kalkylator
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -51,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (exportTimeReportBtn) {
         exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html'));
+    }
+    if (calculatorBtn) {
+        calculatorBtn.addEventListener('click', () => navigateTo('kalkylator.html')); // Navigera till kalkylatorn
     }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
@@ -87,6 +91,7 @@ function handleRoleBasedAccess(role) {
         document.getElementById('planning-total-btn').style.display = 'block';
         document.getElementById('time-reporting-btn').style.display = 'block';
         document.getElementById('export-time-report-btn').style.display = 'block';
+        document.getElementById('calculator-btn').style.display = 'block';  // Gör kalkylatorknappen synlig
 
         // Länk till adminpanelen
         const adminLink = document.createElement('a');
@@ -99,10 +104,12 @@ function handleRoleBasedAccess(role) {
     } else if (role === 'Säljare') {
         document.getElementById('planning-total-btn').style.display = 'block';
         document.getElementById('time-reporting-btn').style.display = 'block';
+        document.getElementById('calculator-btn').style.display = 'block';  // Gör kalkylatorknappen synlig för Säljare
     } else if (role === 'Service') {
         document.getElementById('planning-total-btn').style.display = 'block';
         document.getElementById('time-reporting-btn').style.display = 'block';
         document.getElementById('status-btn').style.display = 'block';
+        document.getElementById('calculator-btn').style.display = 'block';  // Gör kalkylatorknappen synlig för Service
     } else {
         alert('Du har inte behörighet att se denna sida.');
         window.location.href = 'login.html';
