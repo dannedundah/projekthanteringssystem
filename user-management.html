@@ -5,26 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hantera Användare och Behörigheter</title>
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="auth-check.js"></script>
-    <script type="module" src="user-management.js"></script>
+    <script type="module" src="auth-check.js"></script> <!-- Kontroll av användarens autentisering -->
+    <script type="module" src="user-management.js"></script> <!-- Hantering av användare och team -->
 </head>
 <body>
     <div class="container">
         <h2>Hantera Användare och Behörigheter</h2>
 
-        <!-- Roll- och behörighetstabell -->
+        <!-- Roll-, team- och behörighetstabell -->
         <table id="roles-table">
             <thead>
                 <tr>
                     <th>Namn</th>
                     <th>E-post</th>
                     <th>Behörighet</th>
-                    <th>Status</th> <!-- Ny kolumn för status -->
+                    <th>Team</th> <!-- Ny kolumn för team -->
+                    <th>Status</th>
                     <th>Uppdatera</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Dynamisk lista över användare, deras behörigheter och status -->
+                <!-- Dynamisk lista över användare, deras behörigheter, team och status -->
             </tbody>
         </table>
 
@@ -35,41 +36,6 @@
         function navigateTo(page) {
             window.location.href = page;
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Anta att användarlistan och deras status hämtas och bearbetas här
-            const users = [
-                { name: 'Daniel', email: 'daniel@exempel.com', role: 'Admin', status: 'active' },
-                { name: 'Sofie', email: 'sofie@exempel.com', role: 'Montör', status: 'inactive' },
-                // Lägg till fler användare efter behov
-            ];
-
-            const rolesTableBody = document.querySelector('#roles-table tbody');
-            
-            users.forEach(user => {
-                const row = document.createElement('tr');
-
-                const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
-                const statusText = user.status === 'active' ? 'Aktiv' : 'Inaktiv';
-
-                row.innerHTML = `
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>
-                        <select>
-                            <option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option>
-                            <option value="Montör" ${user.role === 'Montör' ? 'selected' : ''}>Montör</option>
-                            <option value="Säljare" ${user.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
-                            <option value="Service" ${user.role === 'Service' ? 'selected' : ''}>Service</option>
-                        </select>
-                    </td>
-                    <td><span class="${statusClass}">${statusText}</span></td>
-                    <td><button class="update-role-btn">Uppdatera</button></td>
-                `;
-
-                rolesTableBody.appendChild(row);
-            });
-        });
     </script>
 </body>
 </html>
