@@ -79,6 +79,6 @@ function toggleCategory(categoryId) {
     }
 }
 
-function navigateToProjectDetail(projectId) {
-    window.location.href = `projekt-detalj.html?id=${projectId}`;
-}
+window.navigateTo = (page) => {
+    window.location.href = page;
+};
