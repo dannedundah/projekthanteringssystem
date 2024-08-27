@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectDropdown = document.getElementById('project-dropdown');
     const timeTypeDropdown = document.getElementById('time-type');
     const hoursInput = document.getElementById('hours');
-    const commentInput = document.getElementById('work-comment'); // Kommentarsfältet
+    const commentInput = document.getElementById('work-comment');
     const monthYearHeader = document.getElementById('month-year');
     let selectedEmployeeName = null;
     let selectedDate = null;
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
-    let existingReportId = null; // To store the ID of the existing report
+    let existingReportId = null;
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -40,13 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
         const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];
 
-        // Update the month-year in the header
         monthYearHeader.textContent = `${monthNames[month]} ${year}`;
 
-        // Start with an empty calendar
         calendar.innerHTML = `<tr>${daysOfWeek.map(day => `<th>${day}</th>`).join('')}</tr>`;
 
-        const firstDay = new Date(year, month, 1).getDay();
+        const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // Justera så att måndag är första dagen
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         let dayNumber = 1;
@@ -64,16 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const report = await getReportForDate(selectedDate);
 
                     if (report) {
-                        existingReportId = report.id; // Store the ID of the existing report
+                        existingReportId = report.id;
                         projectDropdown.value = report.projectId;
                         timeTypeDropdown.value = report.timeType;
                         hoursInput.value = report.hours;
-                        commentInput.value = report.comment || ''; // Fyll i kommentaren om den finns
+                        commentInput.value = report.comment || '';
                         selectedDateHeader.textContent = `Ändra rapportering för ${selectedDate}`;
                     } else {
                         selectedDateHeader.textContent = `Rapportera tid för ${selectedDate}`;
                         timeReportForm.reset();
-                        commentInput.value = ''; // Rensa kommentarsfältet
+                        commentInput.value = '';
                         existingReportId = null;
                     }
 
@@ -153,12 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const project = projectDoc.exists() ? projectDoc.data().address : 'Ej specificerad';
 
             return {
-                id: reportDoc.id, // Return the report ID
+                id: reportDoc.id,
                 projectId: reportData.projectId,
                 project,
                 timeType: reportData.timeType,
                 hours: reportData.hours,
-                comment: reportData.comment // Lägg till kommentaren här
+                comment: reportData.comment
             };
         }
 
@@ -226,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedProjectId = projectDropdown.value;
         const timeType = timeTypeDropdown.value;
         const hours = parseFloat(hoursInput.value);
-        const comment = commentInput.value; // Hämta kommentaren
+        const comment = commentInput.value;
 
         if (selectedProjectId && timeType && hours && selectedDate) {
             const timeReport = {
@@ -235,17 +233,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 hours,
                 date: selectedDate,
                 employee: selectedEmployeeName,
-                comment // Lägg till kommentaren här
+                comment
             };
 
             try {
                 if (existingReportId) {
-                    // Update existing report
                     const reportDocRef = doc(db, 'timeReports', existingReportId);
                     await updateDoc(reportDocRef, timeReport);
                     alert('Tidrapporten har uppdaterats!');
                 } else {
-                    // Add new report
                     await addDoc(collection(db, 'timeReports'), timeReport);
                     alert('Tidrapporten har sparats!');
                 }
