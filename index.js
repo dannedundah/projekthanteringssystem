@@ -2,8 +2,23 @@ import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+// Lägg till Google API-klientbiblioteket
+const CLIENT_ID = '890081653871-obtrck5li44tia4akjgetbqduerep6g1.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyBCQy7S_9Dm7vV8tnyscU_-7m4NmH9QkJM';
+const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+
+gapi.load('client:auth2', () => {
+    gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        discoveryDocs: DISCOVERY_DOCS,
+        scope: SCOPES
+    });
+});
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDYqBOra2wDjyPweyBGnkVMANsvLOx9pps",
+  apiKey: API_KEY,
   authDomain: "projekthanteringsystem.firebaseapp.com",
   projectId: "projekthanteringsystem",
   storageBucket: "projekthanteringsystem.appspot.com",
@@ -30,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
     const logoutBtn = document.getElementById('logout-btn');
+    const googleSheetsBtn = document.getElementById('google-sheets-btn'); // Ny knapp för Google Sheets
 
     if (addProjectBtn) {
         addProjectBtn.addEventListener('click', () => navigateTo('läggatillprojekt.html'));
@@ -55,6 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
     }
+    if (googleSheetsBtn) {  // Lägg till event listener för Google Sheets-knappen
+        googleSheetsBtn.addEventListener('click', handleGoogleSheetsAuth);
+    }
 
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
@@ -77,6 +96,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+function handleGoogleSheetsAuth() {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+        fetchSheetData();
+    }).catch(error => {
+        console.error('Error authenticating with Google Sheets:', error);
+    });
+}
+
+function fetchSheetData() {
+    const sheetId = 'DITT_SHEET_ID';
+    const range = 'Blad1!A1:D10';  // Justera efter behov
+
+    gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: range,
+    }).then(response => {
+        const rows = response.result.values;
+        if (rows.length) {
+            console.log('Data hämtad från Google Sheet:');
+            rows.forEach((row) => {
+                console.log(row.join(', '));
+            });
+        } else {
+            console.log('Inga data funna.');
+        }
+    }).catch(error => {
+        console.error('Error fetching data from Google Sheets:', error);
+    });
+}
 
 function handleRoleBasedAccess(role) {
     if (role === 'Admin') {
