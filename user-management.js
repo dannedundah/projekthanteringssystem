@@ -29,6 +29,7 @@ async function loadUserManagement() {
     const teamsSnapshot = await getDocs(collection(db, 'teams'));
     allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+    // Ladda alla användare från Firestore
     const usersSnapshot = await getDocs(collection(db, 'users'));
     allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -105,11 +106,15 @@ async function updateTeamMembership(userId, newTeamName) {
     const teamsSnapshot = await getDocs(collection(db, 'teams'));
     const allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+    // Hämta användardata för att använda förnamn och efternamn
+    const user = allUsers.find(u => u.id === userId);
+    const userName = `${user.firstName} ${user.lastName}`;
+
     // Ta bort användaren från sitt tidigare team
     for (const team of allTeams) {
-        if (team.members && team.members.includes(userId)) {
+        if (team.members && team.members.includes(userName)) {
             const teamRef = doc(db, 'teams', team.id);
-            const updatedMembers = team.members.filter(member => member !== userId);
+            const updatedMembers = team.members.filter(member => member !== userName);
             await updateDoc(teamRef, { members: updatedMembers });
         }
     }
@@ -119,7 +124,7 @@ async function updateTeamMembership(userId, newTeamName) {
         const newTeam = allTeams.find(team => team.name === newTeamName);
         if (newTeam) {
             const teamRef = doc(db, 'teams', newTeam.id);
-            const updatedMembers = [...(newTeam.members || []), userId];
+            const updatedMembers = [...(newTeam.members || []), userName];
             await updateDoc(teamRef, { members: updatedMembers });
         }
     }
