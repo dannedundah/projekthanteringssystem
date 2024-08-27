@@ -44,6 +44,7 @@ function addUserRow(uid, userData) {
     const row = document.createElement('tr');
     const statusClass = userData.active ? 'status-active' : 'status-inactive';
     const statusText = userData.active ? 'Aktiv' : 'Inaktiv';
+
     row.innerHTML = `
         <td>${fullName}</td>
         <td>${userData.email || 'Ingen e-post'}</td>
@@ -63,7 +64,8 @@ function addUserRow(uid, userData) {
             </select>
         </td>
         <td>
-            <select data-uid="${uid}" class="status-select">
+            <span class="${statusClass}">${statusText}</span>
+            <select data-uid="${uid}" class="status-select" style="display: none;">
                 <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
                 <option value="false" ${!userData.active ? 'selected' : ''}>Inaktiv</option>
             </select>
@@ -91,6 +93,9 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
 
             // Uppdatera teamets medlemslista
             await updateTeamMembership(uid, newTeam);
+
+            // Uppdatera färgen på statusen
+            updateStatusColor(uid, newStatus);
 
             alert('Användaruppgifter uppdaterade!');
         } catch (error) {
@@ -127,5 +132,19 @@ async function updateTeamMembership(userId, newTeamName) {
             const updatedMembers = [...(newTeam.members || []), userName];
             await updateDoc(teamRef, { members: updatedMembers });
         }
+    }
+}
+
+// Funktion för att uppdatera färgen på statusen
+function updateStatusColor(uid, isActive) {
+    const statusSpan = document.querySelector(`select.status-select[data-uid="${uid}"]`).previousElementSibling;
+    if (isActive) {
+        statusSpan.classList.remove('status-inactive');
+        statusSpan.classList.add('status-active');
+        statusSpan.textContent = 'Aktiv';
+    } else {
+        statusSpan.classList.remove('status-active');
+        statusSpan.classList.add('status-inactive');
+        statusSpan.textContent = 'Inaktiv';
     }
 }
