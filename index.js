@@ -106,8 +106,8 @@ function handleGoogleSheetsAuth() {
 }
 
 function fetchSheetData() {
-    const sheetId = 'DITT_SHEET_ID';
-    const range = 'Blad1!A1:D10';  // Justera efter behov
+    const sheetId = 'https://docs.google.com/spreadsheets/d/1a49NWK76spp_WOA-ST4uCvj81ktp1hjBOvzAK6JOSbA/edit?gid=1543502340#gid=1543502340';
+    const range = 'Test med material!A1:D10';  // Justera efter behov
 
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
