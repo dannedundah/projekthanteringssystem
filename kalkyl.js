@@ -1,3 +1,25 @@
+// Funktion för att beräkna installerad effekt kW baserat på panelsort och antal paneler
+function getInstalledPower(panelType, panels) {
+    switch(panelType) {
+        case "JA405": 
+        case "IBC405": 
+            return 0.405 * panels;
+        case "JA370":
+            return 0.37 * panels;
+        case "DMEGC":
+            return 0.535 * panels;
+        case "Eurener":
+            return 0.45 * panels;
+        case "Maysun":
+            return 0.41 * panels;
+        case "JA 435":
+            return 0.435 * panels;
+        default:
+            return 0;
+    }
+}
+
+// Funktionen du har använt
 document.getElementById('calculatorForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Förhindrar att formuläret skickas
 
