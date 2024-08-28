@@ -21,8 +21,20 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const batteryKW = getBatteryKW(batteryType);
     const batteryCost = getBatteryCost(batteryKW);
 
+    // Få batteripris baserat på batteristorlek och summera med batterikostnaden
+    const batteryPrice = getBatteryPrice(batteryType) + batteryCost;
+
     // Beräkna pris baserat på installerad effekt
     const powerCost = getPowerCost(installedPower);
+
+    // Få priser för övriga komponenter
+    const panelSortPrice = getPanelPrice(panelType);
+    const inverter1Price = getInverter1Price(inverter1Type);
+    const inverter2Price = getInverter2Price(inverter2Type);
+    const roofMaterialCost = getRoofMaterialCost(roofType, panels);
+    const chargerPrice = getChargerPrice(chargerQuantity);
+    const extraRoofPrice = getExtraRoofPrice(extraRoofType);
+    const horizontalPanelPrice = getHorizontalPanelPrice(horizontalPanels, panels);
 
     // Beräkna fasta kostnader
     const fallskydd = 2500;
@@ -32,7 +44,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const arbetskostnad = 400 * panels;
 
     // Provision baserat på totalkostnad före provision (exkl. provision)
-    const totalBeforeProvision = (panels * getPanelPrice(panelType)) + inverter1Price + inverter2Price + batteryCost + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice + fallskydd + frakt + forbrukningsmaterial + elektriker + arbetskostnad + powerCost;
+    const totalBeforeProvision = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice + fallskydd + frakt + forbrukningsmaterial + elektriker + arbetskostnad + powerCost;
     const provision = totalBeforeProvision * 0.01 * 1.25;
 
     // Beräkna totala kostnaden inklusive fasta kostnader och provision
@@ -123,6 +135,25 @@ function getBatteryKW(batteryType) {
     }
 }
 
+// Funktion för att beräkna batterikostnad baserat på batteristorlek
+function getBatteryPrice(batteryType) {
+    switch(batteryType) {
+        case "SBR096": return 38446;
+        case "SBR128": return 49976;
+        case "SBR160": return 61506;
+        case "SBR192": return 73036;
+        case "SBR224": return 84566;
+        case "SBR256": return 96096;
+        case "Solax 12kW": return 54887;
+        case "Pylontech 15kWh": return 52038;
+        case "Pylontech 10kWh": return 37170;
+        case "Sigenergy 8kWh": return 29721;
+        case "Sigenergy 16kWh": return 59442;
+        case "Sigenergy 24kWh": return 89163;
+        default: return 0;
+    }
+}
+
 // Funktion för att beräkna batterikostnad baserat på batteri kW
 function getBatteryCost(batteryKW) {
     if (batteryKW === 9.6) return 15000;
@@ -176,9 +207,6 @@ function getInverter1Price(inverterType) {
         case "Sigenergy 17": return 29500;
         case "Sigenergy 20": return 31000;
         case "Sigenergy 25": return 36000;
-        case "Sigenergy 17": return 29500;
-        case "Sigenergy 20": return 31000;
-        case "Sigenergy 25": return 36000;
         default: return 0;
     }
 }
@@ -218,6 +246,13 @@ function getExtraRoofPrice(extraRoofs) {
 function getHorizontalPanelPrice(horizontalPanels, numPanels) {
     if (horizontalPanels === "ja") {
         return numPanels * 80;
+    }
+    return 0;
+}
+
+function getLoadBalancerPrice(loadBalancer) {
+    if (loadBalancer === "ja") {
+        return 3000;
     }
     return 0;
 }
