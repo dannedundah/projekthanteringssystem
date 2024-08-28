@@ -92,27 +92,27 @@ function getInstalledPower(panelType, panels) {
 // Funktion för att beräkna priset baserat på installerad effekt kW
 function getPowerCost(installedPower) {
     if (installedPower <= 0) return 0;
-    if (installedPower <= 10) return 45000;
-    if (installedPower <= 11) return 46500;
-    if (installedPower <= 12) return 48000;
-    if (installedPower <= 13) return 49500;
-    if (installedPower <= 14) return 51000;
-    if (installedPower <= 15) return 52500;
-    if (installedPower <= 16) return 53500;
-    if (installedPower <= 17) return 55000;
-    if (installedPower <= 18) return 56500;
-    if (installedPower <= 19) return 58000;
-    if (installedPower <= 20) return 59500;
-    if (installedPower <= 21) return 61000;
-    if (installedPower <= 22) return 62500;
-    if (installedPower <= 23) return 64000;
-    if (installedPower <= 24) return 65500;
-    if (installedPower <= 25) return 67000;
-    if (installedPower <= 26) return 68500;
-    if (installedPower <= 27) return 70000;
-    if (installedPower <= 28) return 71500;
-    if (installedPower <= 29) return 73000;
-    if (installedPower <= 30) return 74500;
+    if (installedPower <= 10) return 45000 * 0,95;
+    if (installedPower <= 11) return 46500 * 0,95;
+    if (installedPower <= 12) return 48000 * 0,95;
+    if (installedPower <= 13) return 49500 * 0,95;
+    if (installedPower <= 14) return 51000 * 0,95;
+    if (installedPower <= 15) return 52500 * 0,95;
+    if (installedPower <= 16) return 53500 * 0,95;
+    if (installedPower <= 17) return 55000 * 0,95;
+    if (installedPower <= 18) return 56500 * 0,95;
+    if (installedPower <= 19) return 58000 * 0,95;
+    if (installedPower <= 20) return 59500 * 0,95;
+    if (installedPower <= 21) return 61000 * 0,95;
+    if (installedPower <= 22) return 62500 * 0,95;
+    if (installedPower <= 23) return 64000 * 0,95;
+    if (installedPower <= 24) return 65500 * 0,95;
+    if (installedPower <= 25) return 67000 * 0,95;
+    if (installedPower <= 26) return 68500 * 0,95;
+    if (installedPower <= 27) return 70000 * 0,95;
+    if (installedPower <= 28) return 71500 * 0,95;
+    if (installedPower <= 29) return 73000 * 0,95;
+    if (installedPower <= 30) return 74500 * 0,95;
     return 0;
 }
 
@@ -156,17 +156,17 @@ function getBatteryPrice(batteryType) {
 
 // Funktion för att beräkna batterikostnad baserat på batteri kW
 function getBatteryCost(batteryKW) {
-    if (batteryKW === 9.6) return 15000;
-    if (batteryKW === 12.8) return 20000;
-    if (batteryKW === 16) return 25000;
-    if (batteryKW === 19.2) return 30000;
-    if (batteryKW === 22.4) return 35000;
-    if (batteryKW === 25.6) return 40000;
-    if (batteryKW === 15) return 23438;
-    if (batteryKW === 10) return 15625;
-    if (batteryKW === 12) return 25000;
-    if (batteryKW === 8) return 12500;
-    if (batteryKW === 24) return 37500;
+    if (batteryKW === 9.6) return 15000 * 0,95;
+    if (batteryKW === 12.8) return 20000 * 0,95;
+    if (batteryKW === 16) return 25000 * 0,95;
+    if (batteryKW === 19.2) return 30000 * 0,95;
+    if (batteryKW === 22.4) return 35000 * 0,95;
+    if (batteryKW === 25.6) return 40000 * 0,95;
+    if (batteryKW === 15) return 23438 * 0,95;
+    if (batteryKW === 10) return 15625 * 0,95;
+    if (batteryKW === 12) return 25000 * 0,95;
+    if (batteryKW === 8) return 12500 * 0,95;
+    if (batteryKW === 24) return 37500 * 0,95;
     return 0;
 }
 
