@@ -9,10 +9,10 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const batteryType = document.getElementById('battery').value;
     const roofType = document.getElementById('roofType').value;
     const chargerQuantity = parseInt(document.getElementById('charger').value) || 0;
-    const checkwattIncluded = parseInt(document.getElementById('checkwatt').value) || 0;
+    const checkwattIncluded = document.getElementById('checkwatt').checked ? 10000 : 0;
     const extraRoofType = document.getElementById('extraRoof').value;
     const horizontalPanels = document.getElementById('horizontalPanels').value;
-    const loadBalancerIncluded = document.getElementById('loadBalancer').value;
+    const loadBalancerPrice = document.getElementById('loadBalancer').checked ? 3000 : 0;
 
     // Använd funktionerna för att få priserna
     const panelSortPrice = getPanelPrice(panelType);
@@ -21,13 +21,11 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const batteryPrice = getBatteryPrice(batteryType);
     const roofMaterialCost = getRoofMaterialCost(roofType, panels);
     const chargerPrice = getChargerPrice(chargerQuantity);
-    const checkwattPrice = checkwattIncluded * 10000;
     const extraRoofPrice = getExtraRoofPrice(extraRoofType);
     const horizontalPanelPrice = getHorizontalPanelPrice(horizontalPanels, panels);
-    const loadBalancerPrice = loadBalancerIncluded === "ja" ? 3000 : 0;
 
     // Beräkna totala kostnaden
-    const totalCost = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattPrice + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice;
+    const totalCost = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice;
 
     // Visa resultatet
     document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost} SEK`;
