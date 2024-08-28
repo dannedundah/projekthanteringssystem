@@ -24,7 +24,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const extraRoofPrice = getExtraRoofPrice(extraRoofType);
     const horizontalPanelPrice = getHorizontalPanelPrice(horizontalPanels, panels);
 
-    // Beräkna totala kostnaden
+    // Beräkna totala kostnaden inklusive Checkwatt och Lastbalanserare
     const totalCost = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice;
 
     // Visa resultatet
