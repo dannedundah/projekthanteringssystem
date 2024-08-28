@@ -14,24 +14,35 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const horizontalPanels = document.getElementById('horizontalPanels').value;
     const loadBalancerPrice = document.getElementById('loadBalancer').checked ? 3000 : 0;
 
-    // Använd funktionerna för att få priserna
-    const panelSortPrice = getPanelPrice(panelType);
-    const inverter1Price = getInverter1Price(inverter1Type);
-    const inverter2Price = getInverter2Price(inverter2Type);
-    const batteryPrice = getBatteryPrice(batteryType);
-    const roofMaterialCost = getRoofMaterialCost(roofType, panels);
-    const chargerPrice = getChargerPrice(chargerQuantity);
-    const extraRoofPrice = getExtraRoofPrice(extraRoofType);
-    const horizontalPanelPrice = getHorizontalPanelPrice(horizontalPanels, panels);
+    // Beräkna installerad effekt kW baserat på panelsort
+    const installedPower = getInstalledPower(panelType, panels);
 
-    // Beräkna totala kostnaden inklusive Checkwatt och Lastbalanserare
-    const totalCost = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice;
+    // Beräkna batteri kW och tillhörande kostnad
+    const batteryKW = getBatteryKW(batteryType);
+    const batteryCost = getBatteryCost(batteryKW);
+
+    // Beräkna pris baserat på installerad effekt
+    const powerCost = getPowerCost(installedPower);
+
+    // Beräkna fasta kostnader
+    const fallskydd = 2500;
+    const frakt = 1000;
+    const forbrukningsmaterial = 350 * installedPower;
+    const elektriker = 8500;
+    const arbetskostnad = 400 * panels;
+
+    // Provision baserat på totalkostnad före provision (exkl. provision)
+    const totalBeforeProvision = (panels * getPanelPrice(panelType)) + inverter1Price + inverter2Price + batteryCost + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice + fallskydd + frakt + forbrukningsmaterial + elektriker + arbetskostnad + powerCost;
+    const provision = totalBeforeProvision * 0.01 * 1.25;
+
+    // Beräkna totala kostnaden inklusive fasta kostnader och provision
+    const totalCost = totalBeforeProvision + provision;
 
     // Visa resultatet
-    document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost} SEK`;
+    document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost.toFixed(2)} SEK`;
 });
 
-// Funktioner för att beräkna priser baserat på användarens val
+// Funktion för att beräkna priset baserat på panelsort
 function getPanelPrice(panelType) {
     switch(panelType) {
         case "DMEGC": return 600;
@@ -43,6 +54,96 @@ function getPanelPrice(panelType) {
         case "JA 435": return 795;
         default: return 0;
     }
+}
+
+// Funktion för att beräkna installerad effekt kW
+function getInstalledPower(panelType, panels) {
+    switch(panelType) {
+        case "JA405": 
+        case "IBC405": 
+            return 0.405 * panels;
+        case "JA370":
+            return 0.37 * panels;
+        case "DMEGC":
+            return 0.535 * panels;
+        case "Eurener":
+            return 0.45 * panels;
+        case "Maysun":
+            return 0.41 * panels;
+        case "JA 435":
+            return 0.435 * panels;
+        default:
+            return 0;
+    }
+}
+
+// Funktion för att beräkna priset baserat på installerad effekt kW
+function getPowerCost(installedPower) {
+    if (installedPower <= 0) return 0;
+    if (installedPower <= 10) return 45000;
+    if (installedPower <= 11) return 46500;
+    if (installedPower <= 12) return 48000;
+    if (installedPower <= 13) return 49500;
+    if (installedPower <= 14) return 51000;
+    if (installedPower <= 15) return 52500;
+    if (installedPower <= 16) return 53500;
+    if (installedPower <= 17) return 55000;
+    if (installedPower <= 18) return 56500;
+    if (installedPower <= 19) return 58000;
+    if (installedPower <= 20) return 59500;
+    if (installedPower <= 21) return 61000;
+    if (installedPower <= 22) return 62500;
+    if (installedPower <= 23) return 64000;
+    if (installedPower <= 24) return 65500;
+    if (installedPower <= 25) return 67000;
+    if (installedPower <= 26) return 68500;
+    if (installedPower <= 27) return 70000;
+    if (installedPower <= 28) return 71500;
+    if (installedPower <= 29) return 73000;
+    if (installedPower <= 30) return 74500;
+    return 0;
+}
+
+// Funktion för att beräkna batteri kW baserat på batterityp
+function getBatteryKW(batteryType) {
+    switch(batteryType) {
+        case "SBR096": return 9.6;
+        case "SBR128": return 12.8;
+        case "SBR160": return 16;
+        case "SBR192": return 19.2;
+        case "SBR224": return 22.4;
+        case "SBR256": return 25.6;
+        case "Solax 12kW": return 12;
+        case "Pylontech 15kWh": return 15;
+        case "Pylontech 10kWh": return 10;
+        case "Sigenergy 8kWh": return 8;
+        case "Sigenergy 16kWh": return 16;
+        case "Sigenergy 24kWh": return 24;
+        default: return 0;
+    }
+}
+
+// Funktion för att beräkna batterikostnad baserat på batteri kW
+function getBatteryCost(batteryKW) {
+    if (batteryKW === 9.6) return 15000;
+    if (batteryKW === 12.8) return 20000;
+    if (batteryKW === 16) return 25000;
+    if (batteryKW === 19.2) return 30000;
+    if (batteryKW === 22.4) return 35000;
+    if (batteryKW === 25.6) return 40000;
+    if (batteryKW === 15) return 23438;
+    if (batteryKW === 10) return 15625;
+    if (batteryKW === 12) return 25000;
+    if (batteryKW === 8) return 12500;
+    if (batteryKW === 24) return 37500;
+    return 0;
+}
+
+// Uppdaterad funktion för att hantera laddboxpriser
+function getChargerPrice(quantity) {
+    if (quantity === 1) return 12500;
+    if (quantity === 2) return 25000;
+    return 0;
 }
 
 function getInverter1Price(inverterType) {
@@ -75,6 +176,9 @@ function getInverter1Price(inverterType) {
         case "Sigenergy 17": return 29500;
         case "Sigenergy 20": return 31000;
         case "Sigenergy 25": return 36000;
+        case "Sigenergy 17": return 29500;
+        case "Sigenergy 20": return 31000;
+        case "Sigenergy 25": return 36000;
         default: return 0;
     }
 }
@@ -83,34 +187,12 @@ function getInverter2Price(inverterType) {
     return getInverter1Price(inverterType); // Återanvänd funktionen för samma prislista
 }
 
-function getBatteryPrice(batteryType) {
-    switch(batteryType) {
-        case "SBR096": return 38446;
-        case "SBR128": return 49976;
-        case "SBR160": return 61506;
-        case "SBR192": return 73036;
-        case "SBR224": return 84566;
-        case "SBR256": return 96096;
-        case "Solax 12kW": return 54887;
-        case "Pylontech 15kWh": return 52038;
-        case "Pylontech 10kWh": return 37170;
-        case "Sigenergy 8kWh": return 29721;
-        case "Sigenergy 16kWh": return 59442;
-        case "Sigenergy 24kWh": return 89163;
-        default: return 0;
-    }
-}
-
-function getChargerPrice(quantity) {
-    return quantity * 7500; // Multiplicera antal laddboxar med priset
-}
-
 function getRoofMaterialCost(roofType, numPanels) {
     switch(roofType) {
         case "Tegel/betong":
             return 1846 * numPanels;
         case "Papptak":
-            return 2585 * numPanels;
+            return 2858 * numPanels;
         case "TRP":
             return 1975 * numPanels;
         case "Falsat plåttak":
@@ -140,9 +222,3 @@ function getHorizontalPanelPrice(horizontalPanels, numPanels) {
     return 0;
 }
 
-function getLoadBalancerPrice(loadBalancer) {
-    if (loadBalancer === "ja") {
-        return 3000;
-    }
-    return 0;
-}
