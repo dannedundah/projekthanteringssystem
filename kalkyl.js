@@ -7,17 +7,19 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const inverter1Type = document.getElementById('inverter1').value;
     const inverter2Type = document.getElementById('inverter2').value;
     const batteryType = document.getElementById('battery').value;
-    const chargerIncluded = document.getElementById('charger').checked; // Om laddbox är inkluderad
-    const checkwattIncluded = document.getElementById('checkwatt').checked; // Om Checkwatt är inkluderad
+    const roofType = document.getElementById('roofType').value; // Nytt taktyp
+    const chargerIncluded = document.getElementById('charger').checked;
+    const checkwattIncluded = document.getElementById('checkwatt').checked;
     const extraRoofType = document.getElementById('extraRoof').value;
     const horizontalPanels = document.getElementById('horizontalPanels').value;
-    const loadBalancerIncluded = document.getElementById('loadBalancer').checked; // Om lastbalanserare är inkluderad
+    const loadBalancerIncluded = document.getElementById('loadBalancer').checked;
 
     // Använd funktionerna för att få priserna
     const panelSortPrice = getPanelPrice(panelType);
     const inverter1Price = getInverter1Price(inverter1Type);
     const inverter2Price = getInverter2Price(inverter2Type);
     const batteryPrice = getBatteryPrice(batteryType);
+    const roofMaterialCost = getRoofMaterialCost(roofType, panels); // Beräkna takkostnaden
     const chargerPrice = chargerIncluded ? getChargerPrice() : 0;
     const checkwattPrice = checkwattIncluded ? getCheckwattPrice() : 0;
     const extraRoofPrice = getExtraRoofPrice(extraRoofType);
@@ -25,7 +27,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const loadBalancerPrice = loadBalancerIncluded ? getLoadBalancerPrice("ja") : 0;
 
     // Beräkna totala kostnaden
-    const totalCost = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + chargerPrice + checkwattPrice + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice;
+    const totalCost = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattPrice + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice;
 
     // Visa resultatet
     document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost} SEK`;
@@ -132,4 +134,21 @@ function getLoadBalancerPrice(loadBalancer) {
         return 3000;
     }
     return 0;
+}
+
+function getRoofMaterialCost(roofType, numPanels) {
+    switch(roofType) {
+        case "Tegel/betong":
+            return 1846 * numPanels;
+        case "Papptak":
+            return 2858 * numPanels;
+        case "TRP":
+            return 1975 * numPanels;
+        case "Falsat plåttak":
+            return 1973 * numPanels;
+        case "Lättviktstak":
+            return 2098 * numPanels;
+        default:
+            return 0;
+    }
 }
