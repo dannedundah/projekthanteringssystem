@@ -194,7 +194,6 @@ function calculateAnlaggningPrisExMoms(batteryKW, laddboxar, lastbalanserare) {
     // Laddboxar pris baserat på antal
     if (laddboxar === 1) pris += 19500;
     if (laddboxar === 2) pris += 38000;
-    if (laddboxar === 3) pris += 0; // Om det finns en pris för 3 laddboxar, lägg till det här
 
     // Batteri pris baserat på kW
     switch(batteryKW) {
@@ -356,16 +355,16 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const totalPositivEffektAr = calculateTotalPositivEffektAr(egenAnvandning, beraknadEffekt, elInkop, elForsaljning, elUtPaNatet);
     const totaltBidrag = calculateTotaltBidrag(gronRot50, gronRot194);
     
-    // Uppdatera HTML med resultaten
-    document.getElementById('elUtPaNatet').textContent = elUtPaNatet.toFixed(2);
-    document.getElementById('gronRot50').textContent = gronRot50.toFixed(2);
-    document.getElementById('inkopPrisEfterStod').textContent = inkopPrisEfterStod.toFixed(2);
-    document.getElementById('gronRot194').textContent = gronRot194.toFixed(2);
-    document.getElementById('inkopPrisEfterStod194').textContent = inkopPrisEfterStod194.toFixed(2);
-    document.getElementById('beloppKundBetala').textContent = beloppKundBetala.toFixed(2);
-    document.getElementById('totalPositivEffektAr').textContent = totalPositivEffektAr.toFixed(2);
-    document.getElementById('totaltBidrag').textContent = totaltBidrag.toFixed(2);
-    document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost.toFixed(2)} SEK`;
+        // Uppdatera HTML med resultaten
+        document.getElementById('elUtPaNatet').textContent = elUtPaNatet.toFixed(2);
+        document.getElementById('gronRot50').textContent = gronRot50.toFixed(2);
+        document.getElementById('inkopPrisEfterStod').textContent = inkopPrisEfterStod.toFixed(2);
+        document.getElementById('gronRot194').textContent = gronRot194.toFixed(2);
+        document.getElementById('inkopPrisEfterStod194').textContent = inkopPrisEfterStod194.toFixed(2);
+        document.getElementById('beloppKundBetala').textContent = beloppKundBetala.toFixed(2);
+        document.getElementById('totalPositivEffektAr').textContent = totalPositivEffektAr.toFixed(2);
+        document.getElementById('totaltBidrag').textContent = totaltBidrag.toFixed(2);
+        document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost.toFixed(2)} SEK`;
     });
     
     // Funktion för att beräkna priset baserat på panelsort
@@ -382,6 +381,3 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
         }
     }
     
-    // Funktionen för att hantera resterande kod är redan inkluderad i de tidigare delarna.
-    
-
