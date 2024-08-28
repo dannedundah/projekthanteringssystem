@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkylator för Solcellsinstallation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            margin-bottom: 15px;
+            padding: 5px;
+            width: 100%;
+        }
+
+        h2 {
+            margin-top: 30px;
+            font-size: 1.5em;
+        }
+    </style>
 </head>
 <body>
     <h1>Kalkylator för Solcellsinstallation</h1>
     <form id="calculatorForm">
+        <!-- Input Fields -->
         <label for="panels">Antal Paneler:</label>
-        <input type="number" id="panels" value="1" min="1"><br><br>
+        <input type="number" id="panels" value="1" min="1"><br>
 
         <label for="panelSort">Panelsort:</label>
         <select id="panelSort">
@@ -21,7 +45,7 @@
             <option value="Maysun">Maysun</option>
             <option value="IBC405">IBC405</option>
             <option value="JA 435">JA 435</option>
-        </select><br><br>
+        </select><br>
 
         <label for="roofType">Taktyp:</label>
         <select id="roofType">
@@ -31,7 +55,7 @@
             <option value="TRP">TRP</option>
             <option value="Falsat plåttak">Falsat plåttak</option>
             <option value="Lättviktstak">Lättviktstak</option>
-        </select><br><br>
+        </select><br>
 
         <label for="inverter1">Växelriktare 1:</label>
         <select id="inverter1">
@@ -64,7 +88,7 @@
             <option value="Sigenergy 17">Sigenergy 17</option>
             <option value="Sigenergy 20">Sigenergy 20</option>
             <option value="Sigenergy 25">Sigenergy 25</option>
-        </select><br><br>
+        </select><br>
 
         <label for="inverter2">Växelriktare 2:</label>
         <select id="inverter2">
@@ -98,7 +122,7 @@
             <option value="Sigenergy 17">Sigenergy 17</option>
             <option value="Sigenergy 20">Sigenergy 20</option>
             <option value="Sigenergy 25">Sigenergy 25</option>
-        </select><br><br>
+        </select><br>
 
         <label for="battery">Batteri 1:</label>
         <select id="battery">
@@ -115,17 +139,17 @@
             <option value="Sigenergy 8kWh">Sigenergy 8kWh</option>
             <option value="Sigenergy 16kWh">Sigenergy 16kWh</option>
             <option value="Sigenergy 24kWh">Sigenergy 24kWh</option>
-        </select><br><br>
+        </select><br>
 
         <label for="charger">Laddbox:</label>
         <select id="charger">
             <option value="">Välj antal</option>
             <option value="1">1st</option>
             <option value="2">2st</option>
-        </select><br><br>
+        </select><br>
 
         <label for="checkwatt">Checkwatt:</label>
-        <input type="checkbox" id="checkwatt"><br><br>
+        <input type="checkbox" id="checkwatt"><br>
 
         <label for="extraRoof">Antal extra takytor:</label>
         <select id="extraRoof">
