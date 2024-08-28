@@ -110,7 +110,7 @@ function getRoofMaterialCost(roofType, numPanels) {
         case "Tegel/betong":
             return 1846 * numPanels;
         case "Papptak":
-            return 2858 * numPanels;
+            return 2585 * numPanels;
         case "TRP":
             return 1975 * numPanels;
         case "Falsat plåttak":
