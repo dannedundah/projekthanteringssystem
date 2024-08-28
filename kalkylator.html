@@ -4,40 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkylator för Solcellsinstallation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input, select {
-            margin-bottom: 15px;
-            padding: 5px;
-            width: 100%;
-        }
-
-        h2 {
-            margin-top: 30px;
-            font-size: 1.5em;
-        }
-
-        p {
-            margin: 5px 0;
-        }
-    </style>
 </head>
 <body>
     <h1>Kalkylator för Solcellsinstallation</h1>
     <form id="calculatorForm">
-        <!-- Input Fields -->
+        <!-- Paneler -->
         <label for="panels">Antal Paneler:</label>
-        <input type="number" id="panels" value="1" min="1"><br>
+        <input type="number" id="panels" value="1" min="1"><br><br>
 
         <label for="panelSort">Panelsort:</label>
         <select id="panelSort">
@@ -49,8 +22,9 @@
             <option value="Maysun">Maysun</option>
             <option value="IBC405">IBC405</option>
             <option value="JA 435">JA 435</option>
-        </select><br>
+        </select><br><br>
 
+        <!-- Taktyp -->
         <label for="roofType">Taktyp:</label>
         <select id="roofType">
             <option value="">Välj vara</option>
@@ -59,7 +33,7 @@
             <option value="TRP">TRP</option>
             <option value="Falsat plåttak">Falsat plåttak</option>
             <option value="Lättviktstak">Lättviktstak</option>
-        </select><br>
+        </select><br><br>
 
         <label for="inverter1">Växelriktare 1:</label>
         <select id="inverter1">
@@ -145,15 +119,17 @@
             <option value="Sigenergy 24kWh">Sigenergy 24kWh</option>
         </select><br>
 
+        <!-- Laddbox -->
         <label for="charger">Laddbox:</label>
         <select id="charger">
             <option value="">Välj antal</option>
             <option value="1">1st</option>
             <option value="2">2st</option>
-        </select><br>
+        </select><br><br>
 
+        <!-- Övriga val -->
         <label for="checkwatt">Checkwatt:</label>
-        <input type="checkbox" id="checkwatt"><br>
+        <input type="checkbox" id="checkwatt"><br><br>
 
         <label for="extraRoof">Antal extra takytor:</label>
         <select id="extraRoof">
@@ -163,7 +139,7 @@
             <option value="3st">3st</option>
             <option value="4st">4st</option>
             <option value="5st">5st</option>
-        </select><br>
+        </select><br><br>
 
         <label for="horizontalPanels">Liggande paneler:</label>
         <select id="horizontalPanels">
@@ -174,7 +150,7 @@
         <label for="loadBalancer">Lastbalanserare:</label>
         <input type="checkbox" id="loadBalancer"><br><br>
 
-        <!-- Nya fält för att spegla de nya beräkningarna -->
+        <!-- Fält för extra indata som påverkar beräkningar -->
         <label for="beraknadEffekt">Beräknad effekt/år (kWh):</label>
         <input type="number" id="beraknadEffekt" step="any"><br><br>
 
@@ -187,7 +163,7 @@
         <label for="egenAnvandning">Egen användning av egenproducerad el (%):</label>
         <input type="number" id="egenAnvandning" step="any"><br><br>
 
-        <!-- Automatiskt beräknade fält -->
+        <!-- Beräknade resultat -->
         <h2>Beräknade resultat</h2>
         <p>El som går ut på nätet (%): <span id="elUtPaNatet"></span></p>
 
@@ -209,4 +185,3 @@
     <script src="kalkyl.js"></script>
 </body>
 </html>
-
