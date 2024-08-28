@@ -43,6 +43,19 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const elektriker = 8500;
     const arbetskostnad = 400 * panels;
 
+    // Beräkna pris för anläggning (exkl moms)
+    const anlaggningPrisExMoms = calculateAnlaggningPrisExMoms(batteryKW, chargerQuantity, document.getElementById('loadBalancer').checked ? 'ja' : 'nej');
+    const ovrigaKostnader = calculateOvrigaKostnaderSchablon(anlaggningPrisExMoms);
+    const pris97 = calculatePris97(anlaggningPrisExMoms);
+    const anlaggningPrisInkMoms = calculateAnlaggningPrisInkMoms(anlaggningPrisExMoms);
+    const gronRot50 = calculateGronRot50(anlaggningPrisInkMoms);
+    const inkopPrisEfterStod = calculateInkopPrisEfterStod(anlaggningPrisInkMoms, gronRot50);
+
+    // Visa resultat för de beräknade fälten
+    document.getElementById('elUtPaNatet').textContent = `${100 - parseFloat(document.getElementById('egenAnvandning').value || 0)} %`;
+    document.getElementById('gronRot50').textContent = `${gronRot50.toFixed(2)} SEK`;
+    document.getElementById('inkopPrisEfterStod').textContent = `${inkopPrisEfterStod.toFixed(2)} SEK`;
+
     // Provision baserat på totalkostnad före provision (exkl. provision)
     const totalBeforeProvision = (panels * panelSortPrice) + inverter1Price + inverter2Price + batteryPrice + roofMaterialCost + chargerPrice + checkwattIncluded + extraRoofPrice + horizontalPanelPrice + loadBalancerPrice + fallskydd + frakt + forbrukningsmaterial + elektriker + arbetskostnad + powerCost;
     const provision = totalBeforeProvision * 0.01 * 1.25;
@@ -50,7 +63,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     // Beräkna totala kostnaden inklusive fasta kostnader och provision
     const totalCost = totalBeforeProvision + provision;
 
-    // Visa resultatet
+    // Visa totalkostnaden
     document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost.toFixed(2)} SEK`;
 });
 
@@ -256,6 +269,7 @@ function getLoadBalancerPrice(loadBalancer) {
     }
     return 0;
 }
+
 // Funktion för att beräkna pris för anläggning (exkl moms)
 function calculateAnlaggningPrisExMoms(batteryKW, laddboxar, lastbalanserare) {
     let pris = 0;
@@ -263,7 +277,6 @@ function calculateAnlaggningPrisExMoms(batteryKW, laddboxar, lastbalanserare) {
     // Laddboxar pris baserat på antal
     if (laddboxar === 1) pris += 19500;
     if (laddboxar === 2) pris += 38000;
-    if (laddboxar === 3) pris += 0; // Om det finns en pris för 3 laddboxar, lägg till det här
 
     // Batteri pris baserat på kW
     switch(batteryKW) {
