@@ -256,4 +256,96 @@ function getLoadBalancerPrice(loadBalancer) {
     }
     return 0;
 }
+// Funktion för att beräkna pris för anläggning (exkl moms)
+function calculateAnlaggningPrisExMoms(batteryKW, laddboxar, lastbalanserare) {
+    let pris = 0;
+
+    // Laddboxar pris baserat på antal
+    if (laddboxar === 1) pris += 19500;
+    if (laddboxar === 2) pris += 38000;
+    if (laddboxar === 3) pris += 0; // Om det finns en pris för 3 laddboxar, lägg till det här
+
+    // Batteri pris baserat på kW
+    switch(batteryKW) {
+        case 8:
+        case 9.6:
+        case 10:
+            pris += 115000;
+            break;
+        case 12:
+        case 12.8:
+            pris += 133000;
+            break;
+        case 15:
+        case 16:
+            pris += 151000;
+            break;
+        case 19.2:
+            pris += 169000;
+            break;
+        case 22.4:
+            pris += 187000;
+            break;
+        case 24:
+        case 25.6:
+            pris += 205000;
+            break;
+        default:
+            pris += 0; // Om ingen matchning hittas
+            break;
+    }
+
+    // Lastbalanserare (lägger till 3000 kr om "ja")
+    if (lastbalanserare === "ja") pris += 3000;
+
+    return pris;
+}
+
+// Funktion för att beräkna övriga kostnader schablon 3%
+function calculateOvrigaKostnaderSchablon(anlaggningPrisExMoms) {
+    return anlaggningPrisExMoms * 0.03;
+}
+
+// Funktion för att beräkna 97% av priset
+function calculatePris97(anlaggningPrisExMoms) {
+    return anlaggningPrisExMoms * 0.97;
+}
+
+// Funktion för att beräkna pris för anläggning (inkl moms)
+function calculateAnlaggningPrisInkMoms(anlaggningPrisExMoms) {
+    return anlaggningPrisExMoms * 1.25;
+}
+
+// Funktion för att beräkna Grönt ROT (50%)
+function calculateGronRot50(anlaggningPrisInkMoms) {
+    return (anlaggningPrisInkMoms / 2);
+}
+
+// Funktion för att beräkna inköpspris efter stöd (inkl moms)
+function calculateInkopPrisEfterStod(anlaggningPrisInkMoms, gronRot50) {
+    return anlaggningPrisInkMoms - gronRot50;
+}
+
+// Exempel på hur man använder dessa funktioner i en beräkningskedja
+function calculateTotalCost(batteryKW, laddboxar, lastbalanserare) {
+    const anlaggningPrisExMoms = calculateAnlaggningPrisExMoms(batteryKW, laddboxar, lastbalanserare);
+    const ovrigaKostnader = calculateOvrigaKostnaderSchablon(anlaggningPrisExMoms);
+    const pris97 = calculatePris97(anlaggningPrisExMoms);
+    const anlaggningPrisInkMoms = calculateAnlaggningPrisInkMoms(anlaggningPrisExMoms);
+    const gronRot50 = calculateGronRot50(anlaggningPrisInkMoms);
+    const inkopPrisEfterStod = calculateInkopPrisEfterStod(anlaggningPrisInkMoms, gronRot50);
+
+    return {
+        anlaggningPrisExMoms,
+        ovrigaKostnader,
+        pris97,
+        anlaggningPrisInkMoms,
+        gronRot50,
+        inkopPrisEfterStod
+    };
+}
+
+// Exempel på hur man kan anropa funktionen och visa resultatet
+const results = calculateTotalCost(9.6, 1, "ja");
+console.log(results);
 
