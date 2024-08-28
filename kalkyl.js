@@ -38,7 +38,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
 
     // Beräkna fasta kostnader
     const fallskydd = 2500;
-    const frakt = 1000;
+    const frakt = 3500;
     const forbrukningsmaterial = 350 * installedPower;
     const elektriker = 8500;
     const arbetskostnad = 400 * panels;
