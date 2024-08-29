@@ -226,7 +226,7 @@ function calculateAnlaggningPrisExMoms(batteryKW, laddboxar, lastbalanserare) {
     }
 
     // Lastbalanserare (lägger till 3000 kr om "ja")
-    if (lastbalanserare === "ja") pris += 3000;
+    if (lastbalanserare) pris += 3000;
 
     return pris;
 }
@@ -354,37 +354,33 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
     const beloppKundBetala = totalCost - gronRot50 - gronRot194;
     const totalPositivEffektAr = calculateTotalPositivEffektAr(egenAnvandning, beraknadEffekt, elInkop, elForsaljning, elUtPaNatet);
     const totaltBidrag = calculateTotaltBidrag(gronRot50, gronRot194);
-    
-        // Uppdatera HTML med resultaten
-        document.getElementById('elUtPaNatet').textContent = elUtPaNatet.toFixed(2);
-        document.getElementById('gronRot50').textContent = gronRot50.toFixed(2);
-        document.getElementById('inkopPrisEfterStod').textContent = inkopPrisEfterStod.toFixed(2);
-        document.getElementById('gronRot194').textContent = gronRot194.toFixed(2);
-        document.getElementById('inkopPrisEfterStod194').textContent = inkopPrisEfterStod194.toFixed(2);
-        document.getElementById('beloppKundBetala').textContent = beloppKundBetala.toFixed(2);
-        document.getElementById('totalPositivEffektAr').textContent = totalPositivEffektAr.toFixed(2);
-        document.getElementById('totaltBidrag').textContent = totaltBidrag.toFixed(2);
-        document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost.toFixed(2)} SEK`;
-    });
-    
-    // Funktion för att beräkna priset baserat på panelsort
-    function getPanelPrice(panelType) {
-        switch(panelType) {
-            case "DMEGC": return 600;
-            case "JA405": return 500;
-            case "JA370": return 1000;
-            case "Eurener": return 1710;
-            case "Maysun": return 1250;
-            case "IBC405": return 850;
-            case "JA 435": return 795;
-            default: return 0;
-        }
+
+    // Uppdatera HTML med resultaten
+    document.getElementById('elUtPaNatet').textContent = elUtPaNatet.toFixed(2);
+    document.getElementById('gronRot50').textContent = gronRot50.toFixed(2);
+    document.getElementById('inkopPrisEfterStod').textContent = inkopPrisEfterStod.toFixed(2);
+    document.getElementById('gronRot194').textContent = gronRot194.toFixed(2);
+    document.getElementById('inkopPrisEfterStod194').textContent = inkopPrisEfterStod194.toFixed(2);
+    document.getElementById('beloppKundBetala').textContent = beloppKundBetala.toFixed(2);
+    document.getElementById('totalPositivEffektAr').textContent = totalPositivEffektAr.toFixed(2);
+    document.getElementById('totaltBidrag').textContent = totaltBidrag.toFixed(2);
+    document.getElementById('totalCost').textContent = `Total Kostnad: ${totalCost.toFixed(2)} SEK`;
+});
+
+// Funktion för att beräkna priset baserat på panelsort
+function getPanelPrice(panelType) {
+    switch(panelType) {
+        case "DMEGC": return 600;
+        case "JA405": return 500;
+        case "JA370": return 1000;
+        case "Eurener": return 1710;
+        case "Maysun": return 1250;
+        case "IBC405": return 850;
+        case "JA 435": return 795;
+        default: return 0;
     }
-    console.log("Anläggning Pris Exkl Moms:", anlaggningPrisExMoms);
-console.log("Övriga Kostnader:", ovrigaKostnader);
-console.log("Pris 97%:", pris97);
-console.log("Anläggning Pris Inkl Moms:", anlaggningPrisInkMoms);
-console.log("Grön ROT 50%:", gronRot50);
-console.log("Grön ROT 19.4%:", gronRot194);
-console.log("Belopp Kund Betala:", beloppKundBetala);
+}
+
+// Funktionen för att hantera resterande kod är redan inkluderad i de tidigare delarna.
+
 
