@@ -380,4 +380,11 @@ document.getElementById('calculatorForm').addEventListener('submit', function(ev
             default: return 0;
         }
     }
-    
+    console.log("Anläggning Pris Exkl Moms:", anlaggningPrisExMoms);
+console.log("Övriga Kostnader:", ovrigaKostnader);
+console.log("Pris 97%:", pris97);
+console.log("Anläggning Pris Inkl Moms:", anlaggningPrisInkMoms);
+console.log("Grön ROT 50%:", gronRot50);
+console.log("Grön ROT 19.4%:", gronRot194);
+console.log("Belopp Kund Betala:", beloppKundBetala);
+
