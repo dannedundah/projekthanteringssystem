@@ -102,13 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
-        // Lägg till veckodagar och datumformat
-        gantt.config.scale_unit = "day";
-        gantt.config.date_scale = "%d %M (%l)";
-        gantt.config.subscales = [];
-        gantt.config.scale_height = 60;
-
         gantt.init("gantt-chart");
+
+        // Konfigurera Gantt för att visa datum överst och veckodag under
+        gantt.templates.scale_cell_class = function (date) {
+            return "gantt_scale_cell";
+        };
+
+        gantt.templates.date_scale = function (date) {
+            const dayOfWeek = gantt.date.date_to_str("%l")(date); // Få veckodag
+            const dayOfMonth = gantt.date.date_to_str("%d %M")(date); // Få datum
+            return `<div>${dayOfMonth}</div><div>${dayOfWeek}</div>`; // Visa datum överst och veckodag under
+        };
 
         const tasks = await Promise.all(plannings.map(async planning => {
             const projectDocRef = doc(db, 'projects', planning.projectId);
