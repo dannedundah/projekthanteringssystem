@@ -11,12 +11,51 @@
     <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="se-schema.js"></script>
+    <style>
+        /* Basstil för Gantt-diagrammet */
+        #gantt-chart {
+            width: 100%;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        /* Anpassa för mindre skärmar */
+        @media (max-width: 768px) {
+            #gantt-chart {
+                height: 300px; /* Minska höjden för mindre skärmar */
+            }
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5rem; /* Minska rubrikens storlek */
+            }
+            button {
+                width: 100%; /* Gör knapparna bredare för att vara lättare att klicka på mobiler */
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #gantt-chart {
+                height: 200px; /* Ytterligare minskning av höjd för mycket små skärmar */
+            }
+            h1 {
+                font-size: 1.2rem; /* Ytterligare minskning av rubrikens storlek */
+            }
+            button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Mitt Schema</h1>
         <!-- Container för Gantt-diagrammet -->
-        <div id="gantt-chart" style="width:100%; height:400px;"></div>
+        <div id="gantt-chart"></div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>

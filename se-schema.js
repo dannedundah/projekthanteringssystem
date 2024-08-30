@@ -76,6 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = true;
+        gantt.config.fit_tasks = true; // Gör att uppgifterna fyller hela diagrammet
+        gantt.config.grid_width = window.innerWidth < 768 ? 0 : 300; // Dölj rutnätet på små skärmar
 
         gantt.init("gantt-chart");
         
