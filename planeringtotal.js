@@ -7,12 +7,12 @@ const db = getFirestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
-    const teamSelect = document.getElementById('employee-select'); // Ändra namn på employeeSelect till teamSelect
+    const teamSelect = document.getElementById('employee-select'); 
     let plannings = [];
     let allTeams = [];
     let canEdit = false;
 
-    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1"; // Dölj projekt med detta ID
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -103,8 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectDoc = await getDoc(projectDocRef);
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
-                const taskList = [];
 
+                // Filtrera bort projekt med status "Driftsatt"
+                if (projectData.status.trim().toLowerCase() === 'driftsatt') {
+                    return []; // Hoppa över detta projekt
+                }
+
+                const taskList = [];
                 let taskColor;
                 switch (projectData.status.trim().toLowerCase()) {
                     case 'ny':
@@ -236,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
-        if (taskId.endsWith('-electrician')) {
+        if (taskId.endswith('-electrician')) {
             await updateDoc(planningRef, {
                 electricianStartDate: formattedStartDate,
                 electricianEndDate: formattedEndDate
