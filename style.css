@@ -316,10 +316,6 @@ button.remove-button:hover {
     background-color: black !important;
     color: white !important;
 }
-/* Lägg till denna klass för att markera helger med röd färg */
-.weekend {
-    background-color: #ffcccc; /* Ljus röd färg */
-}
 /* För att göra Gantt-diagrammet större */
 .gantt-chart-large {
     width: 100%;
