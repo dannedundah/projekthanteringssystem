@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
+            // Sortera plannings baserat på startdatum
+            plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
             // Ladda och fyll team dropdown
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -86,6 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 planning.projectId !== hiddenProjectId
             );
         }
+
+        // Sortera filteredPlannings baserat på startdatum
+        filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
@@ -250,6 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 endDate: formattedEndDate
             });
         }
+
+        // Uppdatera status för projektet till "Planerad"
+        const projectRef = doc(db, 'projects', taskId.replace('-electrician', ''));
+        await updateDoc(projectRef, {
+            status: 'Planerad'
+        });
     }
 
     function showConfirmationPopup(message) {
