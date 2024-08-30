@@ -318,7 +318,7 @@ button.remove-button:hover {
 }
 /* För att göra Gantt-diagrammet större */
 .gantt-chart-large {
-    width: 120%;
+    width: 100%;
     height: 80vh; /* Tar upp 80% av höjden på skärmen */
     margin: 20px 0; /* Lägger till lite marginal ovanför och under diagrammet */
 }

@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
             // Sortera plannings baserat på startdatum
-            plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            plannings.sort((a, b) => new Date(a.startDate || a.electricianStartDate) - new Date(b.startDate || b.electricianStartDate));
 
             // Ladda och fyll team dropdown
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
@@ -92,8 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Sortera filteredPlannings baserat på startdatum för både vanliga och elektriker-uppgifter
         filteredPlannings.sort((a, b) => {
-            const aStartDate = new Date(a.electricianStartDate || a.startDate);
-            const bStartDate = new Date(b.electricianStartDate || b.startDate);
+            const aStartDate = new Date(a.startDate || a.electricianStartDate);
+            const bStartDate = new Date(b.startDate || b.electricianStartDate);
             return aStartDate - bStartDate;
         });
 
@@ -118,14 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
 
-                // Filtrera bort projekt med status "Driftsatt"
-                if (projectData.status.trim().toLowerCase() === 'driftsatt') {
+                // Filtrera bort projekt med status "Driftsatt" eller "Fakturerad"
+                const projectStatus = projectData.status.trim().toLowerCase();
+                if (projectStatus === 'driftsatt' || projectStatus === 'fakturerad') {
                     return []; // Hoppa över detta projekt
                 }
 
                 const taskList = [];
                 let taskColor;
-                switch (projectData.status.trim().toLowerCase()) {
+                switch (projectStatus) {
                     case 'ny':
                         taskColor = 'pink';
                         break;
