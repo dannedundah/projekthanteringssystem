@@ -136,12 +136,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (isElectricianView) {
                     const startDate = formatDateToString(planning.electricianStartDate);
-                    const endDate = formatDateToString(planning.electricianEndDate);
+                    let endDate = formatDateToString(planning.electricianEndDate);
 
                     if (!startDate || !endDate) {
                         console.error("Invalid start or end date for planning:", planning);
                         return [];
                     }
+
+                    endDate = adjustEndDateForSingleDay(startDate, endDate);
 
                     taskList.push({
                         id: planning.id + '-electrician',
@@ -153,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 } else {
                     const startDate = formatDateToString(planning.startDate);
-                    const endDate = formatDateToString(planning.endDate);
+                    let endDate = formatDateToString(planning.endDate);
 
                     if (!startDate || !endDate) {
                         console.error("Invalid start or end date for planning:", planning);
@@ -217,6 +219,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         return d.toISOString().split('T')[0];
+    }
+
+    function adjustEndDateForSingleDay(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (start.getTime() === end.getTime()) {
+            end.setDate(end.getDate() + 1);
+            return end.toISOString().split('T')[0];
+        }
+        return endDate;
     }
 
     async function saveTaskDates(taskId) {
