@@ -27,12 +27,14 @@ function handleRoleBasedAccess(role) {
   const montorModules = document.getElementById('montor-module');
   const saljareModules = document.getElementById('saljare-module');
   const serviceModules = document.getElementById('service-module');
+  const elektrikerModules = document.getElementById('elektriker-module'); // Ny grupp
 
   // Hide all modules initially
   if (adminModules) adminModules.style.display = 'none';
   if (montorModules) montorModules.style.display = 'none';
   if (saljareModules) saljareModules.style.display = 'none';
   if (serviceModules) serviceModules.style.display = 'none';
+  if (elektrikerModules) elektrikerModules.style.display = 'none'; // Dölj Elektriker-moduler
 
   // Show modules based on the user's role
   if (role === 'Admin') {
@@ -43,6 +45,8 @@ function handleRoleBasedAccess(role) {
     if (saljareModules) saljareModules.style.display = 'block';
   } else if (role === 'Service') {
     if (serviceModules) serviceModules.style.display = 'block';
+  } else if (role === 'Elektriker') { // Lägg till kontroll för Elektriker
+    if (elektrikerModules) elektrikerModules.style.display = 'block';
   } else {
     alert('Du har inte behörighet att se denna sida.');
     window.location.href = 'index.html';

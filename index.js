@@ -2,6 +2,7 @@ import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDYqBOra2wDjyPweyBGnkVMANsvLOx9pps",
   authDomain: "projekthanteringsystem.firebaseapp.com",
@@ -111,6 +112,9 @@ function handleRoleBasedAccess(role) {
     } else if (role === 'Service') {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
+        if (statusBtn) statusBtn.style.display = 'block';
+    } else if (role === 'Elektriker') {
+        if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (statusBtn) statusBtn.style.display = 'block';
     } else {
         alert('Du har inte behörighet att se denna sida.');
