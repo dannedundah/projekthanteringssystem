@@ -7,7 +7,7 @@ const db = getFirestore();
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
-    const teamSelect = document.getElementById('employee-select'); 
+    const teamSelect = document.getElementById('employee-select');
     let plannings = [];
     let allTeams = [];
     let canEdit = false;
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function filterAndRenderGantt(selectedTeam) {
+    function filterAndRenderGantt(selectedTeam) {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
@@ -81,20 +81,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
-            // Sortera elektrikerns datum baserat på startdatum
-            filteredPlannings.sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
-            // Sortera vanliga datum baserat på startdatum
-            filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         } else {
             filteredPlannings = plannings.filter(planning => 
                 planning.team === selectedTeam && 
                 planning.projectId !== hiddenProjectId
             );
-            // Sortera vanliga datum baserat på startdatum
-            filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         }
+
+        // Sortera filteredPlannings baserat på startdatum för både vanliga och elektriker-uppgifter
+        filteredPlannings.sort((a, b) => {
+            const aStartDate = new Date(a.electricianStartDate || a.startDate);
+            const bStartDate = new Date(b.electricianStartDate || b.startDate);
+            return aStartDate - bStartDate;
+        });
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
@@ -108,9 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Anpassa toppskalan för att visa datum och veckodag
         gantt.config.scale_unit = "day";
         gantt.config.date_scale = "%d %M";
-        gantt.config.subscales = [
-            { unit: "day", step: 1, date: "%l" }
-        ];
 
         gantt.init("gantt-chart");
 
