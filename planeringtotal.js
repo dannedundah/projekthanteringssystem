@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function filterAndRenderGantt(selectedTeam) {
+    async function filterAndRenderGantt(selectedTeam) {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
@@ -81,17 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
+            // Sortera elektrikerns datum baserat på startdatum
+            filteredPlannings.sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
+            // Sortera vanliga datum baserat på startdatum
+            filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         } else {
             filteredPlannings = plannings.filter(planning => 
                 planning.team === selectedTeam && 
                 planning.projectId !== hiddenProjectId
             );
+            // Sortera vanliga datum baserat på startdatum
+            filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         }
-
-        // Sortera filteredPlannings baserat på startdatum
-        filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
@@ -105,13 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Anpassa toppskalan för att visa datum och veckodag
         gantt.config.scale_unit = "day";
         gantt.config.date_scale = "%d %M";
+        gantt.config.subscales = [
+            { unit: "day", step: 1, date: "%l" }
+        ];
 
-        // Markera lördagar och söndagar med röd färg
+        // Markera helger med röd bakgrund
         gantt.templates.scale_cell_class = function (date) {
             const day = date.getDay();
-            if (day === 0 || day === 6) { // 0 = söndag, 6 = lördag
-                return "weekend"; // Klass som vi ska definiera för röd färg
-            }
+            return (day === 0 || day === 6) ? "weekend" : "";
+        };
+
+        gantt.templates.task_cell_class = function (item, date) {
+            const day = date.getDay();
+            return (day === 0 || day === 6) ? "weekend" : "";
         };
 
         gantt.init("gantt-chart");
