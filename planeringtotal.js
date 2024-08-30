@@ -143,13 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         return [];
                     }
 
-                    endDate = adjustEndDateForSingleDay(startDate, endDate);
-
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: startDate,
-                        end_date: endDate,
+                        end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700"
                     });
@@ -162,11 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         return [];
                     }
 
+                    // Lägg till en dag för att säkerställa att hela perioden visas
+                    const adjustedEndDate = addOneDay(endDate);
+
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
                         start_date: startDate,
-                        end_date: endDate,
+                        end_date: adjustedEndDate, // Använd det justerade slutdatumet
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: taskColor
                     });
@@ -221,15 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return d.toISOString().split('T')[0];
     }
 
-    function adjustEndDateForSingleDay(startDate, endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-
-        if (start.getTime() === end.getTime()) {
-            end.setDate(end.getDate() + 1);
-            return end.toISOString().split('T')[0];
-        }
-        return endDate;
+    function addOneDay(date) {
+        const d = new Date(date);
+        d.setDate(d.getDate() + 1);
+        return d.toISOString().split('T')[0];
     }
 
     async function saveTaskDates(taskId) {
