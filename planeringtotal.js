@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
+            // Sortera plannings baserat på startdatum
+            plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
             // Ladda och fyll team dropdown
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function filterAndRenderGantt(selectedTeam) {
+    function filterAndRenderGantt(selectedTeam) {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
@@ -78,20 +81,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
-            // Sortera elektrikerns datum baserat på startdatum
-            filteredPlannings.sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
-            // Sortera vanliga datum baserat på startdatum
-            filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         } else {
             filteredPlannings = plannings.filter(planning => 
                 planning.team === selectedTeam && 
                 planning.projectId !== hiddenProjectId
             );
-            // Sortera vanliga datum baserat på startdatum
-            filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         }
+
+        // Sortera filteredPlannings baserat på startdatum
+        filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
@@ -102,24 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
-        // Anpassa toppskalan för att visa datum och veckodag
-        gantt.config.scale_unit = "day";
-        gantt.config.date_scale = "%d %M";
-        gantt.config.subscales = [
-            { unit: "day", step: 1, date: "%l" }
-        ];
-
-        // Markera helger med röd bakgrund
-        gantt.templates.scale_cell_class = function (date) {
-            const day = date.getDay();
-            return (day === 0 || day === 6) ? "weekend" : "";
-        };
-
-        gantt.templates.task_cell_class = function (item, date) {
-            const day = date.getDay();
-            return (day === 0 || day === 6) ? "weekend" : "";
-        };
-
         gantt.init("gantt-chart");
 
         const tasks = await Promise.all(plannings.map(async planning => {
@@ -128,15 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
 
-                // Filtrera bort projekt med status "Driftsatt" eller "Fakturerad"
-                const projectStatus = projectData.status.trim().toLowerCase();
-                if (projectStatus === 'driftsatt' || projectStatus === 'fakturerad') {
+                // Filtrera bort projekt med status "Driftsatt"
+                if (projectData.status.trim().toLowerCase() === 'driftsatt') {
                     return []; // Hoppa över detta projekt
                 }
 
                 const taskList = [];
                 let taskColor;
-                switch (projectStatus) {
+                switch (projectData.status.trim().toLowerCase()) {
                     case 'ny':
                         taskColor = 'pink';
                         break;
