@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, query, where, doc, updateDoc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, query, where, doc, updateDoc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
@@ -94,19 +94,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
+            // Save planning
             await addDoc(collection(db, 'planning'), planning);
 
-            // Update the project status to "Planerad"
+            // Check if project exists and update its status
             const projectRef = doc(db, 'projects', projectId);
-            await updateDoc(projectRef, {
-                status: 'Planerad'
-            });
+            const projectDoc = await getDoc(projectRef);
 
-            alert('Planering sparad och status uppdaterad!');
+            if (projectDoc.exists()) {
+                await updateDoc(projectRef, {
+                    status: 'Planerad'
+                });
+                alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+            } else {
+                console.error(`Project with ID ${projectId} not found.`);
+                alert('Planering sparad, men kunde inte uppdatera projektstatus eftersom projektet inte hittades.');
+            }
+
             planningForm.reset();
         } catch (error) {
-            console.error('Error saving planning:', error);
-            alert('Ett fel uppstod vid sparandet av planeringen.');
+            console.error('Error saving planning or updating project status:', error);
+            alert('Ett fel uppstod vid sparandet av planeringen eller uppdatering av projektstatus.');
         }
     });
 
