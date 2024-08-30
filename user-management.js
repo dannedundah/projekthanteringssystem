@@ -53,6 +53,7 @@ function addUserRow(uid, userData) {
                 <option value="Montör" ${userData.role === 'Montör' ? 'selected' : ''}>Montör</option>
                 <option value="Säljare" ${userData.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
                 <option value="Service" ${userData.role === 'Service' ? 'selected' : ''}>Service</option>
+                <option value="Elektriker" ${userData.role === 'Elektriker' ? 'selected' : ''}>Elektriker</option> <!-- Ny roll -->
             </select>
         </td>
         <td>
