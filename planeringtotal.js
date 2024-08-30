@@ -104,7 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Anpassa toppskalan för att visa datum och veckodag
         gantt.config.scale_unit = "day";
-        gantt.config.date_scale = "%d %M<br>%l"; // %d %M visar datum och månad, %l visar veckodagen
+        gantt.config.date_scale = "%d %M";
+
+        gantt.templates.scale_text = function (start, end) {
+            const dateToStr = gantt.date.date_to_str("%d %M");
+            const weekDayStr = gantt.date.date_to_str("%l"); // %l visar veckodagen
+
+            return dateToStr(start) + "<br>" + weekDayStr(start);
+        };
 
         gantt.init("gantt-chart");
 
