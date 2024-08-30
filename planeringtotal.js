@@ -1,10 +1,3 @@
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Initiera auth och db
-const auth = getAuth();
-const db = getFirestore();
-
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
     const teamSelect = document.getElementById('employee-select'); 
@@ -38,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
-            // Sortera plannings baserat på startdatum
+            // Sortera plannings baserat på startdatum (stigande ordning)
             plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
             // Ladda och fyll team dropdown
@@ -76,13 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
+            // Sortera i fallande ordning (närmast datum överst)
+            filteredPlannings = plannings
+                .filter(planning => 
+                    planning.electricianStartDate && 
+                    planning.electricianEndDate && 
+                    planning.projectId !== hiddenProjectId
+                )
+                .sort((a, b) => new Date(b.electricianStartDate) - new Date(a.electricianStartDate));
+        } else if (selectedTeam === "") {
+            // Visa alla, men filtrera bort plannings med elektrikerdatum
             filteredPlannings = plannings.filter(planning => 
-                planning.electricianStartDate && 
-                planning.electricianEndDate && 
+                !planning.electricianStartDate && 
+                !planning.electricianEndDate && 
                 planning.projectId !== hiddenProjectId
             );
-        } else if (selectedTeam === "") {
-            filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
             filteredPlannings = plannings.filter(planning => 
                 planning.team === selectedTeam && 
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // Sortera filteredPlannings baserat på startdatum
+        // Sortera filteredPlannings baserat på startdatum (stigande ordning)
         filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
