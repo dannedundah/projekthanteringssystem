@@ -117,7 +117,7 @@ async function updateTeamMembership(userId, newTeamName) {
     const user = allUsers.find(u => u.id === userId);
     const userName = `${user.firstName} ${user.lastName}`;
 
-    // Ta bort användaren från sitt tidigare team
+    // Ta bort användaren från alla team (rensa tidigare teamtillhörighet)
     for (const team of allTeams) {
         if (team.members && team.members.includes(userName)) {
             const teamRef = doc(db, 'teams', team.id);
@@ -126,7 +126,7 @@ async function updateTeamMembership(userId, newTeamName) {
         }
     }
 
-    // Lägg till användaren till det nya teamet
+    // Lägg till användaren till det nya teamet (om ett team är valt)
     if (newTeamName) {
         const newTeam = allTeams.find(team => team.name === newTeamName);
         if (newTeam) {
