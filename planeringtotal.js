@@ -135,6 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (projectData.status.trim().toLowerCase() === 'driftsatt') {
                     return []; // Hoppa över detta projekt
                 }
+                // Filtrera bort projekt med status "Fakturerad"
+                if (projectData.status.trim().toLowerCase() === 'fakturerad') {
+                    return []; // Hoppa över detta projekt
+                }
 
                 const taskList = [];
                 let taskColor;
