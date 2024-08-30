@@ -23,29 +23,24 @@ Innertak:
         const projectAddress = document.getElementById('project-address').value.trim();
         const projectDescriptionValue = projectDescription.value.trim();
         const projectStatus = document.getElementById('project-status').value.trim();
-        const projectImages = document.getElementById('project-images').files;
         const projectFiles = document.getElementById('project-files').files;
 
         const imageUrls = [];
         const fileUrls = [];
 
         try {
-            // Ladda upp bilder
-            for (const file of projectImages) {
-                const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-                const storageRef = ref(storage, `project_images/${uniqueFileName}`);
-                const snapshot = await uploadBytes(storageRef, file);
-                const imageUrl = await getDownloadURL(snapshot.ref);
-                imageUrls.push({ name: file.name, url: imageUrl });
-            }
-
-            // Ladda upp andra filer
             for (const file of projectFiles) {
                 const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-                const storageRef = ref(storage, `project_files/${uniqueFileName}`);
+                const fileType = file.type.startsWith('image/') ? 'project_images' : 'project_files';
+                const storageRef = ref(storage, `${fileType}/${uniqueFileName}`);
                 const snapshot = await uploadBytes(storageRef, file);
                 const fileUrl = await getDownloadURL(snapshot.ref);
-                fileUrls.push({ name: file.name, url: fileUrl });
+
+                if (fileType === 'project_images') {
+                    imageUrls.push({ name: file.name, url: fileUrl });
+                } else {
+                    fileUrls.push({ name: file.name, url: fileUrl });
+                }
             }
 
             const project = {
@@ -56,7 +51,7 @@ Innertak:
                 description: projectDescriptionValue,
                 status: projectStatus,
                 images: imageUrls, // Array med objekt som innehåller bildens namn och URL
-                files: fileUrls, // Array med objekt som innehåller filens namn och URL
+                files: fileUrls,   // Array med objekt som innehåller filens namn och URL
                 createdAt: new Date().toISOString()
             };
 
