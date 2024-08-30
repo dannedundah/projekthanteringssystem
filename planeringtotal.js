@@ -38,21 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
-            // Sortera plannings baserat på startdatum
-            plannings.sort((a, b) => new Date(a.startDate || a.electricianStartDate) - new Date(b.startDate || b.electricianStartDate));
-
             // Ladda och fyll team dropdown
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             populateTeamSelect();
-            renderGanttChart(plannings);
-
-            teamSelect.addEventListener('change', () => {
-                const selectedTeam = teamSelect.value;
-                filterAndRenderGantt(selectedTeam);
-            });
-
+            filterAndRenderGantt("");
         } catch (error) {
             console.error('Error fetching plannings:', error);
         }
@@ -76,26 +67,31 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
-            filteredPlannings = plannings.filter(planning => 
-                planning.electricianStartDate && 
-                planning.electricianEndDate && 
+            filteredPlannings = plannings.filter(planning =>
+                planning.electricianStartDate &&
+                planning.electricianEndDate &&
                 planning.projectId !== hiddenProjectId
             );
         } else if (selectedTeam === "") {
             filteredPlannings = plannings.filter(planning => planning.projectId !== hiddenProjectId);
         } else {
-            filteredPlannings = plannings.filter(planning => 
-                planning.team === selectedTeam && 
+            filteredPlannings = plannings.filter(planning =>
+                planning.team === selectedTeam &&
                 planning.projectId !== hiddenProjectId
             );
         }
 
-        // Sortera filteredPlannings baserat på startdatum för både vanliga och elektriker-uppgifter
-        filteredPlannings.sort((a, b) => {
-            const aStartDate = new Date(a.startDate || a.electricianStartDate);
-            const bStartDate = new Date(b.startDate || b.electricianStartDate);
-            return aStartDate - bStartDate;
-        });
+        // Kombinera och sortera alla uppgifter baserat på startdatum
+        filteredPlannings = filteredPlannings.map(planning => {
+            if (selectedTeam === "Elektriker") {
+                return {
+                    ...planning,
+                    startDate: planning.electricianStartDate,
+                    endDate: planning.electricianEndDate
+                };
+            }
+            return planning;
+        }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
@@ -124,30 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     return []; // Hoppa över detta projekt
                 }
 
+                const taskColor = getTaskColor(projectStatus);
+
                 const taskList = [];
-                let taskColor;
-                switch (projectStatus) {
-                    case 'ny':
-                        taskColor = 'pink';
-                        break;
-                    case 'planerad':
-                        taskColor = 'blue';
-                        break;
-                    case 'solceller klart':
-                        taskColor = 'brown';
-                        break;
-                    case 'elektriker klar':
-                        taskColor = 'purple';
-                        break;
-                    case 'driftsatt':
-                        taskColor = 'green';
-                        break;
-                    case 'fakturerad':
-                        taskColor = 'black';
-                        break;
-                    default:
-                        taskColor = 'grey'; 
-                }
 
                 if (isElectricianView) {
                     const startDate = formatDateToString(planning.electricianStartDate);
@@ -162,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         id: planning.id + '-electrician',
                         text: projectData.address || 'Ej specificerad',
                         start_date: startDate,
-                        end_date: endDate, 
+                        end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700"
                     });
@@ -175,14 +150,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         return [];
                     }
 
-                    // Lägg till en dag för att säkerställa att hela perioden visas
                     const adjustedEndDate = addOneDay(endDate);
 
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
                         start_date: startDate,
-                        end_date: adjustedEndDate, // Använd det justerade slutdatumet
+                        end_date: adjustedEndDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: taskColor
                     });
@@ -199,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        gantt.attachEvent("onTaskClick", function(id, e) {
+        gantt.attachEvent("onTaskClick", function (id, e) {
             const task = gantt.getTask(id);
             if (e.target.closest('.gantt_cell')) {
                 window.location.href = task.detailsLink;
@@ -208,14 +182,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         });
 
-        gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
+        gantt.attachEvent("onTaskDrag", function (id, mode, task, original) {
             return true;
         });
 
-        gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+        gantt.attachEvent("onAfterTaskUpdate", async function (id, item) {
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
+    }
+
+    function getTaskColor(status) {
+        switch (status) {
+            case 'ny':
+                return 'pink';
+            case 'planerad':
+                return 'blue';
+            case 'solceller klart':
+                return 'brown';
+            case 'elektriker klar':
+                return 'purple';
+            case 'driftsatt':
+                return 'green';
+            case 'fakturerad':
+                return 'black';
+            default:
+                return 'grey';
+        }
     }
 
     function formatDateToString(date) {
