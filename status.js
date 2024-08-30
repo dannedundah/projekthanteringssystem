@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const electricianCompletedProjects = document.getElementById('electrician-completed-projects');
     const commissionedProjects = document.getElementById('commissioned-projects');
     const billedProjects = document.getElementById('billed-projects');
+    const electricianNotSolarProjects = document.getElementById('electrician-not-solar-projects'); // Ny kategori
 
     try {
         const querySnapshot = await getDocs(collection(db, 'projects'));
@@ -46,6 +47,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     break;
                 case 'fakturerad':
                     billedProjects.appendChild(li);
+                    break;
+                case 'elektriker klar men inte solceller': // Ny status
+                    electricianNotSolarProjects.appendChild(li);
                     break;
                 default:
                     console.warn(`Projekt med ID ${project.id} har okänd status: ${project.status}`);
