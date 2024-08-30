@@ -43,13 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
-                    ganttData.push({
-                        id: docSnapshot.id,
-                        text: projectData.address || 'Ej specificerad',
-                        start_date: formatDate(planningData.startDate),
-                        end_date: formatDate(planningData.endDate),
-                        detailsLink: `projekt-detalj.html?id=${projectDoc.id}`
-                    });
+                    
+                    // Kontrollera om projektets status är "Driftsatt" och exkludera det
+                    if (projectData.status && projectData.status.trim().toLowerCase() !== 'driftsatt') {
+                        ganttData.push({
+                            id: docSnapshot.id,
+                            text: projectData.address || 'Ej specificerad',
+                            start_date: formatDate(planningData.startDate),
+                            end_date: formatDate(planningData.endDate),
+                            detailsLink: `projekt-detalj.html?id=${projectDoc.id}`
+                        });
+                    }
                 }
             }
 
