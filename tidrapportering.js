@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (userDoc.exists()) {
                 const userData = userDoc.data();
+
+                // Kontrollera om användaren har rollen "Elektriker"
+                if (userData.role === 'Elektriker') {
+                    alert('Du har inte behörighet att rapportera tid.');
+                    window.location.href = 'index.html'; // Omdirigera till startsidan eller annan sida
+                    return;
+                }
+
                 selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
                 console.log(`Logged in as: ${selectedEmployeeName}`);
 
