@@ -106,11 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.scale_unit = "day";
         gantt.config.date_scale = "%d %M";
 
-        gantt.templates.scale_text = function (start, end) {
-            const dateToStr = gantt.date.date_to_str("%d %M");
-            const weekDayStr = gantt.date.date_to_str("%l"); // %l visar veckodagen
-
-            return dateToStr(start) + "<br>" + weekDayStr(start);
+        // Markera lördagar och söndagar med röd färg
+        gantt.templates.scale_cell_class = function (date) {
+            const day = date.getDay();
+            if (day === 0 || day === 6) { // 0 = söndag, 6 = lördag
+                return "weekend"; // Klass som vi ska definiera för röd färg
+            }
         };
 
         gantt.init("gantt-chart");
