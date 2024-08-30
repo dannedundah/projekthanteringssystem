@@ -1,5 +1,3 @@
-import { db, collection, getDocs, addDoc, query, where } from './firebase-config.js';
-
 document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
     const projectDropdown = document.getElementById('project-id');
@@ -10,7 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('employee-id-3'),
         document.getElementById('employee-id-4')
     ];
-    if (!projectDropdown || !teamDropdown || !employeeDropdown) {
+
+    if (!projectDropdown || !teamDropdown || employeeDropdowns.some(dropdown => !dropdown)) {
         console.error('One or more dropdown elements are not found.');
         return;
     }
@@ -43,8 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         teamDropdown.addEventListener('change', () => {
             const selectedTeam = teamDropdown.value;
 
-            // Clear existing employees
-            employeeDropdown.innerHTML = '<option value="">Välj anställd</option>';
+            // Clear existing employees in all dropdowns
+            employeeDropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Välj anställd</option>';
+            });
 
             // Find the selected team
             const team = teams.find(t => t.name === selectedTeam);
@@ -52,10 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (team && Array.isArray(team.members)) {
                 // Populate employees if team and members exist
                 team.members.forEach(member => {
-                    const option = document.createElement('option');
-                    option.value = member;
-                    option.textContent = member;
-                    employeeDropdown.appendChild(option);
+                    employeeDropdowns.forEach(dropdown => {
+                        const option = document.createElement('option');
+                        option.value = member;
+                        option.textContent = member;
+                        dropdown.appendChild(option);
+                    });
                 });
             } else {
                 console.warn(`Team ${selectedTeam} has no members or members are not defined.`);
@@ -74,7 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const electricianStartDate = document.getElementById('electrician-start-date').value;
         const electricianEndDate = document.getElementById('electrician-end-date').value;
         const selectedTeam = teamDropdown.value;
-        const selectedEmployee = employeeDropdown.value;
+
+        // Collect selected employees
+        const selectedEmployees = employeeDropdowns.map(dropdown => dropdown.value).filter(employee => employee !== '');
 
         const planning = {
             projectId,
@@ -83,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             electricianStartDate,
             electricianEndDate,
             team: selectedTeam,
-            employees: [selectedEmployee].filter(employee => employee !== ''),
+            employees: selectedEmployees,
         };
 
         try {
