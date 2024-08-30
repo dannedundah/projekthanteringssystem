@@ -102,6 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
+        // Lägg till veckodagar och datumformat
+        gantt.config.scale_unit = "day";
+        gantt.config.date_scale = "%d %M (%l)";
+        gantt.config.subscales = [];
+        gantt.config.scale_height = 60;
+
         gantt.init("gantt-chart");
 
         const tasks = await Promise.all(plannings.map(async planning => {
