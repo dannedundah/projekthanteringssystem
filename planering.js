@@ -1,3 +1,5 @@
+import { db, collection, getDocs, addDoc, query, where } from './firebase-config.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
     const projectDropdown = document.getElementById('project-id');
