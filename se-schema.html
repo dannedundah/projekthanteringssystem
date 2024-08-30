@@ -12,68 +12,26 @@
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="se-schema.js"></script>
     <style>
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin: 0 auto;
-        }
-
-        /* Stil för vänster kolumn (Projektlistan) */
-        .left-column {
-            flex: 1;
-            min-width: 300px;
-            margin-right: 20px;
-            max-width: 100%;
-        }
-
-        #project-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #project-list li {
-            margin: 5px 0;
-            padding: 10px;
-            background: #f7f7f7;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #project-list li:hover {
-            background: #e7e7e7;
-        }
-
-        /* Stil för höger kolumn (Gantt-diagrammet) */
-        .right-column {
-            flex: 2;
-            min-width: 400px;
-            max-width: 100%;
-        }
-
+        /* Basstil för Gantt-diagrammet */
         #gantt-chart {
             width: 100%;
             height: 400px;
+            margin: 0 auto;
         }
 
         /* Anpassa för mindre skärmar */
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .left-column {
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-
             #gantt-chart {
                 height: 300px; /* Minska höjden för mindre skärmar */
             }
-
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5rem; /* Minska rubrikens storlek */
+            }
             button {
-                width: 100%;
+                width: 100%; /* Gör knapparna bredare för att vara lättare att klicka på mobiler */
                 padding: 15px;
                 font-size: 1.2rem;
             }
@@ -83,7 +41,9 @@
             #gantt-chart {
                 height: 200px; /* Ytterligare minskning av höjd för mycket små skärmar */
             }
-
+            h1 {
+                font-size: 1.2rem; /* Ytterligare minskning av rubrikens storlek */
+            }
             button {
                 padding: 12px;
                 font-size: 1rem;
@@ -93,15 +53,10 @@
 </head>
 <body>
     <div class="container">
-        <div class="left-column">
-            <h2>Kommande Projekt</h2>
-            <ul id="project-list"></ul>
-        </div>
-        <div class="right-column">
-            <h2>Gantt-schema</h2>
-            <div id="gantt-chart"></div>
-        </div>
+        <h1>Mitt Schema</h1>
+        <!-- Container för Gantt-diagrammet -->
+        <div id="gantt-chart"></div>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
-    <button onclick="navigateTo('index.html')">Tillbaka</button>
 </body>
 </html>
