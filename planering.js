@@ -4,8 +4,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
     const projectDropdown = document.getElementById('project-id');
     const teamDropdown = document.getElementById('team-id');
-    const employeeDropdown = document.getElementById('employee-id');
-
+    const employeeDropdowns = [
+        document.getElementById('employee-id-1'),
+        document.getElementById('employee-id-2'),
+        document.getElementById('employee-id-3'),
+        document.getElementById('employee-id-4')
+    ];
     if (!projectDropdown || !teamDropdown || !employeeDropdown) {
         console.error('One or more dropdown elements are not found.');
         return;
