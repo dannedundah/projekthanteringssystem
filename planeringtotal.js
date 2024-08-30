@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             populateTeamSelect();
-            filterAndRenderGantt("");
+            filterAndRenderGantt(""); // Rendera alla team som standard
         } catch (error) {
             console.error('Error fetching plannings:', error);
         }
@@ -60,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.textContent = team.name;
                 teamSelect.appendChild(option);
             }
+        });
+
+        teamSelect.addEventListener('change', () => {
+            const selectedTeam = teamSelect.value;
+            filterAndRenderGantt(selectedTeam);
         });
     }
 
@@ -81,22 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // Kombinera och sortera alla uppgifter baserat på startdatum
-        filteredPlannings = filteredPlannings.map(planning => {
-            if (selectedTeam === "Elektriker") {
-                return {
-                    ...planning,
-                    startDate: planning.electricianStartDate,
-                    endDate: planning.electricianEndDate
-                };
-            }
-            return planning;
-        }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        // Sortera filteredPlannings baserat på startdatum för både vanliga och elektriker-uppgifter
+        filteredPlannings.sort((a, b) => {
+            const aStartDate = new Date(a.startDate || a.electricianStartDate);
+            const bStartDate = new Date(b.startDate || b.electricianStartDate);
+            return aStartDate - bStartDate;
+        });
 
-        renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
+        renderGanttChart(filteredPlannings);
     }
 
-    async function renderGanttChart(plannings, isElectricianView = false) {
+    async function renderGanttChart(plannings) {
         ganttChartContainer.innerHTML = '';
 
         gantt.config.xml_date = "%Y-%m-%d";
@@ -122,47 +122,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const taskColor = getTaskColor(projectStatus);
 
-                const taskList = [];
+                const startDate = formatDateToString(planning.startDate || planning.electricianStartDate);
+                let endDate = formatDateToString(planning.endDate || planning.electricianEndDate);
 
-                if (isElectricianView) {
-                    const startDate = formatDateToString(planning.electricianStartDate);
-                    let endDate = formatDateToString(planning.electricianEndDate);
-
-                    if (!startDate || !endDate) {
-                        console.error("Invalid start or end date for planning:", planning);
-                        return [];
-                    }
-
-                    taskList.push({
-                        id: planning.id + '-electrician',
-                        text: projectData.address || 'Ej specificerad',
-                        start_date: startDate,
-                        end_date: endDate,
-                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700"
-                    });
-                } else {
-                    const startDate = formatDateToString(planning.startDate);
-                    let endDate = formatDateToString(planning.endDate);
-
-                    if (!startDate || !endDate) {
-                        console.error("Invalid start or end date for planning:", planning);
-                        return [];
-                    }
-
-                    const adjustedEndDate = addOneDay(endDate);
-
-                    taskList.push({
-                        id: planning.id,
-                        text: projectData.address || 'Ej specificerad',
-                        start_date: startDate,
-                        end_date: adjustedEndDate,
-                        detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: taskColor
-                    });
+                if (!startDate || !endDate) {
+                    console.error("Invalid start or end date for planning:", planning);
+                    return [];
                 }
 
-                return taskList;
+                const adjustedEndDate = addOneDay(endDate);
+
+                return {
+                    id: planning.id,
+                    text: projectData.address || 'Ej specificerad',
+                    start_date: startDate,
+                    end_date: adjustedEndDate,
+                    detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                    color: taskColor
+                };
             }
             return [];
         }));
@@ -173,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        gantt.attachEvent("onTaskClick", function (id, e) {
+        gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
             if (e.target.closest('.gantt_cell')) {
                 window.location.href = task.detailsLink;
@@ -182,11 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         });
 
-        gantt.attachEvent("onTaskDrag", function (id, mode, task, original) {
+        gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
             return true;
         });
 
-        gantt.attachEvent("onAfterTaskUpdate", async function (id, item) {
+        gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
@@ -245,19 +222,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
-        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        const planningRef = doc(db, 'planning', taskId);
 
-        if (taskId.endsWith('-electrician')) {
-            await updateDoc(planningRef, {
-                electricianStartDate: formattedStartDate,
-                electricianEndDate: formattedEndDate
-            });
-        } else {
-            await updateDoc(planningRef, {
-                startDate: formattedStartDate,
-                endDate: formattedEndDate
-            });
-        }
+        await updateDoc(planningRef, {
+            startDate: formattedStartDate,
+            endDate: formattedEndDate
+        });
 
         // Uppdatera status för projektet till "Planerad"
         const projectRef = doc(db, 'projects', taskId.replace('-electrician', ''));
