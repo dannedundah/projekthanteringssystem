@@ -112,17 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { unit: "day", step: 1, date: "%l" }
         ];
 
-        // Markera helger med röd bakgrund
-        gantt.templates.scale_cell_class = function (date) {
-            const day = date.getDay();
-            return (day === 0 || day === 6) ? "weekend" : "";
-        };
-
-        gantt.templates.task_cell_class = function (item, date) {
-            const day = date.getDay();
-            return (day === 0 || day === 6) ? "weekend" : "";
-        };
-
         gantt.init("gantt-chart");
 
         const tasks = await Promise.all(plannings.map(async planning => {
