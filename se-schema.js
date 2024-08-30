@@ -2,7 +2,6 @@ import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateCh
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
-    const projectList = document.getElementById('project-list');
     let selectedEmployeeName = null;
 
     onAuthStateChanged(auth, async (user) => {
@@ -31,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                projectList.innerHTML = '<li>Inga schemaposter hittades.</li>';
+                ganttChartContainer.innerHTML = '<p>Inga schemaposter hittades.</p>';
                 return;
             }
 
@@ -44,42 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
-                    const startDate = formatDate(planningData.startDate);
-                    const endDate = formatDate(planningData.endDate);
-
                     ganttData.push({
                         id: docSnapshot.id,
                         text: projectData.address || 'Ej specificerad',
-                        start_date: startDate,
-                        end_date: endDate,
-                        detailsLink: `projekt-detalj.html?id=${projectDoc.id}`,
-                        startDateObj: new Date(startDate) // Spara som Date-objekt för sortering
+                        start_date: formatDate(planningData.startDate),
+                        end_date: formatDate(planningData.endDate),
+                        detailsLink: `projekt-detalj.html?id=${projectDoc.id}`
                     });
                 }
             }
-
-            // Sortera projekten baserat på startdatum (närmast först)
-            ganttData.sort((a, b) => a.startDateObj - b.startDateObj);
-
-            // Visa projekten i en lista
-            projectList.innerHTML = ganttData.map(task => `
-                <li data-id="${task.id}">
-                    <strong>${task.text}</strong><br>
-                    Startdatum: ${task.start_date}<br>
-                    Slutdatum: ${task.end_date}
-                </li>
-            `).join('');
-
-            // Lägg till klickhantering för att gå till projektets detaljer
-            document.querySelectorAll('#project-list li').forEach(item => {
-                item.addEventListener('click', () => {
-                    const taskId = item.getAttribute('data-id');
-                    const task = ganttData.find(task => task.id === taskId);
-                    if (task && task.detailsLink) {
-                        window.location.href = task.detailsLink;
-                    }
-                });
-            });
 
             renderGanttChart(ganttData);
         } catch (error) {
