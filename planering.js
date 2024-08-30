@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, doc, updateDoc, query, where } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, query, where, doc, updateDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const planningForm = document.getElementById('planning-form');
@@ -94,18 +94,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
-            // Add the new planning document to Firestore
             await addDoc(collection(db, 'planning'), planning);
 
             // Update the project status to "Planerad"
-            const projectDocRef = doc(db, 'projects', projectId);
-            await updateDoc(projectDocRef, { status: 'Planerad' });
+            const projectRef = doc(db, 'projects', projectId);
+            await updateDoc(projectRef, {
+                status: 'Planerad'
+            });
 
-            alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+            alert('Planering sparad och status uppdaterad!');
             planningForm.reset();
         } catch (error) {
-            console.error('Error saving planning or updating project status:', error);
-            alert('Ett fel uppstod vid sparandet av planeringen eller uppdatering av projektstatus.');
+            console.error('Error saving planning:', error);
+            alert('Ett fel uppstod vid sparandet av planeringen.');
         }
     });
 
