@@ -320,4 +320,11 @@ button.remove-button:hover {
 .weekend {
     background-color: #ffcccc; /* Ljus röd färg */
 }
+/* För att göra Gantt-diagrammet större */
+.gantt-chart-large {
+    width: 100%;
+    height: 80vh; /* Tar upp 80% av höjden på skärmen */
+    margin: 20px 0; /* Lägger till lite marginal ovanför och under diagrammet */
+}
+
 
