@@ -38,9 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
-            // Sortera plannings baserat på startdatum
-            plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
             // Ladda och fyll team dropdown
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -131,18 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
 
-                // Filtrera bort projekt med status "Driftsatt"
-                if (projectData.status.trim().toLowerCase() === 'driftsatt') {
-                    return []; // Hoppa över detta projekt
-                }
-                // Filtrera bort projekt med status "Fakturerad"
-                if (projectData.status.trim().toLowerCase() === 'fakturerad') {
+                // Filtrera bort projekt med status "Driftsatt" eller "Fakturerad"
+                const projectStatus = projectData.status.trim().toLowerCase();
+                if (projectStatus === 'driftsatt' || projectStatus === 'fakturerad') {
                     return []; // Hoppa över detta projekt
                 }
 
                 const taskList = [];
                 let taskColor;
-                switch (projectData.status.trim().toLowerCase()) {
+                switch (projectStatus) {
                     case 'ny':
                         taskColor = 'pink';
                         break;
