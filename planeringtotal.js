@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
-        if (taskId.endswith('-electrician')) {
+        if (taskId.endsWith('-electrician')) {
             await updateDoc(planningRef, {
                 electricianStartDate: formattedStartDate,
                 electricianEndDate: formattedEndDate
