@@ -107,6 +107,7 @@ function handleRoleBasedAccess(role) {
     } else if (role === 'Säljare') {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
+        if (statusBtn) statusBtn.style.display = 'block';
     } else if (role === 'Service') {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
