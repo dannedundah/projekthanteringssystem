@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
-    const calculatorBtn = document.getElementById('calculator-btn'); // Knapp för Kalkylator
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -52,9 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (exportTimeReportBtn) {
         exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html'));
-    }
-    if (calculatorBtn) {
-        calculatorBtn.addEventListener('click', () => navigateTo('kalkylator.html')); // Navigera till kalkylatorn
     }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
@@ -83,15 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleRoleBasedAccess(role) {
+    const addProjectBtn = document.getElementById('add-project-btn');
+    const planningBtn = document.getElementById('planning-btn');
+    const viewScheduleBtn = document.getElementById('view-schedule-btn');
+    const statusBtn = document.getElementById('status-btn');
+    const planningTotalBtn = document.getElementById('planning-total-btn');
+    const timeReportingBtn = document.getElementById('time-reporting-btn');
+    const exportTimeReportBtn = document.getElementById('export-time-report-btn');
+
     if (role === 'Admin') {
-        document.getElementById('add-project-btn').style.display = 'block';
-        document.getElementById('planning-btn').style.display = 'block';
-        document.getElementById('view-schedule-btn').style.display = 'block';
-        document.getElementById('status-btn').style.display = 'block';
-        document.getElementById('planning-total-btn').style.display = 'block';
-        document.getElementById('time-reporting-btn').style.display = 'block';
-        document.getElementById('export-time-report-btn').style.display = 'block';
-        document.getElementById('calculator-btn').style.display = 'block';  // Gör kalkylatorknappen synlig för Admin
+        if (addProjectBtn) addProjectBtn.style.display = 'block';
+        if (planningBtn) planningBtn.style.display = 'block';
+        if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
+        if (statusBtn) statusBtn.style.display = 'block';
+        if (planningTotalBtn) planningTotalBtn.style.display = 'block';
+        if (timeReportingBtn) timeReportingBtn.style.display = 'block';
+        if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
 
         // Länk till adminpanelen
         const adminLink = document.createElement('a');
@@ -99,18 +102,15 @@ function handleRoleBasedAccess(role) {
         adminLink.textContent = 'Admin Dashboard';
         document.body.appendChild(adminLink);
     } else if (role === 'Montör') {
-        document.getElementById('view-schedule-btn').style.display = 'block';
-        document.getElementById('time-reporting-btn').style.display = 'block';
-        // Kalkylatorknappen är INTE synlig för Montör
+        if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
+        if (timeReportingBtn) timeReportingBtn.style.display = 'block';
     } else if (role === 'Säljare') {
-        document.getElementById('planning-total-btn').style.display = 'block';
-        document.getElementById('time-reporting-btn').style.display = 'block';
-        document.getElementById('calculator-btn').style.display = 'block';  // Gör kalkylatorknappen synlig för Säljare
+        if (planningTotalBtn) planningTotalBtn.style.display = 'block';
+        if (timeReportingBtn) timeReportingBtn.style.display = 'block';
     } else if (role === 'Service') {
-        document.getElementById('planning-total-btn').style.display = 'block';
-        document.getElementById('time-reporting-btn').style.display = 'block';
-        document.getElementById('status-btn').style.display = 'block';
-        // Kalkylatorknappen är INTE synlig för Service
+        if (planningTotalBtn) planningTotalBtn.style.display = 'block';
+        if (timeReportingBtn) timeReportingBtn.style.display = 'block';
+        if (statusBtn) statusBtn.style.display = 'block';
     } else {
         alert('Du har inte behörighet att se denna sida.');
         window.location.href = 'login.html';
