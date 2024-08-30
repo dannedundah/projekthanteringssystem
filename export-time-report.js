@@ -70,11 +70,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const querySnapshot = await getDocs(q);
                 const reports = querySnapshot.docs.map(doc => doc.data());
 
-                // Gruppera rapporterna efter anställd
+                // Beräkna alla arbetsdagar inom intervallet
+                const workDays = calculateWorkDays(new Date(startDate), new Date(endDate));
+
+                // Gruppera rapporterna efter anställd och kontrollera om alla arbetsdagar är rapporterade
                 const reportStatus = {};
                 users.forEach(user => {
-                    const reportedDates = reports.filter(report => report.employee === `${user.firstName} ${user.lastName}`).map(report => report.date);
-                    reportStatus[`${user.firstName} ${user.lastName}`] = reportedDates.length > 0 ? 'Ja' : 'Nej';
+                    const employeeReports = reports.filter(report => report.employee === `${user.firstName} ${user.lastName}`);
+                    const reportedDates = employeeReports.map(report => report.date);
+
+                    // Kontrollera om medarbetaren har rapporterat alla arbetsdagar
+                    const allDaysReported = workDays.every(day => reportedDates.includes(day));
+                    reportStatus[`${user.firstName} ${user.lastName}`] = allDaysReported ? 'Ja' : 'Nej';
                 });
 
                 // Visa status i tabellen
@@ -158,6 +165,33 @@ function generateSheetData(reports) {
     }
 
     return sheetData;
+}
+
+function calculateWorkDays(start, end) {
+    const workDays = [];
+    let currentDate = new Date(start);
+
+    // Lista över röda dagar (anpassa efter lokala helgdagar)
+    const holidays = [
+        '2024-01-01', // Nyårsdagen
+        '2024-01-06', // Trettondagen
+        // Lägg till fler helgdagar här...
+    ];
+
+    while (currentDate <= end) {
+        const dayOfWeek = currentDate.getDay();
+        const formattedDate = currentDate.toISOString().split('T')[0];
+
+        // Kontrollera om det är en vardag (måndag till fredag) och inte en helgdag
+        if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.includes(formattedDate)) {
+            workDays.push(formattedDate);
+        }
+
+        // Gå vidare till nästa dag
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return workDays;
 }
 
 window.navigateTo = (page) => {
