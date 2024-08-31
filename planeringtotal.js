@@ -218,18 +218,16 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
             const task = gantt.getTask(id);
     
-            // Beräkna den ursprungliga durationen
-            const originalStartDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
-            const originalEndDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
-            const durationInMs = originalEndDate - originalStartDate;
-
-            // Sätt nytt slutdatum baserat på den ursprungliga durationen
-            const newStartDate = new Date(Date.UTC(item.start_date.getFullYear(), item.start_date.getMonth(), item.start_date.getDate()));
-            const newEndDate = new Date(newStartDate.getTime() + durationInMs);
+            // Beräkna durationen baserat på den nya startdatumet
+            const duration = gantt.calculateDuration(task.start_date, task.end_date);
     
-            task.end_date = gantt.date.add(newEndDate, 1, "day"); // Justera slutdatum
-
-            // Uppdatera Gantt-diagrammet med det nya slutdatumet
+            // Sätt nytt slutdatum baserat på den ursprungliga durationen och det nya startdatumet
+            const newEndDate = gantt.calculateEndDate(task.start_date, duration);
+    
+            // Uppdatera uppgiften med det nya slutdatumet
+            task.end_date = newEndDate;
+    
+            // Uppdatera Gantt-diagrammet med de nya datumen
             gantt.updateTask(id);
 
             // Spara de uppdaterade datumen i Firestore
