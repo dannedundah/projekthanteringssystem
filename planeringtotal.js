@@ -80,20 +80,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
-            // Filtrera och sortera i fallande ordning (närmast datum först) för elektrikerns arbete
+            // Filtrera och sortera i stigande ordning (datum längst bort först) för elektrikerns arbete
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.electricianStartDate && 
                     planning.electricianEndDate && 
                     planning.projectId !== hiddenProjectId
                 )
-                .sort((a, b) => new Date(b.electricianStartDate) - new Date(a.electricianStartDate));
+                .sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
-            // Visa alla team förutom Elektriker
+            // Visa endast Team Rickard, Team Marcus och Team Reza
+            const validTeams = ["Team Rickard", "Team Marcus", "Team Reza"];
             filteredPlannings = plannings
                 .filter(planning => 
-                    !planning.electricianStartDate && 
-                    !planning.electricianEndDate && 
+                    validTeams.includes(planning.team) && 
                     planning.projectId !== hiddenProjectId
                 )
                 .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
