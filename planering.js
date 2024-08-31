@@ -102,10 +102,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const projectDoc = await getDoc(projectRef);
 
             if (projectDoc.exists()) {
-                await updateDoc(projectRef, {
-                    status: 'Planerad'
-                });
-                alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+                if (projectId !== "moBgPPK2jgyZaeBnqza1") {  // Kontrollera om det inte är det specifika projektet
+                    await updateDoc(projectRef, {
+                        status: 'Planerad'
+                    });
+                    alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+                } else {
+                    alert('Planering sparad, men projektstatus för detta projekt förblir "Ny".');
+                }
             } else {
                 console.error(`Project with ID ${projectId} not found.`);
                 alert('Planering sparad, men kunde inte uppdatera projektstatus eftersom projektet inte hittades.');
