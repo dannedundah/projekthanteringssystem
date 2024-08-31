@@ -116,6 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
+        // Markera lördagar och söndagar med röd bakgrund
+        gantt.templates.scale_cell_class = function(date){
+            if(date.getDay() === 0 || date.getDay() === 6){ // Sunday = 0, Saturday = 6
+                return "weekend";
+            }
+        };
+
+        gantt.templates.task_cell_class = function(item, date){
+            if(date.getDay() === 0 || date.getDay() === 6){ // Sunday = 0, Saturday = 6
+                return "weekend";
+            }
+        };
+
         gantt.config.columns = [
             { name: "text", label: "Task name", width: 200, tree: true },  // Öka bredden här
             { name: "start_date", label: "Start time", align: "center", width: 80 },
