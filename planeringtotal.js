@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             populateTeamSelect();
-            renderGanttChart(plannings);
+            filterAndRenderGantt("");  // Visa "Alla team" som standard
 
             teamSelect.addEventListener('change', () => {
                 const selectedTeam = teamSelect.value;
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
-            // Filtrera och sortera i fallande ordning (närmast datum först)
+            // Filtrera och sortera i fallande ordning (närmast datum först) för elektrikerns arbete
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.electricianStartDate && 
@@ -89,21 +89,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
                 .sort((a, b) => new Date(b.electricianStartDate) - new Date(a.electricianStartDate));
         } else if (selectedTeam === "") {
-            // Dölj elektrikerns datum när alla team visas
-            filteredPlannings = plannings.filter(planning => 
-                !planning.electricianStartDate && 
-                !planning.electricianEndDate && 
-                planning.projectId !== hiddenProjectId
-            );
+            // Visa alla team förutom Elektriker
+            filteredPlannings = plannings
+                .filter(planning => 
+                    !planning.electricianStartDate && 
+                    !planning.electricianEndDate && 
+                    planning.projectId !== hiddenProjectId
+                )
+                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         } else {
-            filteredPlannings = plannings.filter(planning => 
-                planning.team === selectedTeam && 
-                planning.projectId !== hiddenProjectId
-            );
+            // Filtrera och sortera baserat på startdatum för valt team
+            filteredPlannings = plannings
+                .filter(planning => 
+                    planning.team === selectedTeam && 
+                    planning.projectId !== hiddenProjectId
+                )
+                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         }
-
-        // Sortera filteredPlannings baserat på startdatum
-        filteredPlannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         renderGanttChart(filteredPlannings, selectedTeam === "Elektriker");
     }
