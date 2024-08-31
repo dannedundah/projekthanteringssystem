@@ -216,6 +216,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+            const task = gantt.getTask(id);
+    
+            // Beräkna den ursprungliga durationen
+            const originalStartDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
+            const originalEndDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
+            const durationInMs = originalEndDate - originalStartDate;
+
+            // Sätt nytt slutdatum baserat på den ursprungliga durationen
+            const newStartDate = new Date(Date.UTC(item.start_date.getFullYear(), item.start_date.getMonth(), item.start_date.getDate()));
+            const newEndDate = new Date(newStartDate.getTime() + durationInMs);
+    
+            task.end_date = gantt.date.add(newEndDate, 1, "day"); // Justera slutdatum
+
+            // Uppdatera Gantt-diagrammet med det nya slutdatumet
+            gantt.updateTask(id);
+
+            // Spara de uppdaterade datumen i Firestore
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
