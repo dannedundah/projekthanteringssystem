@@ -237,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const planningDoc = await getDoc(planningRef);
             
             if (planningDoc.exists()) {
+                // Uppdatera planning dokumentet
                 if (taskId.endsWith('-electrician')) {
                     await updateDoc(planningRef, {
                         electricianStartDate: formattedStartDate,
@@ -249,8 +250,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
+                // Extrahera projekt-ID från planning-dokumentet
+                const projectId = planningDoc.data().projectId;
+                if (!projectId) {
+                    console.error(`No projectId found in planning document for taskId: ${taskId}`);
+                    return;
+                }
+
                 // Uppdatera status för projektet till "Planerad"
-                const projectRef = doc(db, 'projects', taskId.replace('-electrician', ''));
+                const projectRef = doc(db, 'projects', projectId);
                 const projectDoc = await getDoc(projectRef);
 
                 if (projectDoc.exists()) {
@@ -258,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         status: 'Planerad'
                     });
                 } else {
-                    console.error(`No project document found for taskId: ${taskId}`);
+                    console.error(`No project document found for projectId: ${projectId}`);
                 }
             } else {
                 console.error(`No planning document found for taskId: ${taskId}`);
