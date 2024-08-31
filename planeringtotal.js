@@ -116,6 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
+        gantt.config.columns = [
+            { name: "text", label: "Task name", width: 200, tree: true },  // Öka bredden här
+            { name: "start_date", label: "Start time", align: "center", width: 80 },
+            { name: "duration", label: "Duration", align: "center", width: 60 }
+        ];
+
         gantt.init("gantt-chart");
 
         const tasks = await Promise.all(plannings.map(async planning => {
@@ -165,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: projectData.address || 'Ej specificerad',
+                        text: projectData.name || 'Ej specificerat namn',
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -180,12 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         return [];
                     }
 
-                    // Lägg till en dag för att säkerställa att hela perioden visas
-                    const adjustedEndDate = endDate;  // Här justerar vi inte slutdatumet
+                    const adjustedEndDate = endDate;
 
                     taskList.push({
                         id: planning.id,
-                        text: projectData.address || 'Ej specificerad',
+                        text: projectData.name || 'Ej specificerat namn',
                         start_date: startDate,
                         end_date: adjustedEndDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
