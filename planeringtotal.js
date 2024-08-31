@@ -1,10 +1,13 @@
-import app from './firebase-config.js';  // Importera firebase-konfigurationen
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Initiera auth och db
-const auth = getAuth(app);  // Använd 'app' från din konfiguration
-const db = getFirestore(app);
+import { 
+    auth, 
+    db, 
+    collection, 
+    getDocs, 
+    doc, 
+    getDoc, 
+    updateDoc, 
+    onAuthStateChanged 
+} from './firebase-config.js';  // Importera de nödvändiga modulerna från firebase-config.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
