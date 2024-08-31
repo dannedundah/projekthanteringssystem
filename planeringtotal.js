@@ -179,13 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     // Lägg till en dag för att säkerställa att hela perioden visas
-                    const adjustedEndDate = addOneDay(endDate);
+                    const adjustedEndDate = endDate;  // Här justerar vi inte slutdatumet
 
                     taskList.push({
                         id: planning.id,
                         text: projectData.address || 'Ej specificerad',
                         start_date: startDate,
-                        end_date: adjustedEndDate, // Använd det justerade slutdatumet
+                        end_date: adjustedEndDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: taskColor
                     });
