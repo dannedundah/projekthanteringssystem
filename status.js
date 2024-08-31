@@ -45,9 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 case 'driftsatt':
                     commissionedProjects.appendChild(li);
                     break;
-                case 'fakturerad':
-                    billedProjects.appendChild(li);
-                    break;
                 case 'elektriker klar men inte solceller': // Ny status
                     electricianNotSolarProjects.appendChild(li);
                     break;
