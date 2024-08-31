@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
-            // Sortera i fallande ordning (närmast datum först)
+            // Filtrera och sortera i fallande ordning (närmast datum först)
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.electricianStartDate && 
@@ -122,12 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
 
-                // Filtrera bort projekt med status "Driftsatt"
-                if (projectData.status.trim().toLowerCase() === 'driftsatt') {
-                    return []; // Hoppa över detta projekt
-                }
-                // Filtrera bort projekt med status "Fakturerad"
-                if (projectData.status.trim().toLowerCase() === 'fakturerad') {
+                // Filtrera bort projekt med status "Driftsatt" eller "Fakturerad"
+                if (['driftsatt', 'fakturerad'].includes(projectData.status.trim().toLowerCase())) {
                     return []; // Hoppa över detta projekt
                 }
 
