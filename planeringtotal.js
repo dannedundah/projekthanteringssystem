@@ -221,6 +221,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function saveTaskDates(taskId) {
+        const task = gantt.getTask(taskId);
+
+        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
+        const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
+
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+        const formattedEndDate = endDate.toISOString().split('T')[0];
+
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+
+        try {
+            const planningDoc = await getDoc(planningRef);
+            
+            if (planningDoc.exists()) {
+                if (taskId.endsWith('-electrician')) {
+                    await updateDoc(planningRef, {
+                        electricianStartDate: formattedStartDate,
+                        electricianEndDate: formattedEndDate
+                    });
+                } else {
+                    await updateDoc(planningRef, {
+                        startDate: formattedStartDate,
+                        endDate: formattedEndDate
+                    });
+                }
+
+                // Uppdatera status för projektet till "Planerad"
+                const projectRef = doc(db, 'projects', taskId.replace('-electrician', ''));
+                const projectDoc = await getDoc(projectRef);
+
+                if (projectDoc.exists()) {
+                    await updateDoc(projectRef, {
+                        status: 'Planerad'
+                    });
+                } else {
+                    console.error(`No project document found for taskId: ${taskId}`);
+                }
+            } else {
+                console.error(`No planning document found for taskId: ${taskId}`);
+            }
+        } catch (error) {
+            console.error("Error updating document: ", error);
+        }
+    }
+
     function formatDateToString(date) {
         if (!date) {
             console.error("Invalid date:", date);
@@ -244,36 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const d = new Date(date);
         d.setDate(d.getDate() + 1);
         return d.toISOString().split('T')[0];
-    }
-
-    async function saveTaskDates(taskId) {
-        const task = gantt.getTask(taskId);
-
-        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
-        const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
-
-        const formattedStartDate = startDate.toISOString().split('T')[0];
-        const formattedEndDate = endDate.toISOString().split('T')[0];
-
-        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
-
-        if (taskId.endsWith('-electrician')) {
-            await updateDoc(planningRef, {
-                electricianStartDate: formattedStartDate,
-                electricianEndDate: formattedEndDate
-            });
-        } else {
-            await updateDoc(planningRef, {
-                startDate: formattedStartDate,
-                endDate: formattedEndDate
-            });
-        }
-
-        // Uppdatera status för projektet till "Planerad"
-        const projectRef = doc(db, 'projects', taskId.replace('-electrician', ''));
-        await updateDoc(projectRef, {
-            status: 'Planerad'
-        });
     }
 
     function showConfirmationPopup(message) {
