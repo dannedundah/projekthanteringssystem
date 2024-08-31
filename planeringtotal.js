@@ -3,7 +3,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Initiera auth och db
-const auth = getAuth(app);
+const auth = getAuth(app);  // Använd 'app' från din konfiguration
 const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', () => {
