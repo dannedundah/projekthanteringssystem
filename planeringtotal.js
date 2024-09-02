@@ -182,6 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         return [];
                     }
 
+                    // Lägg till en dag till slutdatumet för att inkludera hela dagen
+                    endDate = addOneDay(endDate);
+
                     taskList.push({
                         id: planning.id + '-electrician',
                         text: projectData.name || 'Ej specificerat namn',
@@ -199,13 +202,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         return [];
                     }
 
-                    const adjustedEndDate = endDate;
+                    // Lägg till en dag till slutdatumet för att inkludera hela dagen
+                    endDate = addOneDay(endDate);
 
                     taskList.push({
                         id: planning.id,
                         text: projectData.name || 'Ej specificerat namn',
                         start_date: startDate,
-                        end_date: adjustedEndDate,
+                        end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: taskColor
                     });
