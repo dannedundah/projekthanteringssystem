@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('project-name').value = project.name;
                 document.getElementById('customer-name').value = project.customerName;
                 document.getElementById('customer-phone').value = project.customerPhone;
+                document.getElementById('customer-email').value = project.customerEmail; // Visa e-postadressen
                 document.getElementById('project-address').value = project.address;
                 document.getElementById('project-description').value = project.description;
                 document.getElementById('project-status').value = project.status;
@@ -67,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         name: document.getElementById('project-name').value.trim(),
                         customerName: document.getElementById('customer-name').value.trim(),
                         customerPhone: document.getElementById('customer-phone').value.trim(),
+                        customerEmail: document.getElementById('customer-email').value.trim(), // Uppdatera e-postadressen
                         address: document.getElementById('project-address').value.trim(),
                         description: document.getElementById('project-description').value.trim(),
                         status: document.getElementById('project-status').value.trim(),
