@@ -35,100 +35,48 @@
 
     <table>
         <tr>
-            <th>Kolumn A</th>
-            <th>Kolumn B</th>
-        </tr>
-        <!-- Rader för att visa och fylla i värden -->
-        <tr>
-            <td>A1</td>
-            <td><input type="text" id="b1"></td>
+            <th>Produkt</th>
+            <th>Pris</th>
         </tr>
         <tr>
-            <td>A2</td>
-            <td><input type="text" id="b2"></td>
+            <td id="produkt1"></td>
+            <td id="pris1"></td>
         </tr>
         <tr>
-            <td>A3</td>
-            <td><input type="text" id="b3"></td>
+            <td id="produkt2"></td>
+            <td id="pris2"></td>
         </tr>
         <tr>
-            <td>A4</td>
-            <td><input type="text" id="b4"></td>
+            <td id="produkt3"></td>
+            <td id="pris3"></td>
         </tr>
-        <tr>
-            <td>A5</td>
-            <td><input type="text" id="b5"></td>
-        </tr>
-        <tr>
-            <td>A6</td>
-            <td><input type="text" id="b6"></td>
-        </tr>
-        <tr>
-            <td>A7</td>
-            <td><input type="text" id="b7"></td>
-        </tr>
-        <tr>
-            <td>A8</td>
-            <td><input type="text" id="b8"></td>
-        </tr>
-        <tr>
-            <td>A9</td>
-            <td><input type="text" id="b9"></td>
-        </tr>
-        <tr>
-            <td>A10</td>
-            <td><input type="text" id="b10"></td>
-        </tr>
-        <tr>
-            <td>A11</td>
-            <td><input type="text" id="b11"></td>
-        </tr>
-        <tr>
-            <td>A12</td>
-            <td><input type="text" id="b12"></td>
-        </tr>
-        <tr>
-            <td>A13</td>
-            <td><input type="text" id="b13"></td>
-        </tr>
-        <tr>
-            <td>A14</td>
-            <td><input type="text" id="b14"></td>
-        </tr>
+        <!-- Lägg till fler rader efter behov -->
     </table>
 
-    <button onclick="berakna()">Beräkna</button>
+    <button onclick="berakna()">Uppdatera Priser</button>
 
     <div class="result" id="resultat"></div>
 </div>
 
 <script>
     function berakna() {
-        // Hämta värden från inmatningsfälten
-        var values = [
-            document.getElementById("b1").value,
-            document.getElementById("b2").value,
-            document.getElementById("b3").value,
-            document.getElementById("b4").value,
-            document.getElementById("b5").value,
-            document.getElementById("b6").value,
-            document.getElementById("b7").value,
-            document.getElementById("b8").value,
-            document.getElementById("b9").value,
-            document.getElementById("b10").value,
-            document.getElementById("b11").value,
-            document.getElementById("b12").value,
-            document.getElementById("b13").value,
-            document.getElementById("b14").value
-        ];
-
-        // Anropa Google Apps Script-funktionen
+        // Anropa Google Apps Script-funktionen för att uppdatera Google Sheets och hämta resultat
         google.script.run
-            .withSuccessHandler(function(resultat) {
-                document.getElementById("resultat").innerText = "Resultat: " + resultat;
+            .withSuccessHandler(function(data) {
+                // Uppdatera produkterna och priserna i HTML
+                document.getElementById("produkt1").innerText = data.produkter[0];
+                document.getElementById("pris1").innerText = data.priser[0];
+                document.getElementById("produkt2").innerText = data.produkter[1];
+                document.getElementById("pris2").innerText = data.priser[1];
+                document.getElementById("produkt3").innerText = data.produkter[2];
+                document.getElementById("pris3").innerText = data.priser[2];
+                // Fortsätt för fler rader om det finns
             })
-            .beraknaKostnad(values);
+            .hamtaProdukterOchPriser();
     }
+
+    // Kör funktionen direkt för att hämta initiala data
+    berakna();
 </script>
 
 </body>
