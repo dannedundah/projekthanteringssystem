@@ -256,11 +256,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
+        console.log(`Saving dates for task: ${taskId}`);
+        console.log(`Start Date: ${formattedStartDate}, End Date: ${formattedEndDate}`);
+
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
         try {
             const planningDoc = await getDoc(planningRef);
-            
+
             if (planningDoc.exists()) {
                 if (taskId.endsWith('-electrician')) {
                     await updateDoc(planningRef, {
@@ -273,6 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         endDate: formattedEndDate
                     });
                 }
+
+                console.log(`Dates saved successfully for task: ${taskId}`);
 
                 const projectId = planningDoc.data().projectId;
                 if (!projectId) {
