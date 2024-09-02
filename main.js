@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -27,14 +27,14 @@ function handleRoleBasedAccess(role) {
   const montorModules = document.getElementById('montor-module');
   const saljareModules = document.getElementById('saljare-module');
   const serviceModules = document.getElementById('service-module');
-  const elektrikerModules = document.getElementById('elektriker-module'); // Ny grupp
+  const elektrikerModules = document.getElementById('elektriker-module');
 
   // Hide all modules initially
   if (adminModules) adminModules.style.display = 'none';
   if (montorModules) montorModules.style.display = 'none';
   if (saljareModules) saljareModules.style.display = 'none';
   if (serviceModules) serviceModules.style.display = 'none';
-  if (elektrikerModules) elektrikerModules.style.display = 'none'; // Dölj Elektriker-moduler
+  if (elektrikerModules) elektrikerModules.style.display = 'none';
 
   // Show modules based on the user's role
   if (role === 'Admin') {
@@ -45,7 +45,7 @@ function handleRoleBasedAccess(role) {
     if (saljareModules) saljareModules.style.display = 'block';
   } else if (role === 'Service') {
     if (serviceModules) serviceModules.style.display = 'block';
-  } else if (role === 'Elektriker') { // Lägg till kontroll för Elektriker
+  } else if (role === 'Elektriker') {
     if (elektrikerModules) elektrikerModules.style.display = 'block';
   } else {
     alert('Du har inte behörighet att se denna sida.');
@@ -78,3 +78,57 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = 'login.html';
   }
 });
+
+// Function to update user's team
+async function updateUserTeam(userId, newTeam) {
+  const userRef = doc(db, 'users', userId);
+  try {
+    await updateDoc(userRef, {
+      team: newTeam
+    });
+    console.log("Team updated successfully for user:", userId);
+    await loadUsersAndRender(); // Reload and render the user list
+  } catch (error) {
+    console.error("Error updating team:", error);
+  }
+}
+
+// Function to update user's role
+async function updateUserRole(userId, newRole) {
+  const userRef = doc(db, 'users', userId);
+  try {
+    await updateDoc(userRef, {
+      role: newRole
+    });
+    console.log("Role updated successfully for user:", userId);
+    await loadUsersAndRender(); // Reload and render the user list
+  } catch (error) {
+    console.error("Error updating role:", error);
+  }
+}
+
+// Function to render user list
+function renderUserList(users) {
+  const userListContainer = document.getElementById('user-list');
+  userListContainer.innerHTML = ''; // Clear the list first
+
+  users.forEach(user => {
+    const userItem = document.createElement('div');
+    userItem.textContent = `${user.firstName} ${user.lastName} - Team: ${user.team} - Roll: ${user.role}`;
+    userListContainer.appendChild(userItem);
+  });
+}
+
+// Function to load and render the user list
+async function loadUsersAndRender() {
+  const usersQuery = await getDocs(collection(db, 'users'));
+  const users = usersQuery.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  renderUserList(users);
+}
+
+// Initial load of users
+loadUsersAndRender();
+
+window.navigateTo = (page) => {
+  window.location.href = page;
+};
