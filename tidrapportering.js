@@ -214,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentYear--;
         }
         generateCalendar(currentYear, currentMonth);
+        await loadProjects();  // Ladda om projekten när månaden ändras
         await markReportedDays(currentYear, currentMonth);
     });
 
@@ -224,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentYear++;
         }
         generateCalendar(currentYear, currentMonth);
+        await loadProjects();  // Ladda om projekten när månaden ändras
         await markReportedDays(currentYear, currentMonth);
     });
 
@@ -256,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 timeReportForm.reset();
                 projectDropdown.innerHTML = '<option value="">Välj projekt</option>';
+                await loadProjects();  // Ladda om projekten efter att tid har rapporterats
                 timeReportForm.style.display = 'none';
                 markReportedDay(selectedDate);
             } catch (error) {
