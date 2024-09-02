@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        gantt.templates.task_cell_class = function(item, date){
+        gantt.templates.timeline_cell_class = function(item, date){
             if(date.getDay() === 0 || date.getDay() === 6){ // Sunday = 0, Saturday = 6
                 return "weekend";
             }
