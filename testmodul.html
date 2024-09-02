@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testmodul för Daniel</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="testmodul.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Testmodul</h1>
+
+        <!-- Testmodulens innehåll som endast visas för daniel@delidel.se -->
+        <div id="test-modul" style="display: none;">
+            <h2>Testa Skript</h2>
+            <p>Här kan Daniel testa olika skript utan att påverka andra användare.</p>
+            <!-- Lägg till dina testskript och funktioner här -->
+            <textarea id="script-input" placeholder="Skriv ditt JavaScript här..."></textarea>
+            <button id="run-script-btn">Kör skript</button>
+            <div id="script-output"></div>
+        </div>
+
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
+    </div>
+</body>
+</html>
