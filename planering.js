@@ -84,6 +84,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adjustedEndDate = new Date(endDate);
         adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);  // Lägg till en dag
 
+        const adjustedElectricianEndDate = new Date(electricianEndDate);
+        adjustedElectricianEndDate.setDate(adjustedElectricianEndDate.getDate() + 1);  // Lägg till en dag för elektrikern
+
         // Collect selected employees
         const selectedEmployees = employeeDropdowns.map(dropdown => dropdown.value).filter(employee => employee !== '');
 
@@ -92,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             startDate,
             endDate: adjustedEndDate.toISOString().split('T')[0], // Spara det justerade slutdatumet
             electricianStartDate,
-            electricianEndDate,
+            electricianEndDate: adjustedElectricianEndDate.toISOString().split('T')[0], // Spara det justerade slutdatumet för elektrikern
             team: selectedTeam,
             employees: selectedEmployees,
         };
