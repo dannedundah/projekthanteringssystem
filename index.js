@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
+    const testModuleBtn = document.getElementById('test-module-btn'); // Knappen för testmodulen
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -53,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (exportTimeReportBtn) {
         exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html'));
     }
+    if (testModuleBtn) {
+        testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html')); // Navigera till testmodul
+    }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
     }
@@ -64,6 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists() && userDoc.data().active) {
                 const userRole = userDoc.data().role;
+
+                // Kontrollera om användaren är daniel@delidel.se
+                if (user.email === 'daniel@delidel.se') {
+                    testModuleBtn.style.display = 'block';
+                }
+
                 // Hantera rollbaserad åtkomst
                 handleRoleBasedAccess(userRole);
             } else {
