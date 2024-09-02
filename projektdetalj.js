@@ -13,13 +13,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (projectSnap.exists()) {
                 const project = projectSnap.data();
-                document.getElementById('project-name').value = project.name;
-                document.getElementById('customer-name').value = project.customerName;
-                document.getElementById('customer-phone').value = project.customerPhone;
-                document.getElementById('customer-email').value = project.customerEmail; // Visa e-postadressen
-                document.getElementById('project-address').value = project.address;
-                document.getElementById('project-description').value = project.description;
-                document.getElementById('project-status').value = project.status;
+
+                // Kontrollera att varje element finns innan du tilldelar ett värde
+                const projectNameField = document.getElementById('project-name');
+                if (projectNameField) projectNameField.value = project.name;
+
+                const customerNameField = document.getElementById('customer-name');
+                if (customerNameField) customerNameField.value = project.customerName;
+
+                const customerPhoneField = document.getElementById('customer-phone');
+                if (customerPhoneField) customerPhoneField.value = project.customerPhone;
+
+                const customerEmailField = document.getElementById('customer-email');
+                if (customerEmailField) customerEmailField.value = project.customerEmail;
+
+                const projectAddressField = document.getElementById('project-address');
+                if (projectAddressField) projectAddressField.value = project.address;
+
+                const projectDescriptionField = document.getElementById('project-description');
+                if (projectDescriptionField) projectDescriptionField.value = project.description;
+
+                const projectStatusField = document.getElementById('project-status');
+                if (projectStatusField) projectStatusField.value = project.status;
 
                 if (fileGallery) {
                     fileGallery.innerHTML = '';
