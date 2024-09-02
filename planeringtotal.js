@@ -7,7 +7,7 @@ import {
     getDoc, 
     updateDoc, 
     onAuthStateChanged 
-} from './firebase-config.js';  // Importera de nödvändiga modulerna från firebase-config.js
+} from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allTeams = [];
     let canEdit = false;
 
-    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1"; // Dölj projekt med detta ID
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -42,15 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(doc => ({ id: doc.id, ...doc.data() }))
                 .filter(planning => planning.projectId !== hiddenProjectId);
 
-            // Sortera plannings baserat på startdatum
             plannings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-            // Ladda och fyll team dropdown
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             populateTeamSelect();
-            filterAndRenderGantt("");  // Visa "Alla team" som standard
+            filterAndRenderGantt("");  
 
             teamSelect.addEventListener('change', () => {
                 const selectedTeam = teamSelect.value;
@@ -64,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateTeamSelect() {
         teamSelect.innerHTML = '<option value="">Alla team</option>';
-        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; // Elektriker som separat kategori
+        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; 
 
         allTeams.forEach(team => {
-            if (team.name !== 'Team Admin') { // Dölj "Team Admin"
+            if (team.name !== 'Team Admin') { 
                 const option = document.createElement('option');
                 option.value = team.name;
                 option.textContent = team.name;
@@ -80,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
-            // Filtrera och sortera i stigande ordning (datum längst bort först) för elektrikerns arbete
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.electricianStartDate && 
@@ -89,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
                 .sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
-            // Visa endast Team Rickard, Team Marcus och Team Reza
             const validTeams = ["Team Rickard", "Team Marcus", "Team Reza"];
             filteredPlannings = plannings
                 .filter(planning => 
@@ -98,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
                 .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         } else {
-            // Filtrera och sortera baserat på startdatum för valt team
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.team === selectedTeam && 
@@ -116,21 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
-        // Markera lördagar och söndagar med röd bakgrund
         gantt.templates.scale_cell_class = function(date){
-            if(date.getDay() === 0 || date.getDay() === 6){ // Sunday = 0, Saturday = 6
+            if(date.getDay() === 0 || date.getDay() === 6){
                 return "weekend";
             }
         };
 
         gantt.templates.timeline_cell_class = function(item, date){
-            if(date.getDay() === 0 || date.getDay() === 6){ // Sunday = 0, Saturday = 6
+            if(date.getDay() === 0 || date.getDay() === 6){
                 return "weekend";
             }
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Task name", width: 300, tree: true },  // Öka bredden här för att rymma både adress och team
+            { name: "checkbox", label: "", width: 30, template: checkboxTemplate }, 
+            { name: "text", label: "Task name", width: 270, tree: true }, 
             { name: "start_date", label: "Start time", align: "center", width: 80 },
             { name: "duration", label: "Duration", align: "center", width: 60 }
         ];
@@ -143,9 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
 
-                // Filtrera bort projekt med status "Driftsatt" eller "Fakturerad"
                 if (['driftsatt', 'fakturerad'].includes(projectData.status.trim().toLowerCase())) {
-                    return []; // Hoppa över detta projekt
+                    return []; 
                 }
 
                 const taskList = [];
@@ -186,11 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: `${projectData.name} (${teamName})`,  // Lägg till teamnamnet här
+                        text: `${projectData.name} (${teamName})`,  
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700"
+                        color: "#FFD700",
+                        checkbox: planning.electricianChecked || false  // Sätt initialt checkbox-värde
                     });
                 } else {
                     const startDate = formatDateToString(planning.startDate);
@@ -203,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id,
-                        text: `${projectData.name} (${teamName})`,  // Lägg till teamnamnet här
+                        text: `${projectData.name} (${teamName})`,  
                         start_date: startDate,
                         end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -224,7 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
-            if (e.target.closest('.gantt_cell')) {
+            if (e.target.type === 'checkbox') {
+                const isChecked = e.target.checked;
+                task.checkbox = isChecked;
+                saveCheckboxState(task.id, isChecked);
+                e.stopPropagation();
+                return true;
+            } else if (e.target.closest('.gantt_cell')) {
                 window.location.href = task.detailsLink;
                 return false;
             }
@@ -239,6 +240,26 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
+
+        function checkboxTemplate(task) {
+            if (task.checkbox !== undefined) {
+                const checked = task.checkbox ? 'checked' : '';
+                return `<input type="checkbox" class="electrician-checkbox" ${checked}>`;
+            }
+            return '';
+        }
+    }
+
+    async function saveCheckboxState(taskId, isChecked) {
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        try {
+            await updateDoc(planningRef, {
+                electricianChecked: isChecked
+            });
+            console.log(`Checkbox state saved successfully for task: ${taskId}`);
+        } catch (error) {
+            console.error("Error updating checkbox state: ", error);
+        }
     }
 
     async function saveTaskDates(taskId) {
