@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function markReportedDays(year, month) {
         const weekdays = getWeekdaysInMonth(year, month);
+        console.log("Weekdays in month:", weekdays); // Debug log
 
         for (const day of weekdays) {
             const q = query(
@@ -186,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!querySnapshot.empty) {
                 const cell = document.querySelector(`[data-date="${day}"]`);
                 if (cell) {
+                    console.log("Marking reported day:", day); // Debug log
                     cell.classList.add('reported');
                 }
             }
@@ -203,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 weekdays.push(date.toISOString().split('T')[0]);
             }
         }
-
+        console.log("Identified weekdays:", weekdays); // Debug log
         return weekdays;
     }
 
@@ -273,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function markReportedDay(date) {
         const cell = document.querySelector(`[data-date="${date}"]`);
         if (cell) {
+            console.log("Marking reported day:", date); // Debug log
             cell.classList.add('reported');
         }
     }
