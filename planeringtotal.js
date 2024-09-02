@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Task name", width: 200, tree: true },  // Öka bredden här
+            { name: "text", label: "Task name", width: 300, tree: true },  // Öka bredden här för att rymma både adress och team
             { name: "start_date", label: "Start time", align: "center", width: 80 },
             { name: "duration", label: "Duration", align: "center", width: 60 }
         ];
@@ -173,6 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         taskColor = 'grey'; 
                 }
 
+                const teamName = planning.team || 'Ej specificerat team';
+
                 if (isElectricianView) {
                     const startDate = formatDateToString(planning.electricianStartDate);
                     let endDate = formatDateToString(planning.electricianEndDate);
@@ -187,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: projectData.name || 'Ej specificerat namn',
+                        text: `${projectData.name} (${teamName})`,  // Lägg till teamnamnet här
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -207,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id,
-                        text: projectData.name || 'Ej specificerat namn',
+                        text: `${projectData.name} (${teamName})`,  // Lägg till teamnamnet här
                         start_date: startDate,
                         end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -240,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
-            // Spara de uppdaterade datumen i Firestore direkt utan att justera dem
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
@@ -261,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const planningDoc = await getDoc(planningRef);
             
             if (planningDoc.exists()) {
-                // Uppdatera planning dokumentet
                 if (taskId.endsWith('-electrician')) {
                     await updateDoc(planningRef, {
                         electricianStartDate: formattedStartDate,
@@ -274,14 +274,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
-                // Extrahera projekt-ID från planning-dokumentet
                 const projectId = planningDoc.data().projectId;
                 if (!projectId) {
                     console.error(`No projectId found in planning document for taskId: ${taskId}`);
                     return;
                 }
 
-                // Uppdatera status för projektet till "Planerad"
                 const projectRef = doc(db, 'projects', projectId);
                 const projectDoc = await getDoc(projectRef);
 
