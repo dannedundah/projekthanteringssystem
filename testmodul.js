@@ -124,7 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Task name", width: 300, tree: true }, 
+            { name: "checkbox", label: "", width: 30, template: checkboxTemplate }, 
+            { name: "text", label: "Task name", width: 270, tree: true }, 
             { name: "start_date", label: "Start time", align: "center", width: 80 },
             { name: "duration", label: "Duration", align: "center", width: 60 }
         ];
@@ -184,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: "#FFD700",
-                        checkbox: true  // Lägg till en flagga för att visa en checkbox
+                        checkbox: planning.electricianChecked || false  // Sätt initialt checkbox-värde
                     });
                 } else {
                     const startDate = formatDateToString(planning.startDate);
@@ -219,6 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
             if (e.target.type === 'checkbox') {
+                const isChecked = e.target.checked;
+                task.checkbox = isChecked;
+                saveCheckboxState(task.id, isChecked);
                 e.stopPropagation();
                 return true;
             } else if (e.target.closest('.gantt_cell')) {
@@ -237,12 +241,25 @@ document.addEventListener('DOMContentLoaded', () => {
             showConfirmationPopup("Projekt uppdaterat!");
         });
 
-        gantt.templates.task_text = function(start, end, task){
-            if (task.checkbox) {
-                return `<input type="checkbox" class="electrician-checkbox"> ${task.text}`;
+        function checkboxTemplate(task) {
+            if (task.checkbox !== undefined) {
+                const checked = task.checkbox ? 'checked' : '';
+                return `<input type="checkbox" class="electrician-checkbox" ${checked}>`;
             }
-            return task.text;
-        };
+            return '';
+        }
+    }
+
+    async function saveCheckboxState(taskId, isChecked) {
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        try {
+            await updateDoc(planningRef, {
+                electricianChecked: isChecked
+            });
+            console.log(`Checkbox state saved successfully for task: ${taskId}`);
+        } catch (error) {
+            console.error("Error updating checkbox state: ", error);
+        }
     }
 
     async function saveTaskDates(taskId) {
