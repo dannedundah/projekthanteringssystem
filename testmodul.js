@@ -1,6 +1,6 @@
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from './firebase-config.js';
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from './firebase-config.js';  // Modifierad import från firebase-config.js
 
 // Kontrollera om appen redan är initierad
 if (!getApps().length) {
@@ -221,7 +221,7 @@ function initializeGanttScript() {
                         const startDate = formatDateToString(planning.startDate);
                         const endDate = formatDateToString(planning.endDate);
 
-                        if (!startDate || !endDate) {
+                        if (!startDate eller !endDate) {
                             console.error("Invalid start or end date for planning:", planning);
                             return [];
                         }
