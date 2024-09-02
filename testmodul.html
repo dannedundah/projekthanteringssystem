@@ -3,27 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planering Total</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css">
-    <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="testmodul.js"></script>
+    <title>Kalkylator med Google Sheets</title>
     <style>
-        .weekend {
-            background-color: #FFCCCC !important;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Planering Total</h1>
-        <label for="employee-select">Välj team:</label>
-        <select id="employee-select">
-            <option value="">Alla team</option>
-        </select>
-        <div id="gantt-chart" class="gantt-chart-large"></div>
-        <button onclick="navigateTo('index.html')">Tillbaka</button>
+
+<div class="container">
+    <h1>Kalkylator med Google Sheets</h1>
+
+    <div class="form-group">
+        <label for="b3">B3:</label>
+        <input type="text" id="b3">
     </div>
+
+    <div class="form-group">
+        <label for="b4">B4:</label>
+        <input type="text" id="b4">
+    </div>
+
+    <div class="form-group">
+        <label for="b5">B5:</label>
+        <input type="text" id="b5">
+    </div>
+
+    <div class="form-group">
+        <label for="b6">B6:</label>
+        <input type="text" id="b6">
+    </div>
+
+    <div class="form-group">
+        <label for="b7">B7:</label>
+        <input type="text" id="b7">
+    </div>
+
+    <div class="form-group">
+        <label for="b9">B9:</label>
+        <input type="text" id="b9">
+    </div>
+
+    <div class="form-group">
+        <label for="b10">B10:</label>
+        <input type="text" id="b10">
+    </div>
+
+    <div class="form-group">
+        <label for="b11">B11:</label>
+        <input type="text" id="b11">
+    </div>
+
+    <div class="form-group">
+        <label for="b12">B12:</label>
+        <input type="text" id="b12">
+    </div>
+
+    <div class="form-group">
+        <label for="b13">B13:</label>
+        <input type="text" id="b13">
+    </div>
+
+    <div class="form-group">
+        <label for="b14">B14:</label>
+        <input type="text" id="b14">
+    </div>
+
+    <button onclick="berakna()">Beräkna</button>
+
+    <div class="result" id="resultat"></div>
+</div>
+
+<script>
+    function berakna() {
+        // Hämta värden från inmatningsfälten
+        var values = [
+            document.getElementById("b3").value,
+            document.getElementById("b4").value,
+            document.getElementById("b5").value,
+            document.getElementById("b6").value,
+            document.getElementById("b7").value,
+            document.getElementById("b9").value,
+            document.getElementById("b10").value,
+            document.getElementById("b11").value,
+            document.getElementById("b12").value,
+            document.getElementById("b13").value,
+            document.getElementById("b14").value
+        ];
+
+        google.script.run
+            .withSuccessHandler(function(resultat) {
+                document.getElementById("resultat").innerText = "Resultat: " + resultat;
+            })
+            .beraknaKostnad(values);
+    }
+</script>
+
 </body>
 </html>
