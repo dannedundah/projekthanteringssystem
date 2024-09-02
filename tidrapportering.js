@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= daysInMonth; i++) {
             const date = new Date(year, month, i);
             const day = date.getDay();
-            if (day !== 0 && day !== 6) { // Monday to Friday
+            if (day !== 0 && day !== 6) { // Monday to Friday (0 = Sunday, 6 = Saturday)
                 weekdays.push(date.toISOString().split('T')[0]);
             }
         }
