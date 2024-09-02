@@ -80,13 +80,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const electricianEndDate = document.getElementById('electrician-end-date').value;
         const selectedTeam = teamDropdown.value;
 
+        // Justera slutdatumet för att inkludera hela den sista dagen
+        const adjustedEndDate = new Date(endDate);
+        adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);  // Lägg till en dag
+
         // Collect selected employees
         const selectedEmployees = employeeDropdowns.map(dropdown => dropdown.value).filter(employee => employee !== '');
 
         const planning = {
             projectId,
             startDate,
-            endDate,
+            endDate: adjustedEndDate.toISOString().split('T')[0], // Spara det justerade slutdatumet
             electricianStartDate,
             electricianEndDate,
             team: selectedTeam,
