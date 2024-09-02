@@ -20,6 +20,7 @@ Innertak:
         const projectName = document.getElementById('project-input').value.trim();
         const customerName = document.getElementById('customer-name').value.trim();
         const customerPhone = document.getElementById('customer-phone').value.trim();
+        const customerEmail = document.getElementById('customer-email').value.trim(); // Hämta e-postvärdet
         const projectAddress = document.getElementById('project-address').value.trim();
         const projectDescriptionValue = projectDescription.value.trim();
         const projectStatus = document.getElementById('project-status').value.trim();
@@ -47,6 +48,7 @@ Innertak:
                 name: projectName,
                 customerName,
                 customerPhone,
+                customerEmail,  // Lägg till e-post i projektobjektet
                 address: projectAddress,
                 description: projectDescriptionValue,
                 status: projectStatus,
