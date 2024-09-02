@@ -11,6 +11,9 @@ Växelriktare:
 Batteri:
 Laddbox:
 Innertak:
+Mätarplacering:
+Storlek på huvudsäkring:
+Nätbolag:
     `;
     projectDescription.value = defaultDescription.trim();
 
