@@ -46,14 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateCalendar(year, month) {
         const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
-        const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];
+        const daysOfWeek = ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"];  // Rätt ordning för veckodagar
 
         monthYearHeader.textContent = `${monthNames[month]} ${year}`;
 
         calendar.innerHTML = `<tr>${daysOfWeek.map(day => `<th>${day}</th>`).join('')}</tr>`;
 
-        const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // Justera så att måndag är första dagen
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayIndex = (firstDayOfMonth + 6) % 7; // Justera så att måndag är första dagen (0 = måndag)
 
         let dayNumber = 1;
         let row = document.createElement('tr');
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < 42; i++) {
             const cell = document.createElement('td');
 
-            if (i >= firstDay && dayNumber <= daysInMonth) {
+            if (i >= firstDayIndex && dayNumber <= daysInMonth) {
                 cell.textContent = dayNumber;
                 cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
 
@@ -173,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function markReportedDays(year, month) {
         const weekdays = getWeekdaysInMonth(year, month);
-        console.log("Weekdays in month:", weekdays); // Debug log
 
         for (const day of weekdays) {
             const q = query(
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= daysInMonth; i++) {
             const date = new Date(year, month, i);
             const day = date.getDay();
-            if (day !== 0 && day !== 6) { // Monday to Friday (0 = Sunday, 6 = Saturday)
+            if (day !== 0) { // Include all days except Sunday (0 = Sunday)
                 weekdays.push(date.toISOString().split('T')[0]);
             }
         }
