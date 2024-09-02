@@ -1,6 +1,6 @@
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, onAuthStateChanged } from './firebase-config.js';
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from './firebase-config.js';
 
 // Kontrollera om appen redan är initierad
 if (!getApps().length) {
