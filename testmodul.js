@@ -1,51 +1,15 @@
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Kontrollera om appen redan är initierad
-if (!getApps().length) {
-    initializeApp({
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID",
-        measurementId: "YOUR_MEASUREMENT_ID"
-    });
-}
-
-const auth = getAuth();
-const db = getFirestore();
+import { 
+    auth, 
+    db, 
+    collection, 
+    getDocs, 
+    doc, 
+    getDoc, 
+    updateDoc, 
+    onAuthStateChanged 
+} from './firebase-config.js';  // Importera de nödvändiga modulerna från firebase-config.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            if (user.email === 'daniel@delidel.se') {
-                document.getElementById('test-modul').style.display = 'block';
-                initializeGanttScript();  // Kör Gantt-skriptet
-            } else {
-                alert('Du har inte behörighet att se denna sida.');
-                window.location.href = 'index.html';
-            }
-        } else {
-            window.location.href = 'login.html';
-        }
-    });
-
-    // Event listener för att köra skript från textarea
-    document.getElementById('run-script-btn').addEventListener('click', () => {
-        const scriptContent = document.getElementById('script-input').value;
-        try {
-            const result = eval(scriptContent);
-            document.getElementById('script-output').textContent = `Resultat: ${result}`;
-        } catch (error) {
-            document.getElementById('script-output').textContent = `Fel: ${error.message}`;
-        }
-    });
-});
-
-function initializeGanttScript() {
     const ganttChartContainer = document.getElementById('gantt-chart');
     const teamSelect = document.getElementById('employee-select'); 
     let plannings = [];
@@ -67,7 +31,7 @@ function initializeGanttScript() {
             }
         } else {
             console.error('User not logged in');
-            window.location.href = 'login.html';
+            navigateTo('login.html');
         }
     });
 
@@ -116,6 +80,7 @@ function initializeGanttScript() {
         let filteredPlannings = [];
 
         if (selectedTeam === "Elektriker") {
+            // Filtrera och sortera i stigande ordning (datum längst bort först) för elektrikerns arbete
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.electricianStartDate && 
@@ -124,6 +89,7 @@ function initializeGanttScript() {
                 )
                 .sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
+            // Visa endast Team Rickard, Team Marcus och Team Reza
             const validTeams = ["Team Rickard", "Team Marcus", "Team Reza"];
             filteredPlannings = plannings
                 .filter(planning => 
@@ -132,6 +98,7 @@ function initializeGanttScript() {
                 )
                 .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         } else {
+            // Filtrera och sortera baserat på startdatum för valt team
             filteredPlannings = plannings
                 .filter(planning => 
                     planning.team === selectedTeam && 
@@ -149,6 +116,7 @@ function initializeGanttScript() {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = !canEdit;
 
+        // Markera lördagar och söndagar med röd bakgrund
         gantt.templates.scale_cell_class = function(date){
             if(date.getDay() === 0 || date.getDay() === 6){ // Sunday = 0, Saturday = 6
                 return "weekend";
@@ -162,7 +130,7 @@ function initializeGanttScript() {
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Task name", width: 300, tree: true },  
+            { name: "text", label: "Task name", width: 300, tree: true },  // Öka bredden här för att rymma både adress och team
             { name: "start_date", label: "Start time", align: "center", width: 80 },
             { name: "duration", label: "Duration", align: "center", width: 60 }
         ];
@@ -175,6 +143,7 @@ function initializeGanttScript() {
             if (projectDoc.exists()) {
                 const projectData = projectDoc.data();
 
+                // Filtrera bort projekt med status "Driftsatt" eller "Fakturerad"
                 if (['driftsatt', 'fakturerad'].includes(projectData.status.trim().toLowerCase())) {
                     return []; // Hoppa över detta projekt
                 }
@@ -217,7 +186,7 @@ function initializeGanttScript() {
 
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: `${projectData.name} (${teamName}) <input type="checkbox" class="project-checkbox" data-project-id="${planning.projectId}">`,  // Lägg till teamnamnet här och checkbox
+                        text: `${projectData.name} (${teamName})`,  // Lägg till teamnamnet här
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -234,7 +203,7 @@ function initializeGanttScript() {
 
                     taskList.push({
                         id: planning.id,
-                        text: `${projectData.name} (${teamName})`,  
+                        text: `${projectData.name} (${teamName})`,  // Lägg till teamnamnet här
                         start_date: startDate,
                         end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -364,4 +333,8 @@ function initializeGanttScript() {
             }, 300);
         }, 3000);
     }
-}
+});
+
+window.navigateTo = (page) => {
+    window.location.href = page;
+};
