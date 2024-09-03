@@ -56,13 +56,11 @@ function addUserRow(uid, userData) {
                 <option value="Elektriker" ${userData.role === 'Elektriker' ? 'selected' : ''}>Elektriker</option>
             </select>
         </td>
-        <td>
-            <select data-uid="${uid}" class="team-select">
-                ${allTeams.map(team => `
-                    <option value="${team.name}" ${userData.team === team.name ? 'selected' : ''}>${team.name}</option>
-                `).join('')}
-            </select>
-        </td>
+        ${allTeams.map(team => `
+            <td>
+                <input type="checkbox" data-uid="${uid}" data-team="${team.name}" ${userData.teams && userData.teams.includes(team.name) ? 'checked' : ''}>
+            </td>
+        `).join('')}
         <td>
             <select data-uid="${uid}" class="status-select ${statusClass}">
                 <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
@@ -86,19 +84,21 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
     if (e.target.classList.contains('update-role-btn')) {
         const uid = e.target.getAttribute('data-uid');
         const selectRoleElement = document.querySelector(`select.role-select[data-uid="${uid}"]`);
-        const selectTeamElement = document.querySelector(`select.team-select[data-uid="${uid}"]`);
         const selectStatusElement = document.querySelector(`select.status-select[data-uid="${uid}"]`);
+        const teamCheckboxes = document.querySelectorAll(`input[type="checkbox"][data-uid="${uid}"]`);
 
         const newRole = selectRoleElement.value;
-        const newTeam = selectTeamElement.value;
         const newStatus = selectStatusElement.value === 'true';
+        const newTeams = Array.from(teamCheckboxes)
+                              .filter(checkbox => checkbox.checked)
+                              .map(checkbox => checkbox.getAttribute('data-team'));
 
         try {
             const userRef = doc(db, 'users', uid);
-            await updateDoc(userRef, { role: newRole, team: newTeam, active: newStatus });
+            await updateDoc(userRef, { role: newRole, teams: newTeams, active: newStatus });
 
-            // Uppdatera teamets medlemslista
-            await updateTeamMembership(uid, newTeam);
+            // Uppdatera teamens medlemslistor
+            await updateTeamMembership(uid, newTeams);
 
             alert('Användaruppgifter uppdaterade!');
         } catch (error) {
@@ -108,8 +108,8 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
     }
 });
 
-// Funktion för att uppdatera teamets medlemslista
-async function updateTeamMembership(userId, newTeamName) {
+// Funktion för att uppdatera teamens medlemslistor
+async function updateTeamMembership(userId, newTeamNames) {
     // Hämta alla team
     const teamsSnapshot = await getDocs(collection(db, 'teams'));
     const allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -127,12 +127,18 @@ async function updateTeamMembership(userId, newTeamName) {
         }
     }
 
-    // Lägg till användaren till det nya teamet (om ett team är valt)
-    if (newTeamName) {
+    // Lägg till användaren till de nya teamen, om de inte redan är medlemmar
+    for (const newTeamName of newTeamNames) {
         const newTeam = allTeams.find(team => team.name === newTeamName);
         if (newTeam) {
             const teamRef = doc(db, 'teams', newTeam.id);
-            const updatedMembers = [...(newTeam.members || []), userName];
+            let updatedMembers = newTeam.members || [];
+
+            // Kolla om användaren redan är i medlemslistan
+            if (!updatedMembers.includes(userName)) {
+                updatedMembers.push(userName); // Lägg till användaren om de inte redan är i listan
+            }
+
             await updateDoc(teamRef, { members: updatedMembers });
         }
     }
