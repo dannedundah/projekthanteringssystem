@@ -3,81 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkylator med Google Sheets</title>
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .result {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+    <title>Hantera Användare och Behörigheter</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="auth-check.js"></script>
+    <script type="module" src="user-management.js"></script>
 </head>
 <body>
+    <div class="container">
+        <h2>Hantera Användare och Behörigheter</h2>
 
-<div class="container">
-    <h1>Kalkylator med Google Sheets</h1>
+        <!-- Roll-, team- och behörighetstabell -->
+        <table id="roles-table">
+            <thead>
+                <tr>
+                    <th>Namn</th>
+                    <th>E-post</th>
+                    <th>Behörighet</th>
+                    <th>Team</th> <!-- Ny kolumn för team -->
+                    <th>Status</th> <!-- Kolumn för status -->
+                    <th>Uppdatera</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamisk lista över användare, deras behörigheter, team och status -->
+            </tbody>
+        </table>
 
-    <table>
-        <tr>
-            <th>Produkt</th>
-            <th>Pris</th>
-        </tr>
-        <tr>
-            <td id="produkt1"></td>
-            <td id="pris1"></td>
-        </tr>
-        <tr>
-            <td id="produkt2"></td>
-            <td id="pris2"></td>
-        </tr>
-        <tr>
-            <td id="produkt3"></td>
-            <td id="pris3"></td>
-        </tr>
-        <!-- Lägg till fler rader efter behov -->
-    </table>
+        <button onclick="navigateTo('admin.html')">Tillbaka</button>
+    </div>
 
-    <button onclick="berakna()">Uppdatera Priser</button>
-
-    <div class="result" id="resultat"></div>
-</div>
-
-<script>
-    function berakna() {
-        // Anropa Google Apps Script-funktionen för att uppdatera Google Sheets och hämta resultat
-        google.script.run
-            .withSuccessHandler(function(data) {
-                // Uppdatera produkterna och priserna i HTML
-                document.getElementById("produkt1").innerText = data.produkter[0];
-                document.getElementById("pris1").innerText = data.priser[0];
-                document.getElementById("produkt2").innerText = data.produkter[1];
-                document.getElementById("pris2").innerText = data.priser[1];
-                document.getElementById("produkt3").innerText = data.produkter[2];
-                document.getElementById("pris3").innerText = data.priser[2];
-                // Fortsätt för fler rader om det finns
-            })
-            .hamtaProdukterOchPriser();
-    }
-
-    // Kör funktionen direkt för att hämta initiala data
-    berakna();
-</script>
-
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
 </body>
 </html>
