@@ -56,13 +56,11 @@ function addUserRow(uid, userData) {
                 <option value="Elektriker" ${userData.role === 'Elektriker' ? 'selected' : ''}>Elektriker</option>
             </select>
         </td>
-        <td>
-            <select data-uid="${uid}" class="team-select" multiple>
-                ${allTeams.map(team => `
-                    <option value="${team.name}" ${userData.teams && userData.teams.includes(team.name) ? 'selected' : ''}>${team.name}</option>
-                `).join('')}
-            </select>
-        </td>
+        ${allTeams.map(team => `
+            <td>
+                <input type="checkbox" data-uid="${uid}" data-team="${team.name}" ${userData.teams && userData.teams.includes(team.name) ? 'checked' : ''}>
+            </td>
+        `).join('')}
         <td>
             <select data-uid="${uid}" class="status-select ${statusClass}">
                 <option value="true" ${userData.active ? 'selected' : ''}>Aktiv</option>
@@ -86,12 +84,14 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
     if (e.target.classList.contains('update-role-btn')) {
         const uid = e.target.getAttribute('data-uid');
         const selectRoleElement = document.querySelector(`select.role-select[data-uid="${uid}"]`);
-        const selectTeamElements = document.querySelectorAll(`select.team-select[data-uid="${uid}"] option:checked`);
         const selectStatusElement = document.querySelector(`select.status-select[data-uid="${uid}"]`);
+        const teamCheckboxes = document.querySelectorAll(`input[type="checkbox"][data-uid="${uid}"]`);
 
         const newRole = selectRoleElement.value;
-        const newTeams = Array.from(selectTeamElements).map(option => option.value);
         const newStatus = selectStatusElement.value === 'true';
+        const newTeams = Array.from(teamCheckboxes)
+                              .filter(checkbox => checkbox.checked)
+                              .map(checkbox => checkbox.getAttribute('data-team'));
 
         try {
             const userRef = doc(db, 'users', uid);
