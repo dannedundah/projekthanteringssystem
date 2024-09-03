@@ -127,12 +127,18 @@ async function updateTeamMembership(userId, newTeamNames) {
         }
     }
 
-    // Lägg till användaren till de nya teamen
+    // Lägg till användaren till de nya teamen, om de inte redan är medlemmar
     for (const newTeamName of newTeamNames) {
         const newTeam = allTeams.find(team => team.name === newTeamName);
         if (newTeam) {
             const teamRef = doc(db, 'teams', newTeam.id);
-            const updatedMembers = [...(newTeam.members || []), userName];
+            let updatedMembers = newTeam.members || [];
+
+            // Kolla om användaren redan är i medlemslistan
+            if (!updatedMembers.includes(userName)) {
+                updatedMembers.push(userName); // Lägg till användaren om de inte redan är i listan
+            }
+
             await updateDoc(teamRef, { members: updatedMembers });
         }
     }
