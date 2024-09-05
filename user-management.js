@@ -52,11 +52,12 @@ function addUserRow(uid, userData) {
     const row = document.createElement('tr');
     const statusClass = userData.active ? 'status-active' : 'status-inactive';
 
+    // Rendera användarens rad med roll, team-tillhörigheter, status och uppdateringsknapp
     row.innerHTML = `
         <td>${fullName}</td>
         <td>${userData.email || 'Ingen e-post'}</td>
         <td>
-           <select data-uid="${uid}" class="role-select">
+            <select data-uid="${uid}" class="role-select">
                 <option value="Admin" ${userData.role === 'Admin' ? 'selected' : ''}>Admin</option>
                 <option value="Montör" ${userData.role === 'Montör' ? 'selected' : ''}>Montör</option>
                 <option value="Säljare" ${userData.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
@@ -92,7 +93,7 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
         const newStatus = selectStatusElement.value === 'true';
         const newTeams = Array.from(teamCheckboxes)
                               .filter(checkbox => checkbox.checked)
-                              .map(checkbox => checkbox.getAttribute('data-team'));
+                              .map(checkbox => checkbox.getAttribute('data-team')); // Här sparas teamnamnet korrekt
 
         try {
             const userRef = doc(db, 'users', uid);
