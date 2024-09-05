@@ -93,7 +93,7 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
         const newStatus = selectStatusElement.value === 'true';
         const newTeams = Array.from(teamCheckboxes)
                               .filter(checkbox => checkbox.checked)
-                              .map(checkbox => checkbox.getAttribute('data-team')); // Här sparas teamnamnet korrekt
+                              .map(checkbox => checkbox.getAttribute('data-team')); // Sparar rätt teamnamn
 
         try {
             const userRef = doc(db, 'users', uid);
