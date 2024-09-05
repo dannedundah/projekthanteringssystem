@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
+                        color: taskColor,  // ANVÄND SAMMA LOGIK FÖR FÄRG SOM ÖVRIGA PROJEKT
                         checkbox: planning.electricianChecked || false  // Sätt initialt checkbox-värde
                     });
                 } else {
