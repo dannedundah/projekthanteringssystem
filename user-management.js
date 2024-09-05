@@ -29,6 +29,14 @@ async function loadUserManagement() {
     const teamsSnapshot = await getDocs(collection(db, 'teams'));
     allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+    // Definiera den specifika ordningen på teamen
+    const teamOrder = ['Team Admin', 'Team Marcus', 'Team Reza', 'Team Rickard', 'Team Service'];
+
+    // Sortera teamen enligt den definierade ordningen
+    allTeams.sort((a, b) => {
+        return teamOrder.indexOf(a.name) - teamOrder.indexOf(b.name);
+    });
+
     // Ladda alla användare från Firestore
     const usersSnapshot = await getDocs(collection(db, 'users'));
     allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -70,13 +78,6 @@ function addUserRow(uid, userData) {
         <td><button class="update-role-btn" data-uid="${uid}">Uppdatera</button></td>
     `;
     document.getElementById('roles-table').querySelector('tbody').appendChild(row);
-
-    // Lägg till event listener för att ändra statusfärgen när dropdown-värdet ändras
-    const statusSelect = row.querySelector(`select.status-select[data-uid="${uid}"]`);
-    updateStatusColor(statusSelect, statusSelect.value === 'true');
-    statusSelect.addEventListener('change', () => {
-        updateStatusColor(statusSelect, statusSelect.value === 'true');
-    });
 }
 
 // Event listener för att uppdatera roll, team och status
@@ -110,11 +111,9 @@ document.getElementById('roles-table').addEventListener('click', async (e) => {
 
 // Funktion för att uppdatera teamens medlemslistor
 async function updateTeamMembership(userId, newTeamNames) {
-    // Hämta alla team
     const teamsSnapshot = await getDocs(collection(db, 'teams'));
     const allTeams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Hämta användardata för att använda förnamn och efternamn
     const user = allUsers.find(u => u.id === userId);
     const userName = `${user.firstName} ${user.lastName}`;
 
