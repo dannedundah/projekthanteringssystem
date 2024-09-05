@@ -184,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: "#FFD700",
                         checkbox: planning.electricianChecked || false  // Sätt initialt checkbox-värde
                     });
                 } else {
