@@ -157,6 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'elektriker klar':
                         taskColor = 'purple';
                         break;
+                        case 'elektriker klar men inte solceller':
+                        taskColor = 'yellow';
+                        break;
                     case 'driftsatt':
                         taskColor = 'green';
                         break;
