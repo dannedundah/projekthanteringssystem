@@ -248,10 +248,7 @@ button.remove-button:hover {
     list-style-type: none !important;
 }
 
-.electrician-marker {
-    background-color: #FFD700 !important;
-    height: 20px !important;
-}
+
 .confirmation-popup {
     position: fixed;
     bottom: 20px;
