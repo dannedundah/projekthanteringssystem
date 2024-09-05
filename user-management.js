@@ -48,7 +48,7 @@ function addUserRow(uid, userData) {
         <td>${fullName}</td>
         <td>${userData.email || 'Ingen e-post'}</td>
         <td>
-            <select data-uid="${uid}" class="role-select">
+           <select data-uid="${uid}" class="role-select">
                 <option value="Admin" ${userData.role === 'Admin' ? 'selected' : ''}>Admin</option>
                 <option value="Montör" ${userData.role === 'Montör' ? 'selected' : ''}>Montör</option>
                 <option value="Säljare" ${userData.role === 'Säljare' ? 'selected' : ''}>Säljare</option>
