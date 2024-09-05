@@ -6,66 +6,7 @@
     <title>Hantera Användare och Behörigheter</title>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="auth-check.js"></script>
-    <script type="module" src="user-management.js"></script>
-    <style>
-        /* Styla tabellen så att kolumnerna justeras korrekt */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* Låter kolumnerna ha lika mycket utrymme */
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        /* Specifika kolumner kan få bredare utrymme om så önskas */
-        th:nth-child(1), td:nth-child(1) {
-            width: 20%; /* Exempel på bredare kolumn för namn */
-        }
-
-        th:nth-child(2), td:nth-child(2) {
-            width: 20%; /* Exempel på bredare kolumn för e-post */
-        }
-
-        th:nth-child(3), td:nth-child(3) {
-            width: 20%; /* Kolumn för roll */
-        }
-
-        th:nth-child(4), td:nth-child(4),
-        th:nth-child(5), td:nth-child(5),
-        th:nth-child(6), td:nth-child(6),
-        th:nth-child(7), td:nth-child(7) {
-            width: 10%; /* Justera bredd för teamkolumner */
-        }
-
-        th:nth-child(8), td:nth-child(8) {
-            width: 10%; /* Statuskolumn */
-        }
-
-        th:nth-child(9), td:nth-child(9) {
-            width: 10%; /* Uppdateringsknapp */
-        }
-
-        /* Anpassa knappar och statusfärg */
-        .status-select {
-            padding: 5px;
-        }
-
-        button.update-role-btn {
-            background-color: orange;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            cursor: pointer;
-        }
-
-        button.update-role-btn:hover {
-            background-color: darkorange;
-        }
-    </style>
+    <script type="module" src="testmodul.js"></script>
 </head>
 <body>
     <div class="container">
@@ -78,13 +19,14 @@
                     <th>Namn</th>
                     <th>E-post</th>
                     <th>Behörighet</th>
-                    <th>Team Admin</th>
-                    <th>Team Rickard</th>
-                    <th>Team Marcus</th>
-                    <th>Team Reza</th>
-                    <th>Team Service</th>
-                    <th>Status</th>
-                    <th>Uppdatera</th>
+                    <!-- Dynamiskt skapade kolumner för varje team -->
+                    <th>Team Admin</th> <!-- Kolumn för teamet "Admin" -->
+                    <th>Team Rickard</th> <!-- Kolumn för teamet "Rickard" -->
+                    <th>Team Marcus</th> <!-- Kolumn för teamet "Marcus" -->
+                    <th>Team Reza</th> <!-- Kolumn för teamet "Reza" -->
+                    <th>Team Service</th> <!-- Ny kolumn för teamet "Service" -->
+                    <th>Status</th> <!-- Kolumn för status -->
+                    <th>Uppdatera</th> <!-- Kolumn för uppdateringsknappen -->
                 </tr>
             </thead>
             <tbody>
