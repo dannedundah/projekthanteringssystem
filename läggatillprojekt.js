@@ -85,7 +85,7 @@ Nätbolag:
                 const planning = {
                     projectId: docRef.id,
                     startDate: availableStartDate,
-                    endDate: calculateEndDate(availableStartDate, estimatedDays), // Använd uppdaterad funktion
+                    endDate: calculateEndDate(availableStartDate, estimatedDays), // Inkludera alla dagar
                     team: selectedTeam, // Tilldelat team med närmast lediga tid
                     employees: ['Employee1', 'Employee2'], // Justera anställda här
                 };
