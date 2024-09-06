@@ -128,8 +128,12 @@ async function getAvailableStartDateForTeam(estimatedDays) {
     let availableStartDate = new Date();
     availableStartDate.setHours(0, 0, 0, 0); // Nollställ tid så vi bara jobbar med datum
 
-    // Gå igenom varje dag tills vi hittar en ledig dag för ett av teamen
-    while (true) {
+    // Kontroll för att se till att datumet inte ligger bakåt i tiden
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Sätt dagens datum utan tidskomponent
+
+    // Gå igenom varje dag tills vi hittar en ledig dag för ett av teamen framåt i tiden
+    while (availableStartDate >= today) {
         if (isWeekday(availableStartDate) && !isRedDay(availableStartDate)) {
             for (let team of teams) {
                 const teamPlannings = existingPlannings.filter(planning => planning.team === team);
@@ -161,7 +165,15 @@ async function getAvailableStartDateForTeam(estimatedDays) {
         // Om inget team är tillgängligt, gå framåt en dag
         availableStartDate.setDate(availableStartDate.getDate() + 1);
     }
+
+    // Om alla tillgängliga datum är förbi dagens datum, säkerställ att schemaläggningen inte går bakåt i tiden
+    if (availableStartDate < today) {
+        availableStartDate = today;
+    }
+
+    return { startDate: availableStartDate.toISOString().split('T')[0], team: teams[0] }; // Returnera dagens datum eller närmaste framåt
 }
+
 
 // Funktion för att kontrollera om en dag är en vardag (måndag till fredag)
 function isWeekday(date) {
