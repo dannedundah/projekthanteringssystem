@@ -1,5 +1,17 @@
 import { db, collection, addDoc, storage, ref, uploadBytes, getDownloadURL, updateDoc, doc, getDocs, query } from './firebase-config.js';
 
+// Lista över röda dagar (år måste uppdateras varje år eller dynamiskt)
+const redDays = [
+    '2024-01-01', // Nyårsdagen
+    '2024-04-10', // Långfredagen
+    '2024-04-13', // Annandag påsk
+    '2024-05-01', // Första maj
+    '2024-05-21', // Kristi Himmelsfärdsdag
+    '2024-06-06', // Nationaldagen
+    '2024-12-25', // Juldagen
+    '2024-12-26', // Annandag jul
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     const projectForm = document.getElementById('project-form');
     const projectDescription = document.getElementById('project-description');
@@ -107,56 +119,108 @@ Nätbolag:
 
 // Funktionsdefinitioner
 
-// Funktion för att hitta lediga startdatum för teamet baserat på antal dagar
+// Funktion för att hitta lediga startdatum för teamet baserat på antal dagar och hantera vardagar och röda dagar
 async function getAvailableStartDateForTeam(estimatedDays) {
     const teams = ['Team Marcus', 'Team Rickard', 'Team Reza'];
     const planningsSnapshot = await getDocs(collection(db, 'planning'));
     const existingPlannings = planningsSnapshot.docs.map(doc => doc.data());
 
-    let availableStartDate = new Date(); 
-    while (!isTeamAvailableOnDate(availableStartDate, teams, estimatedDays, existingPlannings)) {
-        availableStartDate.setDate(availableStartDate.getDate() + 1); 
-    }
+    let availableStartDate = new Date(); // Börja från dagens datum
+    availableStartDate.setHours(0, 0, 0, 0); // Nollställ tid så vi bara jobbar med datum
 
-    return availableStartDate.toISOString().split('T')[0];
+    while (true) {
+        // Kontrollera om dagen är en vardag och inte röd dag
+        if (isWeekday(availableStartDate) && !isRedDay(availableStartDate)) {
+            // Kolla om alla team har lediga dagar på startdatumet
+            let teamAvailable = teams.every(team => {
+                // Filtrera scheman för det aktuella teamet
+                const teamPlannings = existingPlannings.filter(planning => planning.team === team);
+
+                // Kolla om det finns scheman som överlappar med detta startdatum
+                return !teamPlannings.some(planning => {
+                    const planningStartDate = new Date(planning.startDate);
+                    const planningEndDate = new Date(planning.endDate);
+
+                    // Kontrollera om det planerade datumet överlappar med de datum vi söker
+                    return (availableStartDate <= planningEndDate && availableStartDate >= planningStartDate);
+                });
+            });
+
+            if (teamAvailable) {
+                // Kontrollera att det finns tillräckligt med utrymme för alla dagar i rad
+                let allDaysAvailable = true;
+                for (let i = 0; i < estimatedDays; i++) {
+                    const checkDate = new Date(availableStartDate);
+                    checkDate.setDate(checkDate.getDate() + i);
+
+                    // Kontrollera varje dag om den är en vardag och inte en röd dag
+                    if (!isWeekday(checkDate) || isRedDay(checkDate)) {
+                        allDaysAvailable = false;
+                        break;
+                    }
+
+                    teamAvailable = teams.every(team => {
+                        const teamPlannings = existingPlannings.filter(planning => planning.team === team);
+                        return !teamPlannings.some(planning => {
+                            const planningStartDate = new Date(planning.startDate);
+                            const planningEndDate = new Date(planning.endDate);
+                            return (checkDate <= planningEndDate && checkDate >= planningStartDate);
+                        });
+                    });
+
+                    if (!teamAvailable) {
+                        allDaysAvailable = false;
+                        break;
+                    }
+                }
+
+                if (allDaysAvailable) {
+                    // Om alla dagar är tillgängliga, returnera detta startdatum
+                    return availableStartDate.toISOString().split('T')[0];
+                }
+            }
+        }
+
+        // Om teamet inte är tillgängligt eller det är en röd dag, gå framåt en dag
+        availableStartDate.setDate(availableStartDate.getDate() + 1);
+    }
 }
 
-// Funktion för att kontrollera om teamet är tillgängligt under en viss period
-function isTeamAvailableOnDate(startDate, teams, estimatedDays, existingPlannings) {
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + estimatedDays);
+// Funktion för att kontrollera om en dag är en vardag (måndag till fredag)
+function isWeekday(date) {
+    const day = date.getDay();
+    return day >= 1 && day <= 5; // 1 = måndag, 5 = fredag
+}
 
-    return teams.every(team => {
-        const teamPlannings = existingPlannings.filter(planning => planning.team === team);
-        return !teamPlannings.some(planning => {
-            const planningStartDate = new Date(planning.startDate);
-            const planningEndDate = new Date(planning.endDate);
-            return (startDate <= planningEndDate && endDate >= planningStartDate);
-        });
-    });
+// Funktion för att kontrollera om en dag är en röd dag
+function isRedDay(date) {
+    const formattedDate = date.toISOString().split('T')[0]; // Formatera som YYYY-MM-DD
+    return redDays.includes(formattedDate);
 }
 
 // Funktion för att hitta lediga datum för elektriker
 async function getElectricianAvailableDate(preferredDate) {
-    const maxProjectsPerDay = 2;
+    const maxProjectsPerDay = 2; // Max antal projekt per dag för en elektriker
     let availableDate = new Date(preferredDate);
 
-    while (!(await isElectricianAvailableOnDate(availableDate, maxProjectsPerDay))) {
-        availableDate.setDate(availableDate.getDate() + 1); 
+    while (true) {
+        // Kontrollera om dagen är en vardag och inte en röd dag
+        if (isWeekday(availableDate) && !isRedDay(availableDate)) {
+            const dateString = availableDate.toISOString().split('T')[0];
+            const planningsSnapshot = await getDocs(collection(db, 'planning'));
+            const electricianPlannings = planningsSnapshot.docs
+                .map(doc => doc.data())
+                .filter(planning => planning.electricianStartDate === dateString);
+
+            // Om färre än max antal projekt är schemalagda, returnera datumet
+            if (electricianPlannings.length < maxProjectsPerDay) {
+                return dateString;
+            }
+        }
+
+        // Om elektrikern inte är tillgänglig eller det är en röd dag, gå framåt en dag
+        availableDate.setDate(availableDate.getDate() + 1);
     }
-
-    return availableDate.toISOString().split('T')[0];
-}
-
-// Funktion för att kontrollera om elektriker är tillgänglig på ett visst datum
-async function isElectricianAvailableOnDate(date, maxProjectsPerDay) {
-    const dateString = date.toISOString().split('T')[0];
-    const planningsSnapshot = await getDocs(collection(db, 'planning'));
-    const electricianPlannings = planningsSnapshot.docs
-        .map(doc => doc.data())
-        .filter(planning => planning.electricianStartDate === dateString);
-
-    return electricianPlannings.length < maxProjectsPerDay;
 }
 
 // Funktion för att beräkna slutdatum för projektet baserat på startdatum och uppskattade dagar
@@ -169,6 +233,7 @@ function calculateEndDate(startDate, estimatedDays) {
 // Funktion för att planera elektrikerns startdatum
 function calculateElectricianDate(startDate, estimatedDays) {
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + estimatedDays - 1); 
+    endDate.setDate(endDate.getDate() + estimatedDays - 1);
     return endDate.toISOString().split('T')[0];
 }
+
