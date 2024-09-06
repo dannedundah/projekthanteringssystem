@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, doc, updateDoc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from './firebase-config.js';
 
 export async function autoScheduleProject(projectId, panelCount) {
     const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];  // Endast dessa team ska schemaläggas automatiskt
@@ -112,4 +112,30 @@ function getNextWorkingDay(date) {
         nextDate.setDate(nextDate.getDate() + 1);
     }
     return nextDate;
+}
+
+// Funktion för att manuellt uppdatera datum
+export async function updateProjectDates(projectId, startDate, endDate) {
+    try {
+        const planningRef = doc(db, 'planning', projectId);
+        await updateDoc(planningRef, {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0]
+        });
+
+        console.log(`Projektets datum har uppdaterats: Start ${startDate}, Slut ${endDate}`);
+    } catch (error) {
+        console.error('Error updating project dates:', error);
+    }
+}
+
+// Funktion för att ta bort ett projekt
+export async function deleteProject(projectId) {
+    try {
+        const planningRef = doc(db, 'planning', projectId);
+        await deleteDoc(planningRef);
+        console.log(`Projektet har tagits bort: ${projectId}`);
+    } catch (error) {
+        console.error('Error deleting project:', error);
+    }
 }

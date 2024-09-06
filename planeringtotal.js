@@ -6,8 +6,10 @@ import {
     doc, 
     getDoc, 
     updateDoc, 
+    deleteDoc, 
     onAuthStateChanged 
 } from './firebase-config.js';
+import { updateProjectDates, deleteProject } from './planering.js';  // Importera funktioner för datumuppdatering och borttagning
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
@@ -86,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
                 .sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
-            // Filtrera endast Team Marcus, Team Rickard, och Team Mustafa
             const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];
             filteredPlannings = plannings
                 .filter(planning => 
@@ -128,7 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: "checkbox", label: "", width: 30, template: checkboxTemplate }, 
             { name: "text", label: "Task name", width: 270, tree: true }, 
             { name: "start_date", label: "Start time", align: "center", width: 80 },
-            { name: "duration", label: "Duration", align: "center", width: 60 }
+            { name: "duration", label: "Duration", align: "center", width: 60 },
+            { name: "delete", label: "Ta bort", align: "center", width: 80, template: deleteButtonTemplate }  // Lägg till ta bort-knapp
         ];
 
         gantt.init("gantt-chart");
@@ -157,9 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     case 'elektriker klar':
                         taskColor = 'purple';
-                        break;
-                        case 'elektriker klar men inte solceller':
-                        taskColor = 'yellow';
                         break;
                     case 'driftsatt':
                         taskColor = 'green';
@@ -221,28 +220,21 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        gantt.attachEvent("onTaskClick", function(id, e) {
-            const task = gantt.getTask(id);
-            if (e.target.type === 'checkbox') {
-                const isChecked = e.target.checked;
-                task.checkbox = isChecked;
-                saveCheckboxState(task.id, isChecked);
-                e.stopPropagation();
-                return true;
-            } else if (e.target.closest('.gantt_cell')) {
-                window.location.href = task.detailsLink;
-                return false;
-            }
-            return true;
-        });
-
-        gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
-            return true;
-        });
-
+        // Event för att uppdatera datum manuellt
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
-            await saveTaskDates(id);
-            showConfirmationPopup("Projekt uppdaterat!");
+            const task = gantt.getTask(id);
+            await updateProjectDates(task.projectId, task.start_date, task.end_date);
+            showConfirmationPopup("Projektets datum har uppdaterats!");
+        });
+
+        // Event för att ta bort ett projekt
+        gantt.attachEvent("onTaskClick", async function(id, e) {
+            if (e.target.classList.contains('delete-button')) {
+                const task = gantt.getTask(id);
+                await deleteProject(task.projectId);
+                showConfirmationPopup("Projektet har tagits bort!");
+                filterAndRenderGantt("");  // Uppdatera grafen efter borttagning
+            }
         });
 
         function checkboxTemplate(task) {
@@ -252,59 +244,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return '';
         }
-    }
 
-    async function saveCheckboxState(taskId, isChecked) {
-        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
-        try {
-            await updateDoc(planningRef, {
-                electricianChecked: isChecked
-            });
-            console.log(`Checkbox state saved successfully for task: ${taskId}`);
-        } catch (error) {
-            console.error("Error updating checkbox state: ", error);
-        }
-    }
-
-    async function saveTaskDates(taskId) {
-        const task = gantt.getTask(taskId);
-
-        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
-        const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
-
-        const formattedStartDate = startDate.toISOString().split('T')[0];
-        const formattedEndDate = endDate.toISOString().split('T')[0];
-
-        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
-
-        try {
-            const planningDoc = await getDoc(planningRef);
-
-            if (planningDoc.exists()) {
-                if (taskId.endsWith('-electrician')) {
-                    await updateDoc(planningRef, {
-                        electricianStartDate: formattedStartDate,
-                        electricianEndDate: formattedEndDate
-                    });
-                } else {
-                    await updateDoc(planningRef, {
-                        startDate: formattedStartDate,
-                        endDate: formattedEndDate
-                    });
-                }
-
-                const projectId = planningDoc.data().projectId;
-                const projectRef = doc(db, 'projects', projectId);
-                const projectDoc = await getDoc(projectRef);
-
-                if (projectDoc.exists()) {
-                    await updateDoc(projectRef, {
-                        status: 'Planerad'
-                    });
-                }
-            }
-        } catch (error) {
-            console.error("Error updating document: ", error);
+        function deleteButtonTemplate(task) {
+            return '<button class="delete-button">Ta bort</button>';
         }
     }
 
