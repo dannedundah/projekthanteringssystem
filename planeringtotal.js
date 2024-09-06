@@ -86,7 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 )
                 .sort((a, b) => new Date(a.electricianStartDate) - new Date(b.electricianStartDate));
         } else if (selectedTeam === "") {
-            const validTeams = ["Team Rickard", "Team Marcus", "Team Reza"];
+            // Filtrera endast Team Marcus, Team Rickard, och Team Mustafa
+            const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];
             filteredPlannings = plannings
                 .filter(planning => 
                     validTeams.includes(planning.team) && 
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: taskColor,  // ANVÄND SAMMA LOGIK FÖR FÄRG SOM ÖVRIGA PROJEKT
+                        color: taskColor,
                         checkbox: planning.electricianChecked || false  // Sätt initialt checkbox-värde
                     });
                 } else {
@@ -274,9 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedStartDate = startDate.toISOString().split('T')[0];
         const formattedEndDate = endDate.toISOString().split('T')[0];
 
-        console.log(`Saving dates for task: ${taskId}`);
-        console.log(`Start Date: ${formattedStartDate}, End Date: ${formattedEndDate}`);
-
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
         try {
@@ -295,14 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
-                console.log(`Dates saved successfully for task: ${taskId}`);
-
                 const projectId = planningDoc.data().projectId;
-                if (!projectId) {
-                    console.error(`No projectId found in planning document for taskId: ${taskId}`);
-                    return;
-                }
-
                 const projectRef = doc(db, 'projects', projectId);
                 const projectDoc = await getDoc(projectRef);
 
@@ -310,11 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await updateDoc(projectRef, {
                         status: 'Planerad'
                     });
-                } else {
-                    console.error(`No project document found for projectId: ${projectId}`);
                 }
-            } else {
-                console.error(`No planning document found for taskId: ${taskId}`);
             }
         } catch (error) {
             console.error("Error updating document: ", error);

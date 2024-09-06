@@ -1,31 +1,14 @@
 import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
 export async function autoScheduleProject(projectId, panelCount, teamSize, travelTimeMinutes) {
-    const redDays = ['2024-01-01', '2024-04-10'];  // Exempel på röda dagar
-
-    function isWorkingDay(date) {
-        const day = date.getDay();
-        const dateString = date.toISOString().split('T')[0];
-        return !(day === 0 || day === 6 || redDays.includes(dateString));
-    }
-
-    function getNextWorkingDay(date) {
-        let nextDate = new Date(date);
-        nextDate.setDate(nextDate.getDate() + 1);
-        while (!isWorkingDay(nextDate)) {
-            nextDate.setDate(nextDate.getDate() + 1);
-        }
-        return nextDate;
-    }
-
-    function calculateProjectDuration(panelCount, teamSize) {
-        return Math.ceil((panelCount / 0.7) / teamSize);
-    }
+    const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];  // Endast dessa team ska schemaläggas automatiskt
 
     try {
         const teamsSnapshot = await getDocs(collection(db, 'teams'));
-        const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
+        const teams = teamsSnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(team => validTeams.includes(team.name));  // Filtrera endast de relevanta teamen
+
         const planningsSnapshot = await getDocs(collection(db, 'planning'));
         const plannings = planningsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -35,17 +18,13 @@ export async function autoScheduleProject(projectId, panelCount, teamSize, trave
                 new Date(Math.max(...teamPlannings.map(p => new Date(p.endDate)))) : 
                 new Date(); 
 
-            const projectDuration = calculateProjectDuration(panelCount, team.members.length);
+            const projectDuration = calculateProjectDuration(panelCount, teamSize);
             let startDate = getNextWorkingDay(lastEndDate);
             let endDate = startDate;
 
             for (let i = 0; i < projectDuration; i++) {
                 endDate = getNextWorkingDay(endDate);
             }
-
-            const workHoursPerDay = 8; 
-            const travelTimeHours = travelTimeMinutes / 60;
-            const totalWorkHours = workHoursPerDay - travelTimeHours;
 
             await addDoc(collection(db, 'planning'), {
                 projectId,
@@ -56,7 +35,7 @@ export async function autoScheduleProject(projectId, panelCount, teamSize, trave
             });
 
             await autoScheduleElectrician(projectId, endDate);
-            break;  
+            break;  // Avsluta loopen efter att ett team har schemalagts
         }
     } catch (error) {
         console.error('Error scheduling project:', error);
@@ -87,7 +66,24 @@ async function autoScheduleElectrician(projectId, projectEndDate) {
             electricianStartDate: electricianStartDate.toISOString().split('T')[0],
             electricianEndDate: electricianEndDate.toISOString().split('T')[0]
         });
+
+        console.log(`Elektriker schemalagd på projekt ${projectId}`);
     } else {
         console.warn(`Elektrikern är redan bokad för två projekt den dagen: ${projectEndDate}`);
     }
+}
+
+function calculateProjectDuration(panelCount, teamSize) {
+    return Math.ceil((panelCount / 0.7) / teamSize);
+}
+
+function getNextWorkingDay(date) {
+    let nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    
+    // Exempel för att undvika helger, här kan du också lägga till logik för röda dagar
+    while (nextDate.getDay() === 0 || nextDate.getDay() === 6) {
+        nextDate.setDate(nextDate.getDate() + 1);
+    }
+    return nextDate;
 }
