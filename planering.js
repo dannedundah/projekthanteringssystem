@@ -23,7 +23,7 @@ export async function autoScheduleProject(projectId, panelCount) {
                 new Date(Math.max(...teamPlannings.map(p => new Date(p.endDate)))) : 
                 new Date(); 
 
-            let startDate = getNextWorkingDay(lastEndDate);
+            let startDate = getNextWorkingDay(lastEndDate);  // Hitta nästa arbetsdag efter det senaste slutdatumet
             
             // Om det är första teamet eller om detta team har ett tidigare ledigt datum
             if (!earliestStartDate || startDate < earliestStartDate) {
@@ -37,14 +37,14 @@ export async function autoScheduleProject(projectId, panelCount) {
             let endDate = earliestStartDate;
 
             for (let i = 0; i < projectDuration; i++) {
-                endDate = getNextWorkingDay(endDate);
+                endDate = getNextWorkingDay(endDate);  // Beräkna slutdatum baserat på arbetsdagar
             }
 
             // Lägg till schemat för projektet
             await addDoc(collection(db, 'planning'), {
                 projectId,
                 team: selectedTeam.name,
-                startDate: earliestStartDate.toISOString().split('T')[0],
+                startDate: earliestStartDate.toISOString().split('T')[0],  // Närmsta lediga arbetsdag
                 endDate: endDate.toISOString().split('T')[0],
                 employees: selectedTeam.members
             });
@@ -55,7 +55,7 @@ export async function autoScheduleProject(projectId, panelCount) {
                 status: 'Planerad'
             });
 
-            // Schemalägg elektriker
+            // Schemalägg elektriker dagen efter slutdatum
             await autoScheduleElectrician(projectId, endDate);
         }
 
@@ -73,15 +73,17 @@ async function autoScheduleElectrician(projectId, projectEndDate) {
         doc => doc.data().team === electricianName
     );
     
+    // Kontrollera om elektrikern redan har två projekt den dagen
     electricianBookings = electricianPlannings.filter(p => {
         const startDate = new Date(p.electricianStartDate);
         return startDate.toISOString().split('T')[0] === projectEndDate.toISOString().split('T')[0];
     });
 
     if (electricianBookings.length < 2) {
-        const electricianStartDate = projectEndDate;
-        const electricianEndDate = getNextWorkingDay(electricianStartDate);
+        const electricianStartDate = getNextWorkingDay(projectEndDate);  // Elektrikern börjar nästa arbetsdag efter att projektet slutar
+        const electricianEndDate = getNextWorkingDay(electricianStartDate);  // Elektrikern jobbar en dag
 
+        // Lägg till elektrikerns schema
         await addDoc(collection(db, 'planning'), {
             projectId,
             team: electricianName,
