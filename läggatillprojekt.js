@@ -1,5 +1,4 @@
 import { db, collection, addDoc, storage, ref, uploadBytes, getDownloadURL } from './firebase-config.js';
-import { autoScheduleProject } from './planering.js';  // Importera schemaläggningsfunktionen från planering.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const projectForm = document.getElementById('project-form');
@@ -21,7 +20,6 @@ Nätbolag:
     projectForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Hämta värden från formuläret
         const projectName = document.getElementById('project-input').value.trim();
         const customerName = document.getElementById('customer-name').value.trim();
         const customerPhone = document.getElementById('customer-phone').value.trim();
@@ -31,17 +29,10 @@ Nätbolag:
         const projectStatus = document.getElementById('project-status').value.trim();
         const projectFiles = document.getElementById('project-files').files;
 
-        // Ny information för schemaläggning
-        const panelCount = parseInt(document.getElementById('panel-count').value.trim());  // Antal paneler
-
-        // Sätt teamstorlek till en fast variabel
-        const teamSize = 2;  // Alltid två personer i teamet
-
         const imageUrls = [];
         const fileUrls = [];
 
         try {
-            // Ladda upp filer och bilder till Firebase Storage
             for (const file of projectFiles) {
                 const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
                 const fileType = file.type.startsWith('image/') ? 'project_images' : 'project_files';
@@ -56,7 +47,6 @@ Nätbolag:
                 }
             }
 
-            // Skapa nytt projektobjekt
             const project = {
                 name: projectName,
                 customerName,
@@ -70,21 +60,12 @@ Nätbolag:
                 createdAt: new Date().toISOString()
             };
 
-            // Spara projektet till Firestore
-            const docRef = await addDoc(collection(db, 'projects'), project);
-
-            // Schemalägg projektet automatiskt baserat på antal paneler och teamstorlek
-            await autoScheduleProject(docRef.id, panelCount, teamSize);
-
-            alert('Projektet har lagts till och schemalagts automatiskt!');
-            projectForm.reset();
+            await addDoc(collection(db, 'projects'), project);
+            alert('Projektet har lagts till!');
+            window.location.href = 'status.html';
         } catch (error) {
             console.error('Error adding project:', error);
             alert('Ett fel uppstod vid tillägg av projekt.');
         }
     });
-
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
 });

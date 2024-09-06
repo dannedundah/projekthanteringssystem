@@ -1,155 +1,143 @@
-import { 
-    db, 
-    collection, 
-    getDocs, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
-    doc, 
-    getDoc 
-} from './firebase-config.js';
+import { db, collection, getDocs, addDoc, query, where, doc, updateDoc, getDoc } from './firebase-config.js';
 
-export async function autoScheduleProject(projectId, panelCount) {
-    const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];  // Endast dessa team ska schemaläggas automatiskt
+document.addEventListener('DOMContentLoaded', async () => {
+    const planningForm = document.getElementById('planning-form');
+    const projectDropdown = document.getElementById('project-id');
+    const teamDropdown = document.getElementById('team-id');
+    const employeeDropdowns = [
+        document.getElementById('employee-id-1'),
+        document.getElementById('employee-id-2'),
+        document.getElementById('employee-id-3'),
+        document.getElementById('employee-id-4')
+    ];
+
+    if (!projectDropdown || !teamDropdown || employeeDropdowns.some(dropdown => !dropdown)) {
+        console.error('One or more dropdown elements are not found.');
+        return;
+    }
 
     try {
-        // Hämta alla team
+        // Fetch projects with status "Ny"
+        const projectsQuery = query(collection(db, 'projects'), where('status', '==', 'Ny'));
+        const projectsSnapshot = await getDocs(projectsQuery);
+        const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        projects.forEach(project => {
+            const option = document.createElement('option');
+            option.value = project.id;
+            option.textContent = project.name;
+            projectDropdown.appendChild(option);
+        });
+
+        // Fetch teams
         const teamsSnapshot = await getDocs(collection(db, 'teams'));
-        const teams = teamsSnapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .filter(team => validTeams.includes(team.name));  // Filtrera endast de relevanta teamen
+        const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Hämta alla befintliga schemaläggningar
-        const planningsSnapshot = await getDocs(collection(db, 'planning'));
-        const plannings = planningsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        teams.forEach(team => {
+            const option = document.createElement('option');
+            option.value = team.name;
+            option.textContent = team.name;
+            teamDropdown.appendChild(option);
+        });
 
-        let earliestStartDate = null;
-        let selectedTeam = null;
+        // Handle team selection to populate employees
+        teamDropdown.addEventListener('change', () => {
+            const selectedTeam = teamDropdown.value;
 
-        // Loopa genom teamen för att hitta det första teamet med lediga tider
-        for (const team of teams) {
-            const teamPlannings = plannings.filter(p => p.team === team.name);
-            
-            // Hitta det senaste slutdatumet för teamet eller sätt dagens datum om det är tomt
-            let lastEndDate = teamPlannings.length > 0 ? 
-                new Date(Math.max(...teamPlannings.map(p => new Date(p.endDate)))) : 
-                new Date(); 
-
-            let startDate = getNextWorkingDay(lastEndDate);  // Hitta nästa arbetsdag efter det senaste slutdatumet
-            
-            // Om detta team har ett tidigare ledigt datum än tidigare kontrollerade team
-            if (!earliestStartDate || startDate < earliestStartDate) {
-                earliestStartDate = startDate;
-                selectedTeam = team;
-            }
-        }
-
-        if (selectedTeam && earliestStartDate) {
-            const projectDuration = calculateProjectDuration(panelCount);
-            let endDate = earliestStartDate;
-
-            // Räkna ut slutdatumet baserat på arbetsdagar
-            for (let i = 0; i < projectDuration; i++) {
-                endDate = getNextWorkingDay(endDate);  
-            }
-
-            // Lägg till schemat för projektet
-            await addDoc(collection(db, 'planning'), {
-                projectId,
-                team: selectedTeam.name,
-                startDate: earliestStartDate.toISOString().split('T')[0],  // Närmsta lediga arbetsdag
-                endDate: endDate.toISOString().split('T')[0],
-                employees: selectedTeam.members
+            // Clear existing employees in all dropdowns
+            employeeDropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Välj anställd</option>';
             });
 
-            // Ändra projektets status till "Planerad"
-            const projectRef = doc(db, 'projects', projectId);
-            await updateDoc(projectRef, {
-                status: 'Planerad'
-            });
+            // Find the selected team
+            const team = teams.find(t => t.name === selectedTeam);
 
-            // Schemalägg elektriker dagen efter slutdatumet
-            await autoScheduleElectrician(projectId, endDate);
-        }
-
+            if (team && Array.isArray(team.members)) {
+                // Populate employees if team and members exist
+                team.members.forEach(member => {
+                    employeeDropdowns.forEach(dropdown => {
+                        const option = document.createElement('option');
+                        option.value = member;
+                        option.textContent = member;
+                        dropdown.appendChild(option);
+                    });
+                });
+            } else {
+                console.warn(`Team ${selectedTeam} has no members or members are not defined.`);
+            }
+        });
     } catch (error) {
-        console.error('Error scheduling project:', error);
+        console.error('Error fetching data:', error);
     }
-}
 
-async function autoScheduleElectrician(projectId, projectEndDate) {
-    const electricianName = "Elektriker";
-    let electricianBookings = [];
+    planningForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    // Hämta alla schemaläggningar för elektriker
-    const electricianPlanningsSnapshot = await getDocs(collection(db, 'planning'));
-    const electricianPlannings = electricianPlanningsSnapshot.docs.filter(
-        doc => doc.data().team === electricianName
-    );
-    
-    // Kontrollera om elektrikern redan har två projekt den dagen
-    electricianBookings = electricianPlannings.filter(p => {
-        const startDate = new Date(p.electricianStartDate);
-        return startDate.toISOString().split('T')[0] === projectEndDate.toISOString().split('T')[0];
+        const projectId = projectDropdown.value.trim();
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        const electricianStartDate = document.getElementById('electrician-start-date').value;
+        const electricianEndDate = document.getElementById('electrician-end-date').value;
+        const selectedTeam = teamDropdown.value;
+
+        // Justera slutdatumet för att inkludera hela den sista dagen
+        const adjustedEndDate = new Date(endDate);
+        adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);  // Lägg till en dag
+
+        // Justera elektrikerns slutdatum om det är ifyllt
+        let adjustedElectricianEndDate = null;
+        if (electricianEndDate) {
+            adjustedElectricianEndDate = new Date(electricianEndDate);
+            adjustedElectricianEndDate.setDate(adjustedElectricianEndDate.getDate() + 1);  // Lägg till en dag för elektrikern
+        }
+
+        // Collect selected employees
+        const selectedEmployees = employeeDropdowns.map(dropdown => dropdown.value).filter(employee => employee !== '');
+
+        const planning = {
+            projectId,
+            startDate,
+            endDate: adjustedEndDate.toISOString().split('T')[0], // Spara det justerade slutdatumet
+            team: selectedTeam,
+            employees: selectedEmployees,
+        };
+
+        // Lägg bara till elektrikerns datum om de är ifyllda
+        if (electricianStartDate && adjustedElectricianEndDate) {
+            planning.electricianStartDate = electricianStartDate;
+            planning.electricianEndDate = adjustedElectricianEndDate.toISOString().split('T')[0];
+        }
+
+        try {
+            // Save planning
+            await addDoc(collection(db, 'planning'), planning);
+
+            // Check if project exists and update its status
+            const projectRef = doc(db, 'projects', projectId);
+            const projectDoc = await getDoc(projectRef);
+
+            if (projectDoc.exists()) {
+                if (projectId !== "moBgPPK2jgyZaeBnqza1") {  // Kontrollera om det inte är det specifika projektet
+                    await updateDoc(projectRef, {
+                        status: 'Planerad'
+                    });
+                    alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+                } else {
+                    alert('Planering sparad, men projektstatus för detta projekt förblir "Ny".');
+                }
+            } else {
+                console.error(`Project with ID ${projectId} not found.`);
+                alert('Planering sparad, men kunde inte uppdatera projektstatus eftersom projektet inte hittades.');
+            }
+
+            planningForm.reset();
+        } catch (error) {
+            console.error('Error saving planning or updating project status:', error);
+            alert('Ett fel uppstod vid sparandet av planeringen eller uppdatering av projektstatus.');
+        }
     });
 
-    if (electricianBookings.length < 2) {
-        const electricianStartDate = getNextWorkingDay(projectEndDate);  // Elektrikern börjar dagen efter projektets slut
-        const electricianEndDate = getNextWorkingDay(electricianStartDate);  // Elektrikern jobbar en dag
-
-        // Lägg till elektrikerns schema
-        await addDoc(collection(db, 'planning'), {
-            projectId,
-            team: electricianName,
-            electricianStartDate: electricianStartDate.toISOString().split('T')[0],
-            electricianEndDate: electricianEndDate.toISOString().split('T')[0]
-        });
-
-        console.log(`Elektriker schemalagd för projekt ${projectId}`);
-    } else {
-        console.warn(`Elektrikern är redan bokad för två projekt den dagen: ${projectEndDate}`);
-    }
-}
-
-// Funktion för att beräkna hur många arbetsdagar ett projekt tar
-function calculateProjectDuration(panelCount) {
-    return Math.ceil((panelCount / 0.7) / 16);  // Formeln: Antal paneler / 0,7 / 16, avrundat till närmaste heltal
-}
-
-// Funktion för att hitta nästa arbetsdag, exkluderar helger
-function getNextWorkingDay(date) {
-    let nextDate = new Date(date);
-    nextDate.setDate(nextDate.getDate() + 1);
-    
-    // Exkludera helger (lördag och söndag)
-    while (nextDate.getDay() === 0 || nextDate.getDay() === 6) {
-        nextDate.setDate(nextDate.getDate() + 1);
-    }
-    return nextDate;
-}
-
-// Funktion för att manuellt uppdatera datum för ett projekt
-export async function updateProjectDates(projectId, startDate, endDate) {
-    try {
-        const planningRef = doc(db, 'planning', projectId);
-        await updateDoc(planningRef, {
-            startDate: startDate.toISOString().split('T')[0],
-            endDate: endDate.toISOString().split('T')[0]
-        });
-
-        console.log(`Projektets datum har uppdaterats: Start ${startDate}, Slut ${endDate}`);
-    } catch (error) {
-        console.error('Error updating project dates:', error);
-    }
-}
-
-// Funktion för att ta bort ett projekt
-export async function deleteProject(projectId) {
-    try {
-        const planningRef = doc(db, 'planning', projectId);
-        await deleteDoc(planningRef);  // Ta bort dokumentet från Firestore
-        console.log(`Projektet har tagits bort: ${projectId}`);
-    } catch (error) {
-        console.error('Error deleting project:', error);
-    }
-}
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
+});
