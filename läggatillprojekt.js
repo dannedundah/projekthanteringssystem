@@ -33,7 +33,6 @@ Nätbolag:
 
         // Ny information för schemaläggning
         const panelCount = parseInt(document.getElementById('panel-count').value.trim());  // Antal paneler
-        const travelTime = parseInt(document.getElementById('travel-time').value.trim());  // Restid i minuter
 
         // Sätt teamstorlek till en fast variabel
         const teamSize = 2;  // Alltid två personer i teamet
@@ -74,8 +73,8 @@ Nätbolag:
             // Spara projektet till Firestore
             const docRef = await addDoc(collection(db, 'projects'), project);
 
-            // Schemalägg projektet automatiskt baserat på antal paneler och restid
-            await autoScheduleProject(docRef.id, panelCount, teamSize, travelTime);
+            // Schemalägg projektet automatiskt baserat på antal paneler och teamstorlek
+            await autoScheduleProject(docRef.id, panelCount, teamSize);
 
             alert('Projektet har lagts till och schemalagts automatiskt!');
             projectForm.reset();
