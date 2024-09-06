@@ -121,7 +121,7 @@ Nätbolag:
 
 // Funktion för att hitta lediga startdatum för teamet som har närmast lediga tid
 async function getAvailableStartDateForTeam(estimatedDays) {
-    const teams = ['Team Marcus', 'Team Rickard', 'Team Reza'];
+    const teams = ['Team Rickard', 'Team Reza'];
     const planningsSnapshot = await getDocs(collection(db, 'planning'));
     const existingPlannings = planningsSnapshot.docs.map(doc => doc.data());
 
