@@ -1,6 +1,6 @@
-import { db, collection, getDocs, addDoc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, doc, updateDoc } from './firebase-config.js';
 
-export async function autoScheduleProject(projectId, panelCount, teamSize, travelTimeMinutes) {
+export async function autoScheduleProject(projectId, panelCount) {
     const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];  // Endast dessa team ska schemaläggas automatiskt
 
     try {
@@ -18,7 +18,7 @@ export async function autoScheduleProject(projectId, panelCount, teamSize, trave
                 new Date(Math.max(...teamPlannings.map(p => new Date(p.endDate)))) : 
                 new Date(); 
 
-            const projectDuration = calculateProjectDuration(panelCount, teamSize);
+            const projectDuration = calculateProjectDuration(panelCount);
             let startDate = getNextWorkingDay(lastEndDate);
             let endDate = startDate;
 
@@ -26,6 +26,7 @@ export async function autoScheduleProject(projectId, panelCount, teamSize, trave
                 endDate = getNextWorkingDay(endDate);
             }
 
+            // Lägg till schemat för projektet
             await addDoc(collection(db, 'planning'), {
                 projectId,
                 team: team.name,
@@ -34,6 +35,13 @@ export async function autoScheduleProject(projectId, panelCount, teamSize, trave
                 employees: team.members
             });
 
+            // Ändra projektets status till "Planerad"
+            const projectRef = doc(db, 'projects', projectId);
+            await updateDoc(projectRef, {
+                status: 'Planerad'
+            });
+
+            // Schemalägg elektriker
             await autoScheduleElectrician(projectId, endDate);
             break;  // Avsluta loopen efter att ett team har schemalagts
         }
@@ -73,15 +81,17 @@ async function autoScheduleElectrician(projectId, projectEndDate) {
     }
 }
 
-function calculateProjectDuration(panelCount, teamSize) {
-    return Math.ceil((panelCount / 0.7) / teamSize);
+// Formel för beräkning av arbetsdagar
+function calculateProjectDuration(panelCount) {
+    return Math.ceil((panelCount / 0.7) / 16);  // Formeln: Antal paneler / 0,7 / 16, avrundat till närmaste heltal
 }
 
+// Funktion för att hitta nästa arbetsdag, exkluderar helger
 function getNextWorkingDay(date) {
     let nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1);
     
-    // Exempel för att undvika helger, här kan du också lägga till logik för röda dagar
+    // Exkludera helger, du kan också lägga till logik för röda dagar här om nödvändigt
     while (nextDate.getDay() === 0 || nextDate.getDay() === 6) {
         nextDate.setDate(nextDate.getDate() + 1);
     }
