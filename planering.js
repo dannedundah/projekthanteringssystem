@@ -1,143 +1,93 @@
-import { db, collection, getDocs, addDoc, query, where, doc, updateDoc, getDoc } from './firebase-config.js';
+import { db, collection, getDocs, addDoc } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const planningForm = document.getElementById('planning-form');
-    const projectDropdown = document.getElementById('project-id');
-    const teamDropdown = document.getElementById('team-id');
-    const employeeDropdowns = [
-        document.getElementById('employee-id-1'),
-        document.getElementById('employee-id-2'),
-        document.getElementById('employee-id-3'),
-        document.getElementById('employee-id-4')
-    ];
+export async function autoScheduleProject(projectId, panelCount, teamSize, travelTimeMinutes) {
+    const redDays = ['2024-01-01', '2024-04-10'];  // Exempel på röda dagar
 
-    if (!projectDropdown || !teamDropdown || employeeDropdowns.some(dropdown => !dropdown)) {
-        console.error('One or more dropdown elements are not found.');
-        return;
+    function isWorkingDay(date) {
+        const day = date.getDay();
+        const dateString = date.toISOString().split('T')[0];
+        return !(day === 0 || day === 6 || redDays.includes(dateString));
+    }
+
+    function getNextWorkingDay(date) {
+        let nextDate = new Date(date);
+        nextDate.setDate(nextDate.getDate() + 1);
+        while (!isWorkingDay(nextDate)) {
+            nextDate.setDate(nextDate.getDate() + 1);
+        }
+        return nextDate;
+    }
+
+    function calculateProjectDuration(panelCount, teamSize) {
+        return Math.ceil((panelCount / 0.7) / teamSize);
     }
 
     try {
-        // Fetch projects with status "Ny"
-        const projectsQuery = query(collection(db, 'projects'), where('status', '==', 'Ny'));
-        const projectsSnapshot = await getDocs(projectsQuery);
-        const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        projects.forEach(project => {
-            const option = document.createElement('option');
-            option.value = project.id;
-            option.textContent = project.name;
-            projectDropdown.appendChild(option);
-        });
-
-        // Fetch teams
         const teamsSnapshot = await getDocs(collection(db, 'teams'));
         const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        const planningsSnapshot = await getDocs(collection(db, 'planning'));
+        const plannings = planningsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        teams.forEach(team => {
-            const option = document.createElement('option');
-            option.value = team.name;
-            option.textContent = team.name;
-            teamDropdown.appendChild(option);
-        });
+        for (const team of teams) {
+            const teamPlannings = plannings.filter(p => p.team === team.name);
+            let lastEndDate = teamPlannings.length > 0 ? 
+                new Date(Math.max(...teamPlannings.map(p => new Date(p.endDate)))) : 
+                new Date(); 
 
-        // Handle team selection to populate employees
-        teamDropdown.addEventListener('change', () => {
-            const selectedTeam = teamDropdown.value;
+            const projectDuration = calculateProjectDuration(panelCount, team.members.length);
+            let startDate = getNextWorkingDay(lastEndDate);
+            let endDate = startDate;
 
-            // Clear existing employees in all dropdowns
-            employeeDropdowns.forEach(dropdown => {
-                dropdown.innerHTML = '<option value="">Välj anställd</option>';
+            for (let i = 0; i < projectDuration; i++) {
+                endDate = getNextWorkingDay(endDate);
+            }
+
+            const workHoursPerDay = 8; 
+            const travelTimeHours = travelTimeMinutes / 60;
+            const totalWorkHours = workHoursPerDay - travelTimeHours;
+
+            await addDoc(collection(db, 'planning'), {
+                projectId,
+                team: team.name,
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
+                employees: team.members
             });
 
-            // Find the selected team
-            const team = teams.find(t => t.name === selectedTeam);
-
-            if (team && Array.isArray(team.members)) {
-                // Populate employees if team and members exist
-                team.members.forEach(member => {
-                    employeeDropdowns.forEach(dropdown => {
-                        const option = document.createElement('option');
-                        option.value = member;
-                        option.textContent = member;
-                        dropdown.appendChild(option);
-                    });
-                });
-            } else {
-                console.warn(`Team ${selectedTeam} has no members or members are not defined.`);
-            }
-        });
+            await autoScheduleElectrician(projectId, endDate);
+            break;  
+        }
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error scheduling project:', error);
     }
+}
 
-    planningForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+async function autoScheduleElectrician(projectId, projectEndDate) {
+    const electricianName = "Elektriker";
+    let electricianBookings = [];
 
-        const projectId = projectDropdown.value.trim();
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-        const electricianStartDate = document.getElementById('electrician-start-date').value;
-        const electricianEndDate = document.getElementById('electrician-end-date').value;
-        const selectedTeam = teamDropdown.value;
-
-        // Justera slutdatumet för att inkludera hela den sista dagen
-        const adjustedEndDate = new Date(endDate);
-        adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);  // Lägg till en dag
-
-        // Justera elektrikerns slutdatum om det är ifyllt
-        let adjustedElectricianEndDate = null;
-        if (electricianEndDate) {
-            adjustedElectricianEndDate = new Date(electricianEndDate);
-            adjustedElectricianEndDate.setDate(adjustedElectricianEndDate.getDate() + 1);  // Lägg till en dag för elektrikern
-        }
-
-        // Collect selected employees
-        const selectedEmployees = employeeDropdowns.map(dropdown => dropdown.value).filter(employee => employee !== '');
-
-        const planning = {
-            projectId,
-            startDate,
-            endDate: adjustedEndDate.toISOString().split('T')[0], // Spara det justerade slutdatumet
-            team: selectedTeam,
-            employees: selectedEmployees,
-        };
-
-        // Lägg bara till elektrikerns datum om de är ifyllda
-        if (electricianStartDate && adjustedElectricianEndDate) {
-            planning.electricianStartDate = electricianStartDate;
-            planning.electricianEndDate = adjustedElectricianEndDate.toISOString().split('T')[0];
-        }
-
-        try {
-            // Save planning
-            await addDoc(collection(db, 'planning'), planning);
-
-            // Check if project exists and update its status
-            const projectRef = doc(db, 'projects', projectId);
-            const projectDoc = await getDoc(projectRef);
-
-            if (projectDoc.exists()) {
-                if (projectId !== "moBgPPK2jgyZaeBnqza1") {  // Kontrollera om det inte är det specifika projektet
-                    await updateDoc(projectRef, {
-                        status: 'Planerad'
-                    });
-                    alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
-                } else {
-                    alert('Planering sparad, men projektstatus för detta projekt förblir "Ny".');
-                }
-            } else {
-                console.error(`Project with ID ${projectId} not found.`);
-                alert('Planering sparad, men kunde inte uppdatera projektstatus eftersom projektet inte hittades.');
-            }
-
-            planningForm.reset();
-        } catch (error) {
-            console.error('Error saving planning or updating project status:', error);
-            alert('Ett fel uppstod vid sparandet av planeringen eller uppdatering av projektstatus.');
-        }
+    const electricianPlanningsSnapshot = await getDocs(collection(db, 'planning'));
+    const electricianPlannings = electricianPlanningsSnapshot.docs.filter(
+        doc => doc.data().team === electricianName
+    );
+    
+    electricianBookings = electricianPlannings.filter(p => {
+        const startDate = new Date(p.electricianStartDate);
+        return startDate.toISOString().split('T')[0] === projectEndDate.toISOString().split('T')[0];
     });
 
-    window.navigateTo = (page) => {
-        window.location.href = page;
-    };
-});
+    if (electricianBookings.length < 2) {
+        const electricianStartDate = projectEndDate;
+        const electricianEndDate = getNextWorkingDay(electricianStartDate);
+
+        await addDoc(collection(db, 'planning'), {
+            projectId,
+            team: electricianName,
+            electricianStartDate: electricianStartDate.toISOString().split('T')[0],
+            electricianEndDate: electricianEndDate.toISOString().split('T')[0]
+        });
+    } else {
+        console.warn(`Elektrikern är redan bokad för två projekt den dagen: ${projectEndDate}`);
+    }
+}
