@@ -80,13 +80,13 @@ Nätbolag:
             if (panelCount) {
                 const estimatedDays = Math.ceil(panelCount / 0.7 / 16);
 
-                const availableStartDate = await getAvailableStartDateForTeam(estimatedDays);
+                const { startDate: availableStartDate, team: selectedTeam } = await getAvailableStartDateForTeam(estimatedDays);
 
                 const planning = {
                     projectId: docRef.id,
                     startDate: availableStartDate,
                     endDate: calculateEndDate(availableStartDate, estimatedDays),
-                    team: 'Team Marcus', // Justera team här
+                    team: selectedTeam, // Tilldelat team med närmast lediga tid
                     employees: ['Employee1', 'Employee2'], // Justera anställda här
                 };
 
@@ -119,69 +119,46 @@ Nätbolag:
 
 // Funktionsdefinitioner
 
-// Funktion för att hitta lediga startdatum för teamet baserat på antal dagar och hantera vardagar och röda dagar
+// Funktion för att hitta lediga startdatum för teamet som har närmast lediga tid
 async function getAvailableStartDateForTeam(estimatedDays) {
     const teams = ['Team Marcus', 'Team Rickard', 'Team Reza'];
     const planningsSnapshot = await getDocs(collection(db, 'planning'));
     const existingPlannings = planningsSnapshot.docs.map(doc => doc.data());
 
-    let availableStartDate = new Date(); // Börja från dagens datum
+    let availableStartDate = new Date();
     availableStartDate.setHours(0, 0, 0, 0); // Nollställ tid så vi bara jobbar med datum
 
+    // Gå igenom varje dag tills vi hittar en ledig dag för ett av teamen
     while (true) {
-        // Kontrollera om dagen är en vardag och inte röd dag
         if (isWeekday(availableStartDate) && !isRedDay(availableStartDate)) {
-            // Kolla om alla team har lediga dagar på startdatumet
-            let teamAvailable = teams.every(team => {
-                // Filtrera scheman för det aktuella teamet
+            for (let team of teams) {
                 const teamPlannings = existingPlannings.filter(planning => planning.team === team);
 
-                // Kolla om det finns scheman som överlappar med detta startdatum
-                return !teamPlannings.some(planning => {
-                    const planningStartDate = new Date(planning.startDate);
-                    const planningEndDate = new Date(planning.endDate);
+                let teamAvailable = true;
 
-                    // Kontrollera om det planerade datumet överlappar med de datum vi söker
-                    return (availableStartDate <= planningEndDate && availableStartDate >= planningStartDate);
-                });
-            });
-
-            if (teamAvailable) {
-                // Kontrollera att det finns tillräckligt med utrymme för alla dagar i rad
-                let allDaysAvailable = true;
+                // Kolla om teamet är upptaget någon av de kommande dagarna
                 for (let i = 0; i < estimatedDays; i++) {
                     const checkDate = new Date(availableStartDate);
                     checkDate.setDate(checkDate.getDate() + i);
 
-                    // Kontrollera varje dag om den är en vardag och inte en röd dag
-                    if (!isWeekday(checkDate) || isRedDay(checkDate)) {
-                        allDaysAvailable = false;
-                        break;
-                    }
-
-                    teamAvailable = teams.every(team => {
-                        const teamPlannings = existingPlannings.filter(planning => planning.team === team);
-                        return !teamPlannings.some(planning => {
-                            const planningStartDate = new Date(planning.startDate);
-                            const planningEndDate = new Date(planning.endDate);
-                            return (checkDate <= planningEndDate && checkDate >= planningStartDate);
-                        });
+                    // Kontrollera om teamet är upptaget
+                    teamAvailable = !teamPlannings.some(planning => {
+                        const planningStartDate = new Date(planning.startDate);
+                        const planningEndDate = new Date(planning.endDate);
+                        return checkDate >= planningStartDate && checkDate <= planningEndDate;
                     });
 
-                    if (!teamAvailable) {
-                        allDaysAvailable = false;
-                        break;
-                    }
+                    if (!teamAvailable) break; // Om teamet är upptaget, gå vidare till nästa team
                 }
 
-                if (allDaysAvailable) {
-                    // Om alla dagar är tillgängliga, returnera detta startdatum
-                    return availableStartDate.toISOString().split('T')[0];
+                // Om teamet är ledigt, returnera det
+                if (teamAvailable) {
+                    return { startDate: availableStartDate.toISOString().split('T')[0], team };
                 }
             }
         }
 
-        // Om teamet inte är tillgängligt eller det är en röd dag, gå framåt en dag
+        // Om inget team är tillgängligt, gå framåt en dag
         availableStartDate.setDate(availableStartDate.getDate() + 1);
     }
 }
