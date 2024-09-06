@@ -85,7 +85,7 @@ Nätbolag:
                 const planning = {
                     projectId: docRef.id,
                     startDate: availableStartDate,
-                    endDate: calculateEndDate(availableStartDate, estimatedDays),
+                    endDate: calculateEndDate(availableStartDate, estimatedDays), // Använd uppdaterad funktion
                     team: selectedTeam, // Tilldelat team med närmast lediga tid
                     employees: ['Employee1', 'Employee2'], // Justera anställda här
                 };
@@ -119,9 +119,9 @@ Nätbolag:
 
 // Funktionsdefinitioner
 
-// Funktion för att hitta lediga startdatum för teamet som har närmast lediga tid
+// Funktion för att hitta lediga startdatum för teamet som har närmast lediga tid (Rickard och Reza)
 async function getAvailableStartDateForTeam(estimatedDays) {
-    const teams = ['Team Rickard', 'Team Reza'];
+    const teams = ['Team Rickard', 'Team Reza']; // Team Marcus har tagits bort
     const planningsSnapshot = await getDocs(collection(db, 'planning'));
     const existingPlannings = planningsSnapshot.docs.map(doc => doc.data());
 
@@ -174,7 +174,6 @@ async function getAvailableStartDateForTeam(estimatedDays) {
     return { startDate: availableStartDate.toISOString().split('T')[0], team: teams[0] }; // Returnera dagens datum eller närmaste framåt
 }
 
-
 // Funktion för att kontrollera om en dag är en vardag (måndag till fredag)
 function isWeekday(date) {
     const day = date.getDay();
@@ -215,7 +214,7 @@ async function getElectricianAvailableDate(preferredDate) {
 // Funktion för att beräkna slutdatum för projektet baserat på startdatum och uppskattade dagar
 function calculateEndDate(startDate, estimatedDays) {
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + estimatedDays - 1);
+    endDate.setDate(endDate.getDate() + estimatedDays - 1); // Ta med hela sista dagen
     return endDate.toISOString().split('T')[0];
 }
 
@@ -225,4 +224,3 @@ function calculateElectricianDate(startDate, estimatedDays) {
     endDate.setDate(endDate.getDate() + estimatedDays - 1);
     return endDate.toISOString().split('T')[0];
 }
-
