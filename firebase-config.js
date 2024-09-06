@@ -1,7 +1,35 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs, updateDoc, doc, addDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { 
+  initializeApp 
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  updateDoc, 
+  doc, 
+  addDoc, 
+  getDoc, 
+  query, 
+  where, 
+  deleteDoc  // Lägg till deleteDoc här
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { 
+  getStorage, 
+  ref, 
+  uploadBytes, 
+  getDownloadURL, 
+  deleteObject 
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  onAuthStateChanged, 
+  signOut, 
+  updateProfile 
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDYqBOra2wDjyPweyBGnkVMANsvLOx9pps",
@@ -29,12 +57,13 @@ export {
   getDoc, 
   query, 
   where, 
+  deleteDoc,  // Exportera deleteDoc här
   storage, 
   ref, 
   uploadBytes, 
   getDownloadURL, 
   deleteObject, 
-  auth,  // Auth is exported here
+  auth, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   GoogleAuthProvider, 

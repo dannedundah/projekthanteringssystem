@@ -1,20 +1,32 @@
-import { db, collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from './firebase-config.js';
+import { 
+    db, 
+    collection, 
+    getDocs, 
+    addDoc, 
+    updateDoc, 
+    deleteDoc, 
+    doc, 
+    getDoc 
+} from './firebase-config.js';
 
 export async function autoScheduleProject(projectId, panelCount) {
     const validTeams = ["Team Marcus", "Team Rickard", "Team Mustafa"];  // Endast dessa team ska schemaläggas automatiskt
 
     try {
+        // Hämta alla team
         const teamsSnapshot = await getDocs(collection(db, 'teams'));
         const teams = teamsSnapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
             .filter(team => validTeams.includes(team.name));  // Filtrera endast de relevanta teamen
 
+        // Hämta alla befintliga schemaläggningar
         const planningsSnapshot = await getDocs(collection(db, 'planning'));
         const plannings = planningsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         let earliestStartDate = null;
         let selectedTeam = null;
 
+        // Loopa genom teamen för att hitta det första teamet med lediga tider
         for (const team of teams) {
             const teamPlannings = plannings.filter(p => p.team === team.name);
             
@@ -25,7 +37,7 @@ export async function autoScheduleProject(projectId, panelCount) {
 
             let startDate = getNextWorkingDay(lastEndDate);  // Hitta nästa arbetsdag efter det senaste slutdatumet
             
-            // Om det är första teamet eller om detta team har ett tidigare ledigt datum
+            // Om detta team har ett tidigare ledigt datum än tidigare kontrollerade team
             if (!earliestStartDate || startDate < earliestStartDate) {
                 earliestStartDate = startDate;
                 selectedTeam = team;
@@ -36,8 +48,9 @@ export async function autoScheduleProject(projectId, panelCount) {
             const projectDuration = calculateProjectDuration(panelCount);
             let endDate = earliestStartDate;
 
+            // Räkna ut slutdatumet baserat på arbetsdagar
             for (let i = 0; i < projectDuration; i++) {
-                endDate = getNextWorkingDay(endDate);  // Beräkna slutdatum baserat på arbetsdagar
+                endDate = getNextWorkingDay(endDate);  
             }
 
             // Lägg till schemat för projektet
@@ -55,7 +68,7 @@ export async function autoScheduleProject(projectId, panelCount) {
                 status: 'Planerad'
             });
 
-            // Schemalägg elektriker dagen efter slutdatum
+            // Schemalägg elektriker dagen efter slutdatumet
             await autoScheduleElectrician(projectId, endDate);
         }
 
@@ -68,6 +81,7 @@ async function autoScheduleElectrician(projectId, projectEndDate) {
     const electricianName = "Elektriker";
     let electricianBookings = [];
 
+    // Hämta alla schemaläggningar för elektriker
     const electricianPlanningsSnapshot = await getDocs(collection(db, 'planning'));
     const electricianPlannings = electricianPlanningsSnapshot.docs.filter(
         doc => doc.data().team === electricianName
@@ -80,7 +94,7 @@ async function autoScheduleElectrician(projectId, projectEndDate) {
     });
 
     if (electricianBookings.length < 2) {
-        const electricianStartDate = getNextWorkingDay(projectEndDate);  // Elektrikern börjar nästa arbetsdag efter att projektet slutar
+        const electricianStartDate = getNextWorkingDay(projectEndDate);  // Elektrikern börjar dagen efter projektets slut
         const electricianEndDate = getNextWorkingDay(electricianStartDate);  // Elektrikern jobbar en dag
 
         // Lägg till elektrikerns schema
@@ -91,13 +105,13 @@ async function autoScheduleElectrician(projectId, projectEndDate) {
             electricianEndDate: electricianEndDate.toISOString().split('T')[0]
         });
 
-        console.log(`Elektriker schemalagd på projekt ${projectId}`);
+        console.log(`Elektriker schemalagd för projekt ${projectId}`);
     } else {
         console.warn(`Elektrikern är redan bokad för två projekt den dagen: ${projectEndDate}`);
     }
 }
 
-// Formel för beräkning av arbetsdagar
+// Funktion för att beräkna hur många arbetsdagar ett projekt tar
 function calculateProjectDuration(panelCount) {
     return Math.ceil((panelCount / 0.7) / 16);  // Formeln: Antal paneler / 0,7 / 16, avrundat till närmaste heltal
 }
@@ -107,14 +121,14 @@ function getNextWorkingDay(date) {
     let nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1);
     
-    // Exkludera helger, du kan också lägga till logik för röda dagar här om nödvändigt
+    // Exkludera helger (lördag och söndag)
     while (nextDate.getDay() === 0 || nextDate.getDay() === 6) {
         nextDate.setDate(nextDate.getDate() + 1);
     }
     return nextDate;
 }
 
-// Funktion för att manuellt uppdatera datum
+// Funktion för att manuellt uppdatera datum för ett projekt
 export async function updateProjectDates(projectId, startDate, endDate) {
     try {
         const planningRef = doc(db, 'planning', projectId);
@@ -133,7 +147,7 @@ export async function updateProjectDates(projectId, startDate, endDate) {
 export async function deleteProject(projectId) {
     try {
         const planningRef = doc(db, 'planning', projectId);
-        await deleteDoc(planningRef);
+        await deleteDoc(planningRef);  // Ta bort dokumentet från Firestore
         console.log(`Projektet har tagits bort: ${projectId}`);
     } catch (error) {
         console.error('Error deleting project:', error);
