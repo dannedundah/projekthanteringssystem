@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        // Hämta projekt med status "Ny"
+        // Fetch projects with status "Ny"
         const projectsQuery = query(collection(db, 'projects'), where('status', '==', 'Ny'));
         const projectsSnapshot = await getDocs(projectsQuery);
         const projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             projectDropdown.appendChild(option);
         });
 
-        // Hämta team
+        // Fetch teams
         const teamsSnapshot = await getDocs(collection(db, 'teams'));
         const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -40,20 +40,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             teamDropdown.appendChild(option);
         });
 
-        // Hantera teamval för att fylla anställda
+        // Handle team selection to populate employees
         teamDropdown.addEventListener('change', () => {
             const selectedTeam = teamDropdown.value;
 
-            // Töm anställda i alla dropdowns
+            // Clear existing employees in all dropdowns
             employeeDropdowns.forEach(dropdown => {
                 dropdown.innerHTML = '<option value="">Välj anställd</option>';
             });
 
-            // Hitta det valda teamet
+            // Find the selected team
             const team = teams.find(t => t.name === selectedTeam);
 
             if (team && Array.isArray(team.members)) {
-                // Fyll anställda om teamet och medlemmar finns
+                // Populate employees if team and members exist
                 team.members.forEach(member => {
                     employeeDropdowns.forEach(dropdown => {
                         const option = document.createElement('option');
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 });
             } else {
-                console.warn(`Team ${selectedTeam} har inga medlemmar eller medlemmar är inte definierade.`);
+                console.warn(`Team ${selectedTeam} has no members or members are not defined.`);
             }
         });
     } catch (error) {
@@ -80,41 +80,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         const electricianEndDate = document.getElementById('electrician-end-date').value;
         const selectedTeam = teamDropdown.value;
 
+        // Justera slutdatumet för att inkludera hela den sista dagen
         const adjustedEndDate = new Date(endDate);
-        adjustedEndDate.setDate(adjustedEndDate.getDate() + 1); 
+        adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);  // Lägg till en dag
 
+        // Justera elektrikerns slutdatum om det är ifyllt
         let adjustedElectricianEndDate = null;
         if (electricianEndDate) {
             adjustedElectricianEndDate = new Date(electricianEndDate);
-            adjustedElectricianEndDate.setDate(adjustedElectricianEndDate.getDate() + 1); 
+            adjustedElectricianEndDate.setDate(adjustedElectricianEndDate.getDate() + 1);  // Lägg till en dag för elektrikern
         }
 
+        // Collect selected employees
         const selectedEmployees = employeeDropdowns.map(dropdown => dropdown.value).filter(employee => employee !== '');
 
         const planning = {
             projectId,
             startDate,
-            endDate: adjustedEndDate.toISOString().split('T')[0],
+            endDate: adjustedEndDate.toISOString().split('T')[0], // Spara det justerade slutdatumet
             team: selectedTeam,
             employees: selectedEmployees,
         };
 
+        // Lägg bara till elektrikerns datum om de är ifyllda
         if (electricianStartDate && adjustedElectricianEndDate) {
             planning.electricianStartDate = electricianStartDate;
             planning.electricianEndDate = adjustedElectricianEndDate.toISOString().split('T')[0];
         }
 
         try {
+            // Save planning
             await addDoc(collection(db, 'planning'), planning);
 
+            // Check if project exists and update its status
             const projectRef = doc(db, 'projects', projectId);
             const projectDoc = await getDoc(projectRef);
 
             if (projectDoc.exists()) {
-                await updateDoc(projectRef, {
-                    status: 'Planerad'
-                });
-                alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+                if (projectId !== "moBgPPK2jgyZaeBnqza1") {  // Kontrollera om det inte är det specifika projektet
+                    await updateDoc(projectRef, {
+                        status: 'Planerad'
+                    });
+                    alert('Planering sparad och projektstatus uppdaterad till "Planerad"!');
+                } else {
+                    alert('Planering sparad, men projektstatus för detta projekt förblir "Ny".');
+                }
+            } else {
+                console.error(`Project with ID ${projectId} not found.`);
+                alert('Planering sparad, men kunde inte uppdatera projektstatus eftersom projektet inte hittades.');
             }
 
             planningForm.reset();
