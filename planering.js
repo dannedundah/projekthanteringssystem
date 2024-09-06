@@ -12,15 +12,29 @@ export async function autoScheduleProject(projectId, panelCount) {
         const planningsSnapshot = await getDocs(collection(db, 'planning'));
         const plannings = planningsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+        let earliestStartDate = null;
+        let selectedTeam = null;
+
         for (const team of teams) {
             const teamPlannings = plannings.filter(p => p.team === team.name);
+            
+            // Hitta det senaste slutdatumet för teamet eller sätt dagens datum om det är tomt
             let lastEndDate = teamPlannings.length > 0 ? 
                 new Date(Math.max(...teamPlannings.map(p => new Date(p.endDate)))) : 
                 new Date(); 
 
-            const projectDuration = calculateProjectDuration(panelCount);
             let startDate = getNextWorkingDay(lastEndDate);
-            let endDate = startDate;
+            
+            // Om det är första teamet eller om detta team har ett tidigare ledigt datum
+            if (!earliestStartDate || startDate < earliestStartDate) {
+                earliestStartDate = startDate;
+                selectedTeam = team;
+            }
+        }
+
+        if (selectedTeam && earliestStartDate) {
+            const projectDuration = calculateProjectDuration(panelCount);
+            let endDate = earliestStartDate;
 
             for (let i = 0; i < projectDuration; i++) {
                 endDate = getNextWorkingDay(endDate);
@@ -29,10 +43,10 @@ export async function autoScheduleProject(projectId, panelCount) {
             // Lägg till schemat för projektet
             await addDoc(collection(db, 'planning'), {
                 projectId,
-                team: team.name,
-                startDate: startDate.toISOString().split('T')[0],
+                team: selectedTeam.name,
+                startDate: earliestStartDate.toISOString().split('T')[0],
                 endDate: endDate.toISOString().split('T')[0],
-                employees: team.members
+                employees: selectedTeam.members
             });
 
             // Ändra projektets status till "Planerad"
@@ -43,8 +57,8 @@ export async function autoScheduleProject(projectId, panelCount) {
 
             // Schemalägg elektriker
             await autoScheduleElectrician(projectId, endDate);
-            break;  // Avsluta loopen efter att ett team har schemalagts
         }
+
     } catch (error) {
         console.error('Error scheduling project:', error);
     }
