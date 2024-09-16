@@ -319,5 +319,21 @@ button.remove-button:hover {
     height: 80vh; /* Tar upp 80% av höjden på skärmen */
     margin: 20px 0; /* Lägger till lite marginal ovanför och under diagrammet */
 }
+.admin-dashboard-link {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background-color: #f1f1f1;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #333;
+}
+
+.admin-dashboard-link:hover {
+    background-color: #ddd;
+    color: #000;
+}
 
 
