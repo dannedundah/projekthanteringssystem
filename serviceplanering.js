@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
 
                 if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
-                    loadServiceTeam();  // Ladda service-teamet
-                    loadServicePlans(); // Ladda tidigare planeringar
+                    await loadServiceTeam();  // Ladda service-teamet
+                    await loadServicePlans(); // Ladda tidigare planeringar
                 } else {
                     alert("Du har inte behörighet att se denna sida.");
                     window.location.href = 'login.html';
@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Service');
             serviceTeam = serviceTeamData ? serviceTeamData.members : [];
+
+            if (serviceTeam.length === 0) {
+                console.warn('Inga medlemmar hittades i "Service"-teamet.');
+            }
 
             // Fyll i rullgardinsmenyn
             serviceTeam.forEach(member => {
@@ -65,15 +69,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Rendera service-planer i tabellen
     function renderPlans(plans) {
         servicePlanTableBody.innerHTML = '';
-        plans.forEach(plan => {
+        if (plans.length === 0) {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${plan.employee}</td>
-                <td>${plan.task}</td>
-                <td>${plan.date}</td>
-            `;
+            row.innerHTML = `<td colspan="3">Inga planeringar tillgängliga.</td>`;
             servicePlanTableBody.appendChild(row);
-        });
+        } else {
+            plans.forEach(plan => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${plan.employee}</td>
+                    <td>${plan.task}</td>
+                    <td>${plan.date}</td>
+                `;
+                servicePlanTableBody.appendChild(row);
+            });
+        }
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
@@ -96,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 date
             });
 
-            loadServicePlans();
+            await loadServicePlans();
             servicePlanningForm.reset();  // Återställ formuläret efter inlämning
         } catch (error) {
             console.error("Error adding service plan:", error);
