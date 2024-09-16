@@ -112,7 +112,7 @@ function handleRoleBasedAccess(role) {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
-        if (adminDashboardLink) adminDashboardLink.style.display = 'block'; // Visa adminpanelen för Admin-användare
+        if (adminDashboardLink) adminDashboardLink.style.display = 'block';
     } else if (role === 'Montör') {
         if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
@@ -121,6 +121,7 @@ function handleRoleBasedAccess(role) {
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (statusBtn) statusBtn.style.display = 'block';
     } else if (role === 'Service') {
+        if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Service-rollen
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (statusBtn) statusBtn.style.display = 'block';
