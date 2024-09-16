@@ -4,7 +4,7 @@ import {
     collection, 
     getDocs, 
     addDoc, 
-    deleteDoc, 
+    deleteDoc,  // Se till att deleteDoc importeras korrekt
     doc, 
     onAuthStateChanged 
 } from './firebase-config.js';
@@ -115,14 +115,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Ta bort en planering
     async function deletePlan(event) {
         const planId = event.target.getAttribute('data-id');
-        const planRef = doc(db, 'service-plans', planId);
+        const planRef = doc(db, 'service-plans', planId);  // Hämta rätt referens
 
         try {
-            await deleteDoc(planRef);
+            await deleteDoc(planRef);  // Använd deleteDoc för att ta bort dokumentet
             alert("Planering borttagen.");
-            await loadServicePlans();
+            await loadServicePlans();  // Uppdatera listan efter borttagning
         } catch (error) {
-            console.error("Error removing document: ", error);
+            console.error("Error removing document: ", error);  // Logga eventuella fel
         }
     }
 });
