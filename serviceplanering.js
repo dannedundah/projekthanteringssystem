@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, doc, deleteDoc, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, getDocs, addDoc, doc, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
