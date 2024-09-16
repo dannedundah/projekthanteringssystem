@@ -29,7 +29,6 @@ export {
   getDoc, 
   query, 
   where, 
-  deleteDoc, // Exportera deleteDoc här
   storage, 
   ref, 
   uploadBytes, 
