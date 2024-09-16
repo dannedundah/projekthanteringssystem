@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
     const testModuleBtn = document.getElementById('test-module-btn');
     const arbetsmiljoBtn = document.getElementById('arbetsmiljo-btn'); // Knappen för arbetsmiljö
+    const adminDashboardLink = document.getElementById('admin-dashboard'); // Länk till adminpanelen
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html'));
     }
     if (arbetsmiljoBtn) {
-        arbetsmiljoBtn.addEventListener('click', () => navigateTo('arbetsmiljo.html')); // Navigera till arbetsmiljömodul
+        arbetsmiljoBtn.addEventListener('click', () => navigateTo('arbetsmiljo.html'));
     }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
@@ -101,6 +102,7 @@ function handleRoleBasedAccess(role) {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
+    const adminDashboardLink = document.getElementById('admin-dashboard'); // Länk till adminpanelen
 
     if (role === 'Admin') {
         if (addProjectBtn) addProjectBtn.style.display = 'block';
@@ -110,6 +112,7 @@ function handleRoleBasedAccess(role) {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
+        if (adminDashboardLink) adminDashboardLink.style.display = 'block'; // Visa adminpanelen för Admin-användare
     } else if (role === 'Montör') {
         if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
