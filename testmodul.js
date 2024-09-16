@@ -4,7 +4,6 @@ import {
     collection, 
     getDocs, 
     addDoc, 
-    deleteDoc,  // Se till att deleteDoc importeras korrekt
     doc, 
     onAuthStateChanged 
 } from './firebase-config.js';
