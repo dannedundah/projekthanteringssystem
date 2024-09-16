@@ -17,10 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const servicePlanTableBody = document.getElementById('service-plan-table').querySelector('tbody');
 
     let canEdit = false;
-    let serviceTeam = [];
-    let plans = [];
 
-    // Kontrollera om användaren är inloggad och tillåten att redigera baserat på roll från Firestore
+    // Kontrollera om användaren är inloggad och hämta användarens roll
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
@@ -28,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     
-                    // Kontrollera om användaren har rätt roll (exempelvis 'Admin' eller 'Service')
+                    // Kontrollera om användaren har rollen 'Admin' eller 'Service'
                     canEdit = userData.role === 'Admin' || userData.role === 'Service';
                     if (canEdit) {
                         initializePage();
@@ -60,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Ladda service-teammedlemmar från Firebase
     async function loadServiceTeam() {
         const teamSnapshot = await getDocs(collection(db, 'teams'));
-        serviceTeam = teamSnapshot.docs.map(doc => doc.data()).filter(team => team.name === 'Service');
+        const serviceTeam = teamSnapshot.docs.map(doc => doc.data()).filter(team => team.name === 'Service');
 
         serviceTeam.forEach(member => {
             const option = document.createElement('option');
@@ -73,12 +71,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Ladda alla planeringar för servicegänget
     async function loadServicePlans() {
         const plansSnapshot = await getDocs(collection(db, 'service-plans'));
-        plans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderPlans();
+        const plans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderPlans(plans);
     }
 
     // Rendera alla planeringar i tabellen
-    function renderPlans() {
+    function renderPlans(plans) {
         servicePlanTableBody.innerHTML = '';
         plans.forEach(plan => {
             const row = document.createElement('tr');
@@ -128,14 +126,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Ta bort en planering
     async function deletePlan(event) {
         const planId = event.target.getAttribute('data-id');
-        const planRef = doc(db, 'service-plans', planId);  // Hämta rätt referens
+        const planRef = doc(db, 'service-plans', planId);
 
         try {
-            await deleteDoc(planRef);  // Använd deleteDoc för att ta bort dokumentet
+            await deleteDoc(planRef);
             alert("Planering borttagen.");
-            await loadServicePlans();  // Uppdatera listan efter borttagning
+            await loadServicePlans();
         } catch (error) {
-            console.error("Error removing document: ", error);  // Logga eventuella fel
+            console.error("Error removing document: ", error);
         }
     }
 });
