@@ -29,15 +29,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Ladda teamet "Service" och fyll i rullgardinsmenyn med medlemmar
+    // Ladda teamet "Team Service" och fyll i rullgardinsmenyn med medlemmar
     async function loadServiceTeam() {
         try {
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
-            const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Service');
+            const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service');
             serviceTeam = serviceTeamData ? serviceTeamData.members : [];
 
             if (serviceTeam.length === 0) {
-                console.warn('Inga medlemmar hittades i "Service"-teamet.');
+                console.warn('Inga medlemmar hittades i "Team Service".');
             }
 
             // Fyll i rullgardinsmenyn
