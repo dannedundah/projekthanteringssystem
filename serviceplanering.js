@@ -5,6 +5,7 @@ import {
     getDocs, 
     addDoc, 
     doc, 
+    getDoc, 
     onAuthStateChanged 
 } from './firebase-config.js';
 
@@ -19,16 +20,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     let serviceTeam = [];
     let plans = [];
 
-    // Kontrollera om användaren är inloggad och tillåten att redigera
+    // Kontrollera om användaren är inloggad och tillåten att redigera baserat på roll från Firestore
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const userEmail = user.email;
-            canEdit = ["daniel@delidel.se", "sofie@delidel.se"].includes(userEmail);
-            if (canEdit) {
-                initializePage();
-            } else {
-                alert("Du har inte behörighet att se denna sida.");
-                window.location.href = 'index.html';
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    
+                    // Kontrollera om användaren har rätt roll (exempelvis 'Admin' eller 'Service')
+                    canEdit = userData.role === 'Admin' || userData.role === 'Service';
+                    if (canEdit) {
+                        initializePage();
+                    } else {
+                        alert("Du har inte behörighet att se denna sida.");
+                        window.location.href = 'index.html';
+                    }
+                } else {
+                    console.error("Användardokumentet finns inte.");
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error("Ett fel uppstod vid hämtning av användardata:", error);
+                window.location.href = 'login.html';
             }
         } else {
             window.location.href = 'login.html';
