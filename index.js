@@ -31,37 +31,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
     const testModuleBtn = document.getElementById('test-module-btn');
-    const arbetsmiljoBtn = document.getElementById('arbetsmiljo-btn'); // Knappen för arbetsmiljö
-    const adminDashboardLink = document.getElementById('admin-dashboard'); // Länk till adminpanelen
+    const arbetsmiljoBtn = document.getElementById('arbetsmiljo-btn');
+    const servicePlanningBtn = document.getElementById('serviceplanering-btn'); // Knappen för serviceplanering
+    const adminDashboardLink = document.getElementById('admin-dashboard');
     const logoutBtn = document.getElementById('logout-btn');
 
-    if (addProjectBtn) {
-        addProjectBtn.addEventListener('click', () => navigateTo('läggatillprojekt.html'));
-    }
-    if (planningBtn) {
-        planningBtn.addEventListener('click', () => navigateTo('planering.html'));
-    }
-    if (viewScheduleBtn) {
-        viewScheduleBtn.addEventListener('click', () => navigateTo('se-schema.html'));
-    }
-    if (statusBtn) {
-        statusBtn.addEventListener('click', () => navigateTo('status.html'));
-    }
-    if (planningTotalBtn) {
-        planningTotalBtn.addEventListener('click', () => navigateTo('planeringtotal.html'));
-    }
-    if (timeReportingBtn) {
-        timeReportingBtn.addEventListener('click', () => navigateTo('tidrapportering.html'));
-    }
-    if (exportTimeReportBtn) {
-        exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html'));
-    }
-    if (testModuleBtn) {
-        testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html'));
-    }
-    if (arbetsmiljoBtn) {
-        arbetsmiljoBtn.addEventListener('click', () => navigateTo('arbetsmiljo.html'));
-    }
+    // Navigering till olika moduler
+    if (addProjectBtn) addProjectBtn.addEventListener('click', () => navigateTo('läggatillprojekt.html'));
+    if (planningBtn) planningBtn.addEventListener('click', () => navigateTo('planering.html'));
+    if (viewScheduleBtn) viewScheduleBtn.addEventListener('click', () => navigateTo('se-schema.html'));
+    if (statusBtn) statusBtn.addEventListener('click', () => navigateTo('status.html'));
+    if (planningTotalBtn) planningTotalBtn.addEventListener('click', () => navigateTo('planeringtotal.html'));
+    if (timeReportingBtn) timeReportingBtn.addEventListener('click', () => navigateTo('tidrapportering.html'));
+    if (exportTimeReportBtn) exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html'));
+    if (testModuleBtn) testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html'));
+    if (arbetsmiljoBtn) arbetsmiljoBtn.addEventListener('click', () => navigateTo('arbetsmiljo.html'));
+    if (servicePlanningBtn) servicePlanningBtn.addEventListener('click', () => navigateTo('serviceplanering.html')); // Navigering till serviceplanering
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
     }
@@ -74,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userDoc.exists() && userDoc.data().active) {
                 const userRole = userDoc.data().role;
 
-                // Kontrollera om användaren är daniel@delidel.se
+                // Visa testmodulen om det är Daniel
                 if (user.email === 'daniel@delidel.se') {
                     testModuleBtn.style.display = 'block';
                 }
@@ -94,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Hantera åtkomst baserat på användarens roll
 function handleRoleBasedAccess(role) {
     const addProjectBtn = document.getElementById('add-project-btn');
     const planningBtn = document.getElementById('planning-btn');
@@ -102,7 +88,8 @@ function handleRoleBasedAccess(role) {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
-    const adminDashboardLink = document.getElementById('admin-dashboard'); // Länk till adminpanelen
+    const servicePlanningBtn = document.getElementById('serviceplanering-btn'); // Serviceplanering-knapp
+    const adminDashboardLink = document.getElementById('admin-dashboard'); 
 
     if (role === 'Admin') {
         if (addProjectBtn) addProjectBtn.style.display = 'block';
