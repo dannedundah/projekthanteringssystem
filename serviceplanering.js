@@ -1,12 +1,10 @@
 import { 
-    auth, 
     db, 
     collection, 
     getDocs, 
     addDoc, 
     doc, 
-    getDoc, 
-    onAuthStateChanged 
+    getDoc 
 } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -16,43 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const serviceDate = document.getElementById('service-date');
     const servicePlanTableBody = document.getElementById('service-plan-table').querySelector('tbody');
 
-    let canEdit = false;
-
-    // Kontrollera om användaren är inloggad och hämta användarens roll
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    
-                    // Kontrollera om användaren har rollen 'Admin' eller 'Service'
-                    canEdit = userData.role === 'Admin' || userData.role === 'Service';
-                    if (canEdit) {
-                        initializePage();
-                    } else {
-                        alert("Du har inte behörighet att se denna sida.");
-                        window.location.href = 'index.html';
-                    }
-                } else {
-                    console.error("Användardokumentet finns inte.");
-                    window.location.href = 'login.html';
-                }
-            } catch (error) {
-                console.error("Ett fel uppstod vid hämtning av användardata:", error);
-                window.location.href = 'login.html';
-            }
-        } else {
-            window.location.href = 'login.html';
-        }
-    });
-
     // Initialisera sidan genom att ladda medlemmar och planeringar
-    async function initializePage() {
+    try {
         await loadServiceTeam();
         await loadServicePlans();
-
         addPlanBtn.addEventListener('click', addPlan);
+    } catch (error) {
+        console.error('Error initializing the page:', error);
     }
 
     // Ladda service-teammedlemmar från Firebase
@@ -119,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             serviceDate.value = '';
             await loadServicePlans();
         } catch (error) {
-            console.error("Error adding document: ", error);
+            console.error("Error adding document:", error);
         }
     }
 
@@ -133,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert("Planering borttagen.");
             await loadServicePlans();
         } catch (error) {
-            console.error("Error removing document: ", error);
+            console.error("Error removing document:", error);
         }
     }
 });
