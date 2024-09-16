@@ -12,12 +12,14 @@
     <div class="container">
         <h1>Arbetsmiljö</h1>
 
+        <!-- Sektion för uppladdning av flera filer, synlig endast för daniel@delidel.se -->
         <div id="upload-section" style="display:none;">
-            <h2>Ladda upp fil</h2>
-            <input type="file" id="fileInput">
+            <h2>Ladda upp filer</h2>
+            <input type="file" id="fileInput" multiple> <!-- multiple attribut -->
             <button id="uploadFileBtn">Ladda upp</button>
         </div>
 
+        <!-- Sektion för att visa filer till alla -->
         <div id="file-list-section">
             <h2>Tillgängliga filer</h2>
             <ul id="fileList"></ul>

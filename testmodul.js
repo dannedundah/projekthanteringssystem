@@ -11,37 +11,42 @@ const uploadFileBtn = document.getElementById('uploadFileBtn');
 const fileList = document.getElementById('fileList');
 const logoutBtn = document.getElementById('logout-btn');
 
-// Visa endast uppladdningssektionen för den godkända användaren
+// Visa endast uppladdningssektionen för användaren med rätt e-post
 onAuthStateChanged(auth, async (user) => {
     if (user && user.email === 'daniel@delidel.se') {
-        uploadSection.style.display = 'block';
-        loadFileList();
+        uploadSection.style.display = 'block'; // Visa uppladdningssektionen
+        loadFileList(); // Ladda filerna
     } else if (user) {
-        loadFileList();
+        loadFileList(); // Ladda filerna för andra användare
     } else {
         alert('Du måste vara inloggad för att se denna sida.');
-        window.location.href = 'login.html';
+        window.location.href = 'login.html'; // Skicka till inloggningssidan om användaren inte är inloggad
     }
 });
 
-// Ladda upp fil
+// Ladda upp flera filer
 uploadFileBtn.addEventListener('click', async () => {
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Vänligen välj en fil att ladda upp.');
+    const files = fileInput.files;
+    if (files.length === 0) {
+        alert('Vänligen välj minst en fil att ladda upp.');
         return;
     }
 
-    const storageRef = ref(storage, `arbetsmiljo/${file.name}`);
-    try {
-        await uploadBytes(storageRef, file);
-        alert('Fil uppladdad!');
-        fileInput.value = '';
-        loadFileList();
-    } catch (error) {
-        console.error('Fel vid uppladdning:', error);
-        alert('Fel vid uppladdning av fil.');
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const storageRef = ref(storage, `arbetsmiljo/${file.name}`);
+        try {
+            await uploadBytes(storageRef, file);
+            console.log(`${file.name} uppladdad!`);
+        } catch (error) {
+            console.error(`Fel vid uppladdning av ${file.name}:`, error);
+            alert(`Fel vid uppladdning av ${file.name}.`);
+        }
     }
+
+    alert('Alla filer har laddats upp!');
+    fileInput.value = '';
+    loadFileList(); // Uppdatera listan med filer efter uppladdning
 });
 
 // Visa listan över uppladdade filer
