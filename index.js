@@ -100,6 +100,7 @@ function handleRoleBasedAccess(role) {
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
+        if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Service-rollen
     } else if (role === 'Montör') {
         if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
