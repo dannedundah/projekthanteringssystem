@@ -30,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
-    const testModuleBtn = document.getElementById('test-module-btn'); // Knappen för testmodulen
+    const testModuleBtn = document.getElementById('test-module-btn');
+    const arbetsmiljoBtn = document.getElementById('arbetsmiljo-btn'); // Knappen för arbetsmiljö
     const logoutBtn = document.getElementById('logout-btn');
 
     if (addProjectBtn) {
@@ -55,7 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         exportTimeReportBtn.addEventListener('click', () => navigateTo('export-time-report.html'));
     }
     if (testModuleBtn) {
-        testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html')); // Navigera till testmodul
+        testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html'));
+    }
+    if (arbetsmiljoBtn) {
+        arbetsmiljoBtn.addEventListener('click', () => navigateTo('arbetsmiljo.html')); // Navigera till arbetsmiljömodul
     }
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
@@ -106,12 +110,6 @@ function handleRoleBasedAccess(role) {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
-
-        // Länk till adminpanelen
-        const adminLink = document.createElement('a');
-        adminLink.href = 'admin.html';
-        adminLink.textContent = 'Admin Dashboard';
-        document.body.appendChild(adminLink);
     } else if (role === 'Montör') {
         if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
