@@ -5,42 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Serviceplanering</title>
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="serviceplanering.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Serviceplanering</h1>
+        <form id="service-planning-form">
+            <label for="employee-select">Välj person:</label>
+            <select id="employee-select" required>
+                <!-- Medlemmar laddas dynamiskt -->
+            </select>
 
-        <label for="service-team">Välj teammedlem:</label>
-        <select id="service-team">
-            <option value="">Välj medlem</option>
-        </select>
+            <label for="task">Uppgift:</label>
+            <input type="text" id="task" placeholder="Ange uppgift" required>
 
-        <label for="service-comment">Kommentar:</label>
-        <textarea id="service-comment" rows="4" placeholder="Vad ska de göra?"></textarea>
+            <label for="date">Datum:</label>
+            <input type="date" id="date" required>
 
-        <label for="service-date">Välj datum:</label>
-        <input type="date" id="service-date">
+            <button type="submit">Lägg till planering</button>
+        </form>
 
-        <button id="add-plan-btn">Lägg till planering</button>
-
-        <h2>Planering för Servicegänget</h2>
+        <h2>Planerat schema</h2>
         <table id="service-plan-table">
             <thead>
                 <tr>
-                    <th>Medlem</th>
+                    <th>Person</th>
+                    <th>Uppgift</th>
                     <th>Datum</th>
-                    <th>Kommentar</th>
-                    <th>Åtgärder</th>
+                    <th>Ta bort</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Planeringar kommer renderas här -->
+                <!-- Planerade uppgifter visas här -->
             </tbody>
         </table>
 
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+    <script type="module" src="serviceplanering.js"></script>
 </body>
 </html>
