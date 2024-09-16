@@ -10,40 +10,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Kontrollera att användaren är inloggad och har rätt roll
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-            if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
-                loadServiceTeam();  // Ladda service-teamet
-                loadServicePlans(); // Ladda tidigare planeringar
-            } else {
-                alert("Du har inte behörighet att se denna sida.");
-                window.location.href = 'login.html';
+                if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
+                    loadServiceTeam();  // Ladda service-teamet
+                    loadServicePlans(); // Ladda tidigare planeringar
+                } else {
+                    alert("Du har inte behörighet att se denna sida.");
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+                alert("Ett fel uppstod vid hämtning av användardata.");
             }
         } else {
             window.location.href = 'login.html';
         }
     });
 
+    // Ladda teamet "Service" och fyll i rullgardinsmenyn med medlemmar
     async function loadServiceTeam() {
-        const teamsSnapshot = await getDocs(collection(db, 'teams'));
-        const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Service');
-        serviceTeam = serviceTeamData ? serviceTeamData.members : [];
+        try {
+            const teamsSnapshot = await getDocs(collection(db, 'teams'));
+            const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Service');
+            serviceTeam = serviceTeamData ? serviceTeamData.members : [];
 
-        serviceTeam.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member;
-            option.textContent = member;
-            employeeSelect.appendChild(option);
-        });
+            // Fyll i rullgardinsmenyn
+            serviceTeam.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member;
+                option.textContent = member;
+                employeeSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error loading service team:", error);
+            alert("Ett fel uppstod vid hämtning av service-teamet.");
+        }
     }
 
+    // Ladda tidigare service-planer
     async function loadServicePlans() {
-        const plansSnapshot = await getDocs(collection(db, 'service-plans'));
-        const plans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        try {
+            const plansSnapshot = await getDocs(collection(db, 'service-plans'));
+            const plans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        renderPlans(plans);
+            renderPlans(plans);
+        } catch (error) {
+            console.error("Error loading service plans:", error);
+            alert("Ett fel uppstod vid hämtning av service-planer.");
+        }
     }
 
+    // Rendera service-planer i tabellen
     function renderPlans(plans) {
         servicePlanTableBody.innerHTML = '';
         plans.forEach(plan => {
@@ -52,22 +71,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>${plan.employee}</td>
                 <td>${plan.task}</td>
                 <td>${plan.date}</td>
-                <td><button class="delete-plan-btn" data-id="${plan.id}">Ta bort</button></td>
             `;
             servicePlanTableBody.appendChild(row);
         });
-
-        document.querySelectorAll('.delete-plan-btn').forEach(button => {
-            button.addEventListener('click', deletePlan);
-        });
     }
 
-    async function deletePlan(event) {
-        const planId = event.target.getAttribute('data-id');
-        await deleteDoc(doc(db, 'service-plans', planId));
-        loadServicePlans();
-    }
-
+    // Hantera formulärinlämning för att skapa en ny service-plan
     servicePlanningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -75,13 +84,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         const task = document.getElementById('task').value;
         const date = document.getElementById('date').value;
 
-        await addDoc(collection(db, 'service-plans'), {
-            employee,
-            task,
-            date
-        });
+        if (!employee || !task || !date) {
+            alert("Vänligen fyll i alla fält.");
+            return;
+        }
 
-        loadServicePlans();
-        servicePlanningForm.reset();
+        try {
+            await addDoc(collection(db, 'service-plans'), {
+                employee,
+                task,
+                date
+            });
+
+            loadServicePlans();
+            servicePlanningForm.reset();  // Återställ formuläret efter inlämning
+        } catch (error) {
+            console.error("Error adding service plan:", error);
+            alert("Ett fel uppstod vid skapandet av service-planen.");
+        }
     });
 });
