@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, doc, onAuthStateChanged } from './firebase-config.js';
+import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
@@ -7,13 +7,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let serviceTeam = [];
 
+    // Kontrollera att användaren är inloggad och har rätt roll
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-            if (userDoc.exists() && userDoc.data().role === 'Admin' || userDoc.data().role === 'Service') {
-                loadServiceTeam();
-                loadServicePlans();
+            if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
+                loadServiceTeam();  // Ladda service-teamet
+                loadServicePlans(); // Ladda tidigare planeringar
             } else {
                 alert("Du har inte behörighet att se denna sida.");
                 window.location.href = 'login.html';
@@ -25,7 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadServiceTeam() {
         const teamsSnapshot = await getDocs(collection(db, 'teams'));
-        serviceTeam = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Service').members;
+        const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Service');
+        serviceTeam = serviceTeamData ? serviceTeamData.members : [];
 
         serviceTeam.forEach(member => {
             const option = document.createElement('option');
