@@ -1,4 +1,4 @@
-import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc } from './firebase-config.js';
+import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc, updateDoc, deleteDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Rendera service-planer i tabellen
+    // Rendera service-planer i tabellen med ta bort-knapp och kryssruta för färdigställande
     function renderPlans(plans) {
         servicePlanTableBody.innerHTML = '';
         if (plans.length === 0) {
             const row = document.createElement('tr');
-            row.innerHTML = `<td colspan="3">Inga planeringar tillgängliga.</td>`;
+            row.innerHTML = `<td colspan="4">Inga planeringar tillgängliga.</td>`;
             servicePlanTableBody.appendChild(row);
         } else {
             plans.forEach(plan => {
@@ -80,9 +80,47 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td>${plan.employee}</td>
                     <td>${plan.task}</td>
                     <td>${plan.date}</td>
+                    <td><input type="checkbox" class="mark-complete" data-id="${plan.id}" ${plan.completed ? 'checked' : ''}></td>
+                    <td><button class="delete-plan-btn" data-id="${plan.id}">Ta bort</button></td>
                 `;
                 servicePlanTableBody.appendChild(row);
             });
+
+            // Lägg till event listeners för att hantera ta bort och färdigställande
+            document.querySelectorAll('.delete-plan-btn').forEach(button => {
+                button.addEventListener('click', deletePlan);
+            });
+
+            document.querySelectorAll('.mark-complete').forEach(checkbox => {
+                checkbox.addEventListener('change', markComplete);
+            });
+        }
+    }
+
+    // Funktion för att ta bort en service-plan
+    async function deletePlan(event) {
+        const planId = event.target.getAttribute('data-id');
+        try {
+            await deleteDoc(doc(db, 'service-plans', planId));
+            await loadServicePlans();  // Ladda om planerna efter borttagning
+        } catch (error) {
+            console.error("Error removing service plan:", error);
+            alert("Ett fel uppstod vid borttagning av service-planen.");
+        }
+    }
+
+    // Funktion för att markera en service-plan som färdig
+    async function markComplete(event) {
+        const planId = event.target.getAttribute('data-id');
+        const isCompleted = event.target.checked;
+
+        try {
+            const planRef = doc(db, 'service-plans', planId);
+            await updateDoc(planRef, { completed: isCompleted });
+            alert("Planens status har uppdaterats.");
+        } catch (error) {
+            console.error("Error updating plan status:", error);
+            alert("Ett fel uppstod vid uppdatering av planens status.");
         }
     }
 
@@ -103,7 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             await addDoc(collection(db, 'service-plans'), {
                 employee,
                 task,
-                date
+                date,
+                completed: false  // Ny plan är inte färdig vid skapandet
             });
 
             await loadServicePlans();
