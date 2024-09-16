@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbetsmiljö</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="arbetsmiljo.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Arbetsmiljö</h1>
+
+        <!-- Sektion för uppladdning av flera filer, synlig endast för daniel@delidel.se -->
+        <div id="upload-section" style="display:none;">
+            <h2>Ladda upp filer</h2>
+            <input type="file" id="fileInput" multiple> <!-- multiple attribut -->
+            <button id="uploadFileBtn">Ladda upp</button>
+        </div>
+
+        <!-- Sektion för att visa filer till alla -->
+        <div id="file-list-section">
+            <h2>Tillgängliga filer</h2>
+            <ul id="fileList"></ul>
+        </div>
+
+        <button id="backToHomeBtn">Tillbaka till startsidan</button> <!-- Knapp för att gå tillbaka -->
+        <button id="logout-btn">Logga ut</button>
+    </div>
+</body>
+</html>
