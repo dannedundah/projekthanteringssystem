@@ -91,6 +91,7 @@ function handleRoleBasedAccess(role) {
     const servicePlanningBtn = document.getElementById('serviceplanering-btn'); // Serviceplanering-knapp
     const adminDashboardLink = document.getElementById('admin-dashboard'); 
 
+    // Hantera Admin roll
     if (role === 'Admin') {
         if (addProjectBtn) addProjectBtn.style.display = 'block';
         if (planningBtn) planningBtn.style.display = 'block';
@@ -100,16 +101,22 @@ function handleRoleBasedAccess(role) {
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
+        if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Admin
+    }
+    
+    // Hantera Service roll
+    else if (role === 'Service') {
         if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Service-rollen
-    } else if (role === 'Montör') {
-        if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
-        if (timeReportingBtn) timeReportingBtn.style.display = 'block';
-    } else if (role === 'Säljare') {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (statusBtn) statusBtn.style.display = 'block';
-    } else if (role === 'Service') {
-        if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Service-rollen
+    }
+    
+    // Hantera övriga roller
+    else if (role === 'Montör') {
+        if (viewScheduleBtn) viewScheduleBtn.style.display = 'block';
+        if (timeReportingBtn) timeReportingBtn.style.display = 'block';
+    } else if (role === 'Säljare') {
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (statusBtn) statusBtn.style.display = 'block';
@@ -121,6 +128,7 @@ function handleRoleBasedAccess(role) {
         window.location.href = 'login.html';
     }
 }
+
 
 function navigateTo(page) {
     window.location.href = page;
