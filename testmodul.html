@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviceärenden - Ticketsystem</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Serviceärenden</h1>
+
+        <!-- Formulär för att skapa ett nytt ärende -->
+        <form id="ticket-form">
+            <label for="description">Beskrivning:</label>
+            <input type="text" id="description" placeholder="Beskriv ärendet" required>
+
+            <label for="responsible">Ansvarig:</label>
+            <input type="text" id="responsible" placeholder="Ange ansvarig" required>
+
+            <label for="priority">Prioritet:</label>
+            <select id="priority" required>
+                <option value="Låg">Låg</option>
+                <option value="Medel">Medel</option>
+                <option value="Hög">Hög</option>
+            </select>
+
+            <button type="submit">Skapa ärende</button>
+        </form>
+
+        <!-- Kolumner för olika statusar -->
+        <div class="ticket-board">
+            <div class="column" id="new-tickets">
+                <h2>Nytt</h2>
+                <ul id="new-list" class="ticket-list"></ul>
+            </div>
+
+            <div class="column" id="in-progress-tickets">
+                <h2>Pågående</h2>
+                <ul id="in-progress-list" class="ticket-list"></ul>
+            </div>
+
+            <div class="column" id="completed-tickets">
+                <h2>Färdigt</h2>
+                <ul id="completed-list" class="ticket-list"></ul>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="testmodul.js"></script>
+</body>
+</html>
