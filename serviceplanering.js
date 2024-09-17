@@ -1,4 +1,4 @@
-import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc } from './firebase-config.js';
+import { auth, db, collection, getDocs, addDoc, doc, updateDoc, onAuthStateChanged, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
@@ -66,6 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Rendera Gantt-schemat med DHTMLX Gantt, och visa adressen och ansvarig person
     function renderGanttChart(plans) {
         gantt.config.xml_date = "%Y-%m-%d";
+        gantt.config.drag_move = true; // Tillåt att flytta projekt
+        gantt.config.drag_resize = true; // Tillåt att ändra storlek på projekt
         gantt.init("gantt-chart");
 
         // Anpassa kolumnerna till vänster i Gantt-schemat
@@ -86,12 +88,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         gantt.clearAll();
         gantt.parse({ data: tasks });
 
+        // Spara datumändringar när ett projekt flyttas eller ändras
+        gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+            await saveTaskDates(id, item);
+        });
+
         // Visa popup med detaljer när man klickar på ett projekt
         gantt.attachEvent("onTaskClick", function (id) {
             const task = gantt.getTask(id);
             showPopup(`Adress: ${task.text}<br>Uppgift: ${task.details}<br>Ansvarig: ${task.employee}`);
             return true;
         });
+    }
+
+    // Spara de nya datumen efter att ett projekt flyttas eller ändras
+    async function saveTaskDates(taskId, task) {
+        const planningRef = doc(db, 'service-plans', taskId);
+        const startDate = task.start_date.toISOString().split('T')[0]; // Konvertera startdatumet till rätt format
+
+        try {
+            await updateDoc(planningRef, {
+                date: startDate // Uppdatera datumet
+            });
+            console.log("Datum uppdaterat för uppgift:", taskId);
+        } catch (error) {
+            console.error("Error updating task date:", error);
+            alert("Ett fel uppstod vid uppdateringen av datumet.");
+        }
     }
 
     // Skapa popup med uppgift och adress
