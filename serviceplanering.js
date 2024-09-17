@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.columns = [
             { name: "text", label: "Adress", width: "*", tree: true },
-            { name: "task", label: "Uppgift", width: 100, align: "center" },
             { name: "employee", label: "Person", width: 100, align: "center" },
             { name: "start_date", label: "Datum", align: "center", width: 80 }
         ];
@@ -76,14 +75,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tasks = servicePlans.map(plan => ({
             id: plan.id,
             text: plan.address, // Visa adressen i Gantt-schemat
-            task: plan.task,    // Visa uppgiften i Gantt-schemat
             employee: plan.employee, // Visa vem som är planerad
             start_date: plan.date,
-            duration: 1 // Exempel: Justera varaktigheten vid behov
+            duration: 1, // Exempel: Justera varaktigheten vid behov
+            description: plan.task // Uppgift, som vi visar när man klickar på projektet
         }));
 
         gantt.clearAll();
         gantt.parse({ data: tasks });
+
+        // Visa uppgifter när man klickar på en uppgift
+        gantt.attachEvent("onTaskClick", function(id, e) {
+            const task = gantt.getTask(id);
+            showTaskDetails(task);
+            return true;
+        });
+    }
+
+    // Funktion för att visa en popup eller tooltip med adress och uppgift
+    function showTaskDetails(task) {
+        const popup = document.createElement('div');
+        popup.classList.add('task-details-popup');
+        popup.innerHTML = `
+            <h3>Detaljer</h3>
+            <p><strong>Adress:</strong> ${task.text}</p>
+            <p><strong>Uppgift:</strong> ${task.description}</p>
+            <button id="close-popup">Stäng</button>
+        `;
+        document.body.appendChild(popup);
+
+        document.getElementById('close-popup').addEventListener('click', () => {
+            document.body.removeChild(popup);
+        });
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
