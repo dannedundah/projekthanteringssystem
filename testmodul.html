@@ -3,52 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviceärenden - Ticketsystem</title>
+    <title>Serviceärenden (Ticketsystem)</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Serviceärenden</h1>
-
-        <!-- Formulär för att skapa ett nytt ärende -->
-        <form id="ticket-form">
-            <label for="description">Beskrivning:</label>
-            <input type="text" id="description" placeholder="Beskriv ärendet" required>
-
-            <label for="responsible">Ansvarig:</label>
-            <input type="text" id="responsible" placeholder="Ange ansvarig" required>
-
-            <label for="priority">Prioritet:</label>
-            <select id="priority" required>
-                <option value="Låg">Låg</option>
-                <option value="Medel">Medel</option>
-                <option value="Hög">Hög</option>
-            </select>
-
-            <button type="submit">Skapa ärende</button>
-        </form>
-
-        <!-- Kolumner för olika statusar -->
-        <div class="ticket-board">
-            <div class="column" id="new-tickets">
-                <h2>Nytt</h2>
-                <ul id="new-list" class="ticket-list"></ul>
+        <h1>Serviceärenden (Ticketsystem)</h1>
+        <div class="ticket-columns">
+            <div class="ticket-column" id="todo">
+                <h2>Att göra</h2>
+                <div class="ticket-list" id="todo-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Tickets kommer visas här -->
+                </div>
             </div>
-
-            <div class="column" id="in-progress-tickets">
+            <div class="ticket-column" id="in-progress">
                 <h2>Pågående</h2>
-                <ul id="in-progress-list" class="ticket-list"></ul>
+                <div class="ticket-list" id="in-progress-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Tickets kommer visas här -->
+                </div>
             </div>
-
-            <div class="column" id="completed-tickets">
-                <h2>Färdigt</h2>
-                <ul id="completed-list" class="ticket-list"></ul>
+            <div class="ticket-column" id="done">
+                <h2>Klart</h2>
+                <div class="ticket-list" id="done-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Tickets kommer visas här -->
+                </div>
             </div>
         </div>
-
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
-
-    <script type="module" src="testmodul.js"></script>
+    <script type="module" src="service-tickets.js"></script>
 </body>
 </html>

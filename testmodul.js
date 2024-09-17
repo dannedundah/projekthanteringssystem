@@ -1,98 +1,92 @@
-import { db, collection, addDoc, getDocs, doc, updateDoc } from './firebase-config.js';
+import { auth, db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const ticketForm = document.getElementById('ticket-form');
-    const newList = document.getElementById('new-list');
-    const inProgressList = document.getElementById('in-progress-list');
-    const completedList = document.getElementById('completed-list');
+let tickets = [];
 
-    let tickets = [];
+document.addEventListener('DOMContentLoaded', async () => {
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-    // Ladda existerande ärenden från Firestore
-    async function loadTickets() {
+            if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
+                await loadTickets();
+                renderTickets();
+            } else {
+                alert("Du har inte behörighet att se denna sida.");
+                window.location.href = 'login.html';
+            }
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+});
+
+async function loadTickets() {
+    try {
         const querySnapshot = await getDocs(collection(db, 'service-tickets'));
         tickets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderTickets();
+    } catch (error) {
+        console.error('Error loading tickets:', error);
     }
+}
 
-    // Rendera ärenden i respektive kolumn
-    function renderTickets() {
-        newList.innerHTML = '';
-        inProgressList.innerHTML = '';
-        completedList.innerHTML = '';
+function renderTickets() {
+    const todoList = document.getElementById('todo-list');
+    const inProgressList = document.getElementById('in-progress-list');
+    const doneList = document.getElementById('done-list');
 
-        tickets.forEach(ticket => {
-            const listItem = document.createElement('li');
-            listItem.textContent = `${ticket.description} - ${ticket.responsible} (${ticket.priority})`;
-            listItem.dataset.id = ticket.id;
+    todoList.innerHTML = '';
+    inProgressList.innerHTML = '';
+    doneList.innerHTML = '';
 
-            if (ticket.status === 'Nytt') {
-                newList.appendChild(listItem);
-            } else if (ticket.status === 'Pågående') {
-                inProgressList.appendChild(listItem);
-            } else if (ticket.status === 'Färdigt') {
-                completedList.appendChild(listItem);
-            }
-        });
-    }
+    tickets.forEach(ticket => {
+        const ticketItem = document.createElement('div');
+        ticketItem.className = 'ticket-item';
+        ticketItem.textContent = `${ticket.title} - ${ticket.description}`;
+        ticketItem.draggable = true;
+        ticketItem.id = ticket.id;
+        ticketItem.ondragstart = drag;
 
-    // Skapa ett nytt ärende
-    ticketForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const description = document.getElementById('description').value;
-        const responsible = document.getElementById('responsible').value;
-        const priority = document.getElementById('priority').value;
-
-        try {
-            await addDoc(collection(db, 'service-tickets'), {
-                description,
-                responsible,
-                priority,
-                status: 'Nytt'
-            });
-            loadTickets();
-        } catch (error) {
-            console.error('Error adding ticket:', error);
-        }
-
-        ticketForm.reset();
-    });
-
-    // Drag-and-drop via Sortable.js
-    const sortableNew = new Sortable(newList, {
-        group: 'tickets',
-        animation: 150,
-        onEnd: async (evt) => {
-            const ticketId = evt.item.dataset.id;
-            await updateTicketStatus(ticketId, 'Nytt');
+        if (ticket.status === 'todo') {
+            todoList.appendChild(ticketItem);
+        } else if (ticket.status === 'in-progress') {
+            inProgressList.appendChild(ticketItem);
+        } else if (ticket.status === 'done') {
+            doneList.appendChild(ticketItem);
         }
     });
+}
 
-    const sortableInProgress = new Sortable(inProgressList, {
-        group: 'tickets',
-        animation: 150,
-        onEnd: async (evt) => {
-            const ticketId = evt.item.dataset.id;
-            await updateTicketStatus(ticketId, 'Pågående');
-        }
-    });
+function allowDrop(event) {
+    event.preventDefault();
+}
 
-    const sortableCompleted = new Sortable(completedList, {
-        group: 'tickets',
-        animation: 150,
-        onEnd: async (evt) => {
-            const ticketId = evt.item.dataset.id;
-            await updateTicketStatus(ticketId, 'Färdigt');
-        }
-    });
+function drag(event) {
+    event.dataTransfer.setData('text', event.target.id);
+}
 
-    // Uppdatera status på ärendet i Firestore
-    async function updateTicketStatus(ticketId, newStatus) {
-        const ticketRef = doc(db, 'service-tickets', ticketId);
+async function drop(event) {
+    event.preventDefault();
+    const ticketId = event.dataTransfer.getData('text');
+    const ticketElement = document.getElementById(ticketId);
+    const newStatus = event.target.closest('.ticket-list').id.split('-')[0];
+
+    // Flytta elementet till rätt lista
+    event.target.appendChild(ticketElement);
+
+    // Uppdatera status på biljetten och spara i Firebase
+    await updateTicketStatus(ticketId, newStatus);
+}
+
+async function updateTicketStatus(ticketId, newStatus) {
+    const ticketRef = doc(db, 'service-tickets', ticketId);
+    try {
         await updateDoc(ticketRef, { status: newStatus });
-        loadTickets();
+        console.log('Ticket status updated successfully');
+    } catch (error) {
+        console.error('Error updating ticket status:', error);
     }
+}
 
-    loadTickets();
-});
+function navigateTo(page) {
+    window.location.href = page;
+}
