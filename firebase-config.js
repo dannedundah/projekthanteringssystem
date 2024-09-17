@@ -27,7 +27,6 @@ export {
   doc, 
   addDoc, 
   getDoc, 
-  deleteDoc,
   query, 
   where, 
   storage, 
