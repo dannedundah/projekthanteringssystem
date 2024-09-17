@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.columns = [
             { name: "text", label: "Adress", width: "*", tree: true },
+            { name: "employee", label: "Person", width: 100, align: "center" },
             { name: "start_date", label: "Datum", align: "center", width: 80 }
         ];
 
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tasks = servicePlans.map(plan => ({
             id: plan.id,
             text: plan.address, // Visa adressen i Gantt-schemat
+            employee: plan.employee, // Visa vem som är planerad
             start_date: plan.date,
             duration: 1,  // Exempel: Justera varaktigheten vid behov
             task: plan.task // Lagra uppdraget som en egenskap
@@ -81,13 +83,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         gantt.clearAll();
         gantt.parse({ data: tasks });
-
-        // Lägg till ett event för att visa uppdrag när användaren klickar på en uppgift
-        gantt.attachEvent("onTaskClick", function (id, e) {
-            const task = gantt.getTask(id);
-            alert(`Uppgift: ${task.task}`);  // Visa uppdraget i en popup
-            return true;
-        });
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
