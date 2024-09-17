@@ -78,11 +78,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             employee: plan.employee, // Visa vem som är planerad
             start_date: plan.date,
             duration: 1,  // Exempel: Justera varaktigheten vid behov
-            task: plan.task // Lagra uppdraget som en egenskap
+            description: plan.task // Uppgift visas som beskrivning när man klickar på projektet
         }));
 
         gantt.clearAll();
         gantt.parse({ data: tasks });
+
+        // Använd DHTMLX Gantt:s inbyggda "task_description" funktion för att visa beskrivningen
+        gantt.templates.tooltip_text = function (start, end, task) {
+            return "<b>Adress:</b> " + task.text + "<br/><b>Uppgift:</b> " + task.description + "<br/><b>Person:</b> " + task.employee;
+        };
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
