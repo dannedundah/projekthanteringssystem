@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.columns = [
             { name: "text", label: "Adress", width: "*", tree: true },
+            { name: "task", label: "Uppgift", width: 100, align: "center" },
             { name: "employee", label: "Person", width: 100, align: "center" },
             { name: "start_date", label: "Datum", align: "center", width: 80 }
         ];
@@ -75,19 +76,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tasks = servicePlans.map(plan => ({
             id: plan.id,
             text: plan.address, // Visa adressen i Gantt-schemat
+            task: plan.task,    // Visa uppgiften i Gantt-schemat
             employee: plan.employee, // Visa vem som är planerad
             start_date: plan.date,
-            duration: 1,  // Exempel: Justera varaktigheten vid behov
-            description: plan.task // Uppgift visas som beskrivning när man klickar på projektet
+            duration: 1 // Exempel: Justera varaktigheten vid behov
         }));
 
         gantt.clearAll();
         gantt.parse({ data: tasks });
-
-        // Använd DHTMLX Gantt:s inbyggda "task_description" funktion för att visa beskrivningen
-        gantt.templates.tooltip_text = function (start, end, task) {
-            return "<b>Adress:</b> " + task.text + "<br/><b>Uppgift:</b> " + task.description + "<br/><b>Person:</b> " + task.employee;
-        };
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
