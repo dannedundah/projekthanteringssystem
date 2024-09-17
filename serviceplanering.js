@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 text: planning.address,
                 person: planning.employee,
                 start_date: startDate,
-                duration: 1, // Assuming each task is one day, adjust as needed
+                duration: 1, // Justera om det behövs
                 taskData: planning.task
             };
         });
