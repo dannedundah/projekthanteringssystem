@@ -1,4 +1,4 @@
-import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc, updateDoc } from './firebase-config.js';
+import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc, deleteDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
 
                 if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
-                    await loadServiceTeam();  // Ladda service-teamet
-                    await loadServicePlans(); // Ladda tidigare planeringar
+                    loadServiceTeam();  // Ladda service-teamet
+                    loadServicePlans(); // Ladda tidigare planeringar
                 } else {
                     alert("Du har inte behörighet att se denna sida.");
                     window.location.href = 'login.html';
@@ -29,16 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Ladda teamet "Team Service" och fyll i rullgardinsmenyn med medlemmar
+    // Ladda teamet "Service" och fyll i rullgardinsmenyn med medlemmar
     async function loadServiceTeam() {
         try {
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service');
             serviceTeam = serviceTeamData ? serviceTeamData.members : [];
-
-            if (serviceTeam.length === 0) {
-                console.warn('Inga medlemmar hittades i "Team Service".');
-            }
 
             // Fyll i rullgardinsmenyn
             serviceTeam.forEach(member => {
@@ -66,61 +62,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Rendera service-planer i tabellen med ta bort-knapp och kryssruta för färdigställande
+    // Rendera service-planer i tabellen
     function renderPlans(plans) {
         servicePlanTableBody.innerHTML = '';
-        if (plans.length === 0) {
+        plans.forEach(plan => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td colspan="4">Inga planeringar tillgängliga.</td>`;
+            row.innerHTML = `
+                <td>${plan.employee}</td>
+                <td>${plan.task}</td>
+                <td>${plan.date}</td>
+                <td><input type="checkbox" data-id="${plan.id}" ${plan.completed ? 'checked' : ''}></td>
+                <td><button class="delete-plan-btn" data-id="${plan.id}">Ta bort</button></td>
+            `;
             servicePlanTableBody.appendChild(row);
-        } else {
-            plans.forEach(plan => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${plan.employee}</td>
-                    <td>${plan.task}</td>
-                    <td>${plan.date}</td>
-                    <td><input type="checkbox" class="mark-complete" data-id="${plan.id}" ${plan.completed ? 'checked' : ''}></td>
-                    <td><button class="delete-plan-btn" data-id="${plan.id}">Ta bort</button></td>
-                `;
-                servicePlanTableBody.appendChild(row);
-            });
+        });
 
-            // Lägg till event listeners för att hantera ta bort och färdigställande
-            document.querySelectorAll('.delete-plan-btn').forEach(button => {
-                button.addEventListener('click', deletePlan);
-            });
+        document.querySelectorAll('.delete-plan-btn').forEach(button => {
+            button.addEventListener('click', deletePlan);
+        });
 
-            document.querySelectorAll('.mark-complete').forEach(checkbox => {
-                checkbox.addEventListener('change', markComplete);
-            });
-        }
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', toggleCompleted);
+        });
     }
 
-    // Funktion för att ta bort en service-plan
+    // Hantera borttagning av en service-plan
     async function deletePlan(event) {
         const planId = event.target.getAttribute('data-id');
         try {
             await deleteDoc(doc(db, 'service-plans', planId));
-            await loadServicePlans();  // Ladda om planerna efter borttagning
+            loadServicePlans(); // Ladda om planerna efter borttagning
         } catch (error) {
             console.error("Error removing service plan:", error);
             alert("Ett fel uppstod vid borttagning av service-planen.");
         }
     }
 
-    // Funktion för att markera en service-plan som färdig
-    async function markComplete(event) {
+    // Hantera uppdatering av en plan när den är markerad som färdig
+    async function toggleCompleted(event) {
         const planId = event.target.getAttribute('data-id');
-        const isCompleted = event.target.checked;
+        const completed = event.target.checked;
 
         try {
-            const planRef = doc(db, 'service-plans', planId);
-            await updateDoc(planRef, { completed: isCompleted });
-            alert("Planens status har uppdaterats.");
+            await updateDoc(doc(db, 'service-plans', planId), {
+                completed: completed
+            });
         } catch (error) {
-            console.error("Error updating plan status:", error);
-            alert("Ett fel uppstod vid uppdatering av planens status.");
+            console.error("Error updating completion status:", error);
+            alert("Ett fel uppstod vid uppdatering av slutförd status.");
         }
     }
 
@@ -142,10 +131,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 employee,
                 task,
                 date,
-                completed: false  // Ny plan är inte färdig vid skapandet
+                completed: false  // Nytt fält för att hålla reda på om uppgiften är klar
             });
 
-            await loadServicePlans();
+            loadServicePlans();
             servicePlanningForm.reset();  // Återställ formuläret efter inlämning
         } catch (error) {
             console.error("Error adding service plan:", error);
