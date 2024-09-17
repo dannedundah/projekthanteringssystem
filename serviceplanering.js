@@ -118,15 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
-            await saveTaskDates(id);
-            showConfirmationPopup("Datum uppdaterat och sparat!");
-        });
-
         gantt.attachEvent("onTaskClick", function(id) {
             const task = gantt.getTask(id);
             showPopup(`Adress: ${task.text}<br>Uppgift: ${task.taskData}<br>Ansvarig: ${task.person}`);
             return true;
+        });
+
+        gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+            await saveTaskDates(id);
+            showConfirmationPopup("Datum uppdaterat och sparat!");
         });
     }
 
@@ -182,6 +182,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Funktion för att visa popup för projektinformation
     function showPopup(message) {
+        const existingPopup = document.querySelector('.task-details-popup');
+        if (existingPopup) {
+            document.body.removeChild(existingPopup);
+        }
+
         const popup = document.createElement('div');
         popup.classList.add('task-details-popup');
         popup.innerHTML = `<p>${message}</p><button id="close-popup">Stäng</button>`;
