@@ -3,52 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviceplanering Gantt-schema</title>
+    <title>Serviceplanering Gantt</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Inkludera Google Charts Gantt-biblioteket -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['gantt']});
-      google.charts.setOnLoadCallback(drawChart);
-
-      function drawChart(servicePlans = []) {
-        const data = new google.visualization.DataTable();
-        data.addColumn('string', 'Task ID');
-        data.addColumn('string', 'Task Name');
-        data.addColumn('string', 'Resource');
-        data.addColumn('date', 'Start Date');
-        data.addColumn('date', 'End Date');
-        data.addColumn('number', 'Duration');
-        data.addColumn('number', 'Percent Complete');
-        data.addColumn('string', 'Dependencies');
-
-        // Ladda dynamisk data för Gantt-schemat
-        const rows = servicePlans.map(plan => [
-          plan.id,
-          plan.task,
-          plan.employee,
-          new Date(plan.startDate),
-          new Date(plan.endDate),
-          null,  // Duration
-          100,   // Percent complete, kan justeras
-          null   // Dependencies
-        ]);
-        data.addRows(rows);
-
-        const options = {
-          height: 400
-        };
-
-        const chart = new google.visualization.Gantt(document.getElementById('gantt-chart'));
-        chart.draw(data, options);
-      }
-    </script>
+    <!-- DHTMLX Gantt CSS -->
+    <link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css">
 </head>
 <body>
     <div class="container">
-        <h1>Serviceplanering Gantt-schema</h1>
-
-        <!-- Formulär för att lägga till planering -->
+        <h1>Serviceplanering</h1>
         <form id="service-planning-form">
             <label for="employee-select">Välj person:</label>
             <select id="employee-select" required>
@@ -67,11 +29,14 @@
             <button type="submit">Lägg till planering</button>
         </form>
 
-        <!-- Div för att visa Gantt-schema -->
+        <h2>Planerat schema</h2>
+        <!-- Gantt diagram container -->
         <div id="gantt-chart" style="width: 100%; height: 500px;"></div>
 
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
+    <!-- DHTMLX Gantt JavaScript -->
+    <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
     <script type="module" src="serviceplanering.js"></script>
 </body>
 </html>

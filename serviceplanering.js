@@ -3,6 +3,8 @@ import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
     const servicePlanningForm = document.getElementById('service-planning-form');
+
+    let serviceTeam = [];
     let servicePlans = [];
 
     // Kontrollera att användaren är inloggad och har rätt roll
@@ -12,8 +14,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
 
                 if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
-                    loadServiceTeam();  // Ladda service-teamet
-                    loadServicePlans(); // Ladda tidigare planeringar
+                    await loadServiceTeam();  // Ladda service-teamet
+                    await loadServicePlans(); // Ladda tidigare planeringar
+                    initializeGantt(); // Initiera Gantt-schemat
                 } else {
                     alert("Du har inte behörighet att se denna sida.");
                     window.location.href = 'login.html';
@@ -32,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service');
-            const serviceTeam = serviceTeamData ? serviceTeamData.members : [];
+            serviceTeam = serviceTeamData ? serviceTeamData.members : [];
 
             // Fyll i rullgardinsmenyn
             serviceTeam.forEach(member => {
@@ -52,13 +55,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const plansSnapshot = await getDocs(collection(db, 'service-plans'));
             servicePlans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            // Rendera Gantt-schema med de hämtade planerna
-            drawChart(servicePlans);
         } catch (error) {
             console.error("Error loading service plans:", error);
             alert("Ett fel uppstod vid hämtning av service-planer.");
         }
+    }
+
+    // Initiera Gantt-schemat och visa planerna
+    function initializeGantt() {
+        gantt.config.xml_date = "%Y-%m-%d";
+        gantt.config.columns = [
+            { name: "text", label: "Task", width: "*", tree: true },
+            { name: "start_date", label: "Start Date", align: "center" },
+            { name: "duration", label: "Duration", align: "center" }
+        ];
+        gantt.init("gantt-chart");
+
+        const tasks = servicePlans.map(plan => ({
+            id: plan.id,
+            text: `${plan.employee} - ${plan.task}`,
+            start_date: plan.date,
+            duration: 1,  // Example: You can adjust the duration based on your data
+        }));
+
+        gantt.clearAll();
+        gantt.parse({ data: tasks });
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
@@ -66,23 +87,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
 
         const employee = employeeSelect.value;
+        const address = document.getElementById('address').value;
         const task = document.getElementById('task').value;
         const date = document.getElementById('date').value;
 
-        if (!employee || !task || !date) {
+        if (!employee || !task || !date || !address) {
             alert("Vänligen fyll i alla fält.");
             return;
         }
 
         try {
-            await addDoc(collection(db, 'service-plans'), {
-                employee,
-                task,
-                startDate: date,  // Startdatum för uppgiften
-                endDate: date     // För detta exempel använder vi samma datum som slutdatum
-            });
+            const newPlan = { employee, address, task, date };
+            await addDoc(collection(db, 'service-plans'), newPlan);
+            servicePlans.push(newPlan);
 
-            loadServicePlans();
+            // Ladda om Gantt-schemat med den nya planen
+            initializeGantt();
             servicePlanningForm.reset();  // Återställ formuläret efter inlämning
         } catch (error) {
             console.error("Error adding service plan:", error);
