@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${plan.employee}</td>
+                <td>${plan.address}</td>
                 <td>${plan.task}</td>
                 <td>${plan.date}</td>
                 <td><input type="checkbox" data-id="${plan.id}" ${plan.completed ? 'checked' : ''}></td>
@@ -101,10 +102,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
 
         const employee = employeeSelect.value;
+        const address = document.getElementById('address').value;
         const task = document.getElementById('task').value;
         const date = document.getElementById('date').value;
 
-        if (!employee || !task || !date) {
+        if (!employee || !address || !task || !date) {
             alert("Vänligen fyll i alla fält.");
             return;
         }
@@ -112,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await addDoc(collection(db, 'service-plans'), {
                 employee,
+                address,
                 task,
                 date,
                 completed: false  // Nytt fält för att hålla reda på om uppgiften är klar
