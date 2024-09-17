@@ -93,6 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
+        // Visa popup med detaljer när man klickar på ett projekt
+        gantt.attachEvent("onTaskClick", function (id) {
+            const task = gantt.getTask(id);
+            showTaskDetailsPopup(`Adress: ${task.text}<br>Uppgift: ${task.taskData}<br>Ansvarig: ${task.person}`);
+            return true;
+        });
+
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
             await saveTaskDates(id);
             showConfirmationPopup("Datum uppdaterat och sparat!");
@@ -123,6 +130,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Error updating document: ", error);
         }
+    }
+
+    // Funktion för att visa popup med projektinformation
+    function showTaskDetailsPopup(details) {
+        const popup = document.createElement('div');
+        popup.classList.add('task-details-popup');
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>Projektinformation</h3>
+                <p>${details}</p>
+                <button id="close-popup">Stäng</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        document.getElementById('close-popup').addEventListener('click', () => {
+            popup.remove();
+        });
     }
 
     // Form submit handler for adding new service plans
