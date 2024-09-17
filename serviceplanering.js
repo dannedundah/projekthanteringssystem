@@ -64,10 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Filtrera projekt när användaren väljer en person
         employeeFilter.addEventListener('change', () => {
             const selectedEmployee = employeeFilter.value;
-            const filteredPlannings = selectedEmployee ?
-                plannings.filter(planning => planning.employee === selectedEmployee) :
-                plannings;
-            renderGanttChart(filteredPlannings);
+            if (selectedEmployee === "") {
+                renderGanttChart(plannings); // Visa alla projekt om "Visa alla" är vald
+            } else {
+                const filteredPlannings = plannings.filter(planning => planning.employee === selectedEmployee);
+                renderGanttChart(filteredPlannings); // Visa endast valda personens projekt
+            }
         });
     }
 
