@@ -1,163 +1,132 @@
 import { auth, db, collection, getDocs, addDoc, doc, updateDoc, onAuthStateChanged, getDoc } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const employeeSelect = document.getElementById('employee-select');
-    const servicePlanningForm = document.getElementById('service-planning-form');
+document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
-    const backBtn = document.getElementById('back-btn');
-
+    const employeeSelect = document.getElementById('employee-select'); 
+    let plannings = [];
     let serviceTeam = [];
+    let canEdit = false;
 
-    // Kontrollera att användaren är inloggad och har rätt roll
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-                if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
-                    loadServiceTeam();  // Ladda service-teamet
-                    loadServicePlans(); // Ladda tidigare planeringar
-                } else {
-                    alert("Du har inte behörighet att se denna sida.");
-                    window.location.href = 'login.html';
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-                alert("Ett fel uppstod vid hämtning av användardata.");
+            if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
+                canEdit = true;
+                await initializePage();
+            } else {
+                alert("Du har inte behörighet att se denna sida.");
+                window.location.href = 'login.html';
             }
         } else {
             window.location.href = 'login.html';
         }
     });
 
-    // Ladda teamet "Team Service" och fyll i rullgardinsmenyn med medlemmar
-    async function loadServiceTeam() {
+    async function initializePage() {
         try {
+            const querySnapshot = await getDocs(collection(db, 'service-plans'));
+            plannings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
-            const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service');
-            serviceTeam = serviceTeamData ? serviceTeamData.members : [];
+            serviceTeam = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service').members;
 
-            // Fyll i rullgardinsmenyn
-            serviceTeam.forEach(member => {
-                const option = document.createElement('option');
-                option.value = member;
-                option.textContent = member;
-                employeeSelect.appendChild(option);
-            });
+            populateEmployeeSelect();
+            renderGanttChart();
         } catch (error) {
-            console.error("Error loading service team:", error);
-            alert("Ett fel uppstod vid hämtning av service-teamet.");
+            console.error('Error fetching plannings or teams:', error);
         }
     }
 
-    // Ladda och rendera Gantt-schemat för service-planer
-    async function loadServicePlans() {
-        try {
-            const plansSnapshot = await getDocs(collection(db, 'service-plans'));
-            const plans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            renderGanttChart(plans);
-        } catch (error) {
-            console.error("Error loading service plans:", error);
-            alert("Ett fel uppstod vid hämtning av service-planer.");
-        }
+    function populateEmployeeSelect() {
+        employeeSelect.innerHTML = '<option value="">Välj person</option>';
+        serviceTeam.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member;
+            option.textContent = member;
+            employeeSelect.appendChild(option);
+        });
     }
 
-    // Rendera Gantt-schemat med DHTMLX Gantt, och visa adressen och ansvarig person
-    function renderGanttChart(plans) {
+    async function renderGanttChart() {
+        ganttChartContainer.innerHTML = '';
+
         gantt.config.xml_date = "%Y-%m-%d";
-        gantt.config.drag_move = true; // Tillåt att flytta projekt
-        gantt.config.drag_resize = true; // Tillåt att ändra storlek på projekt
-        gantt.init("gantt-chart");
+        gantt.config.readonly = !canEdit;
 
-        // Anpassa kolumnerna till vänster i Gantt-schemat
+        gantt.templates.scale_cell_class = function(date) {
+            if (date.getDay() === 0 || date.getDay() === 6) {
+                return "weekend";
+            }
+        };
+
+        gantt.templates.timeline_cell_class = function(item, date) {
+            if (date.getDay() === 0 || date.getDay() === 6) {
+                return "weekend";
+            }
+        };
+
         gantt.config.columns = [
-            { name: "text", label: "Adress", width: 200, tree: true },
-            { name: "employee", label: "Ansvarig", align: "center", width: 100 }
+            { name: "text", label: "Adress", width: 200, tree: true }, 
+            { name: "person", label: "Person", align: "center", width: 150 },
+            { name: "start_date", label: "Startdatum", align: "center", width: 100 },
+            { name: "duration", label: "Varaktighet", align: "center", width: 80 }
         ];
 
-        const tasks = plans.map(plan => ({
-            id: plan.id,
-            text: plan.address,  // Adressen visas som projektets namn
-            employee: plan.employee,  // Ansvarig person
-            start_date: plan.date,
-            duration: 1,  // Varaktighet för en dag
-            details: plan.task
-        }));
+        const tasks = plannings.map(planning => {
+            const startDate = planning.date;
+            return {
+                id: planning.id,
+                text: planning.address,
+                person: planning.employee,
+                start_date: startDate,
+                duration: 1, // Assuming each task is one day, adjust as needed
+                taskData: planning.task
+            };
+        });
 
-        gantt.clearAll();
-        gantt.parse({ data: tasks });
+        gantt.init("gantt-chart");
 
-        // Spara datumändringar när ett projekt flyttas eller ändras
+        gantt.parse({
+            data: tasks,
+            links: []
+        });
+
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
-            await saveTaskDates(id, item);
+            await saveTaskDates(id);
+            alert("Projekt uppdaterat och sparat!");
         });
 
-        // Visa popup med detaljer när man klickar på ett projekt
-        gantt.attachEvent("onTaskClick", function (id) {
-            const task = gantt.getTask(id);
-            showPopup(`Adress: ${task.text}<br>Uppgift: ${task.details}<br>Ansvarig: ${task.employee}`);
-            return true;
-        });
     }
 
-    // Spara de nya datumen efter att ett projekt flyttas eller ändras
-    async function saveTaskDates(taskId, task) {
+    // Funktion för att spara de uppdaterade datumen i Firestore
+    async function saveTaskDates(taskId) {
+        const task = gantt.getTask(taskId);
+        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
+
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+
         const planningRef = doc(db, 'service-plans', taskId);
-        const startDate = formatDateToFirestore(task.start_date); // Formatera datum korrekt för Firestore
 
         try {
-            await updateDoc(planningRef, {
-                date: startDate // Uppdatera datumet i Firestore
-            });
-            console.log("Datum uppdaterat för uppgift:", taskId);
-        } catch (error) {
-            console.error("Error updating task date:", error);
-            alert("Ett fel uppstod vid uppdateringen av datumet.");
-        }
-    }
+            const planningDoc = await getDoc(planningRef);
 
-    // Formatera datum till korrekt Firestore-format
-    function formatDateToFirestore(date) {
-        if (typeof date === 'object') {
-            return date.toISOString().split('T')[0]; // Konvertera till 'YYYY-MM-DD'
-        }
-        return date; // Returnera om det redan är rätt format
-    }
-
-    // Skapa popup med uppgift och adress
-    function showPopup(taskDetails) {
-        // Skapa popup-elementet
-        const popup = document.createElement('div');
-        popup.classList.add('popup');
-
-        // Lägg till innehållet och stängningsknappen
-        popup.innerHTML = `
-            <div class="popup-content">
-                <span class="close-btn">&times;</span>
-                <h2>Detaljer för uppgiften</h2>
-                <p>${taskDetails}</p>
-            </div>
-        `;
-
-        // Lägg till popupen i dokumentet
-        document.body.appendChild(popup);
-
-        // Hantera stängning när användaren klickar på stängningsknappen
-        const closeButton = popup.querySelector('.close-btn');
-        closeButton.addEventListener('click', () => {
-            popup.remove();
-        });
-
-        // Alternativt: Hantera stängning om användaren klickar utanför popupen
-        window.addEventListener('click', (event) => {
-            if (event.target === popup) {
-                popup.remove();
+            if (planningDoc.exists()) {
+                await updateDoc(planningRef, {
+                    date: formattedStartDate
+                });
+                console.log(`Date saved successfully for task: ${taskId}`);
+            } else {
+                console.error(`No planning document found for taskId: ${taskId}`);
             }
-        });
+        } catch (error) {
+            console.error("Error updating document: ", error);
+        }
     }
 
-    // Hantera formulärinlämning för att skapa en ny service-plan
+    // Form submit handler for adding new service plans
+    const servicePlanningForm = document.getElementById('service-planning-form');
     servicePlanningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -166,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const task = document.getElementById('task').value;
         const date = document.getElementById('date').value;
 
-        if (!employee || !address || !task || !date) {
+        if (!employee || !task || !date || !address) {
             alert("Vänligen fyll i alla fält.");
             return;
         }
@@ -179,16 +148,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 date
             });
 
-            loadServicePlans();
-            servicePlanningForm.reset();  // Återställ formuläret efter inlämning
+            alert("Planering tillagd!");
+            await initializePage();  // Refresh the page after submission
+            servicePlanningForm.reset();  // Clear form inputs
         } catch (error) {
             console.error("Error adding service plan:", error);
             alert("Ett fel uppstod vid skapandet av service-planen.");
         }
     });
 
-    // Navigera tillbaka till startsidan
-    backBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
+    window.navigateTo = (page) => {
+        window.location.href = page;
+    };
 });
