@@ -11,7 +11,6 @@
 <body>
     <div class="container">
         <h1>Serviceplanering</h1>
-
         <form id="service-planning-form">
             <label for="employee-select">Välj person:</label>
             <select id="employee-select" required>
@@ -30,14 +29,12 @@
             <button type="submit">Lägg till planering</button>
         </form>
 
-        <h2>Planerat schema</h2>
-
-        <!-- Dropdown för filtrering av person -->
-        <label for="employee-filter">Filtrera person:</label>
+        <h2>Filtrera projekt per ansvarig</h2>
         <select id="employee-filter">
             <option value="">Visa alla</option>
         </select>
 
+        <h2>Planerat schema</h2>
         <!-- Gantt diagram container -->
         <div id="gantt-chart" style="width: 100%; height: 500px;"></div>
 
