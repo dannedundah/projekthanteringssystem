@@ -104,17 +104,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Spara de nya datumen efter att ett projekt flyttas eller ändras
     async function saveTaskDates(taskId, task) {
         const planningRef = doc(db, 'service-plans', taskId);
-        const startDate = task.start_date.toISOString().split('T')[0]; // Konvertera startdatumet till rätt format
+        const startDate = formatDateToFirestore(task.start_date); // Formatera datum korrekt för Firestore
 
         try {
             await updateDoc(planningRef, {
-                date: startDate // Uppdatera datumet
+                date: startDate // Uppdatera datumet i Firestore
             });
             console.log("Datum uppdaterat för uppgift:", taskId);
         } catch (error) {
             console.error("Error updating task date:", error);
             alert("Ett fel uppstod vid uppdateringen av datumet.");
         }
+    }
+
+    // Formatera datum till korrekt Firestore-format
+    function formatDateToFirestore(date) {
+        if (typeof date === 'object') {
+            return date.toISOString().split('T')[0]; // Konvertera till 'YYYY-MM-DD'
+        }
+        return date; // Returnera om det redan är rätt format
     }
 
     // Skapa popup med uppgift och adress
