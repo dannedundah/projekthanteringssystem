@@ -68,9 +68,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.init("gantt-chart");
 
+        // Anpassa kolumnerna till vänster i Gantt-schemat
+        gantt.config.columns = [
+            { name: "text", label: "Adress", width: 200, tree: true },
+            { name: "employee", label: "Ansvarig", align: "center", width: 100 }
+        ];
+
         const tasks = plans.map(plan => ({
             id: plan.id,
-            text: `${plan.address} - ${plan.employee}`,  // Visa både adress och ansvarig person
+            text: plan.address,  // Adressen visas som projektets namn
+            employee: plan.employee,  // Ansvarig person
             start_date: plan.date,
             duration: 1,  // Varaktighet för en dag
             details: plan.task
@@ -82,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Visa popup med detaljer när man klickar på ett projekt
         gantt.attachEvent("onTaskClick", function (id) {
             const task = gantt.getTask(id);
-            showPopup(`Adress: ${task.text.split(' - ')[0]}<br>Uppgift: ${task.details}<br>Ansvarig: ${task.text.split(' - ')[1]}`);
+            showPopup(`Adress: ${task.text}<br>Uppgift: ${task.details}<br>Ansvarig: ${task.employee}`);
             return true;
         });
     }
