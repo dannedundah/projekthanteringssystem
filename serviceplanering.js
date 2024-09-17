@@ -63,17 +63,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Rendera Gantt-schemat med DHTMLX Gantt
+    // Rendera Gantt-schemat med DHTMLX Gantt, och visa adressen som projektets namn
     function renderGanttChart(plans) {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.init("gantt-chart");
 
         const tasks = plans.map(plan => ({
             id: plan.id,
-            text: plan.employee,
+            text: plan.address,  // Adressen visas som projektets namn
             start_date: plan.date,
             duration: 1,  // Varaktighet för en dag
-            address: plan.address,
+            employee: plan.employee,
             details: plan.task
         }));
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Visa popup med detaljer när man klickar på ett projekt
         gantt.attachEvent("onTaskClick", function (id) {
             const task = gantt.getTask(id);
-            showPopup(`Adress: ${task.address}<br>Uppgift: ${task.details}`);
+            showPopup(`Adress: ${task.text}<br>Uppgift: ${task.details}<br>Ansvarig: ${task.employee}`);
             return true;
         });
     }
