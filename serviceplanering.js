@@ -1,11 +1,9 @@
-import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc, updateDoc } from './firebase-config.js';
+import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
-    const servicePlanTableBody = document.getElementById('service-plan-table').querySelector('tbody');
     const servicePlanningForm = document.getElementById('service-planning-form');
-
-    let serviceTeam = [];
+    let servicePlans = [];
 
     // Kontrollera att användaren är inloggad och har rätt roll
     onAuthStateChanged(auth, async (user) => {
@@ -34,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
             const serviceTeamData = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service');
-            serviceTeam = serviceTeamData ? serviceTeamData.members : [];
+            const serviceTeam = serviceTeamData ? serviceTeamData.members : [];
 
             // Fyll i rullgardinsmenyn
             serviceTeam.forEach(member => {
@@ -53,47 +51,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadServicePlans() {
         try {
             const plansSnapshot = await getDocs(collection(db, 'service-plans'));
-            const plans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            servicePlans = plansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            renderPlans(plans);
+            // Rendera Gantt-schema med de hämtade planerna
+            drawChart(servicePlans);
         } catch (error) {
             console.error("Error loading service plans:", error);
             alert("Ett fel uppstod vid hämtning av service-planer.");
-        }
-    }
-
-    // Rendera service-planer i tabellen
-    function renderPlans(plans) {
-        servicePlanTableBody.innerHTML = '';
-        plans.forEach(plan => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${plan.employee}</td>
-                <td>${plan.address}</td>
-                <td>${plan.task}</td>
-                <td>${plan.date}</td>
-                <td><input type="checkbox" data-id="${plan.id}" ${plan.completed ? 'checked' : ''}></td>
-            `;
-            servicePlanTableBody.appendChild(row);
-        });
-
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', toggleCompleted);
-        });
-    }
-
-    // Hantera uppdatering av en plan när den är markerad som färdig
-    async function toggleCompleted(event) {
-        const planId = event.target.getAttribute('data-id');
-        const completed = event.target.checked;
-
-        try {
-            await updateDoc(doc(db, 'service-plans', planId), {
-                completed: completed
-            });
-        } catch (error) {
-            console.error("Error updating completion status:", error);
-            alert("Ett fel uppstod vid uppdatering av slutförd status.");
         }
     }
 
@@ -102,11 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
 
         const employee = employeeSelect.value;
-        const address = document.getElementById('address').value;
         const task = document.getElementById('task').value;
         const date = document.getElementById('date').value;
 
-        if (!employee || !address || !task || !date) {
+        if (!employee || !task || !date) {
             alert("Vänligen fyll i alla fält.");
             return;
         }
@@ -114,10 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await addDoc(collection(db, 'service-plans'), {
                 employee,
-                address,
                 task,
-                date,
-                completed: false  // Nytt fält för att hålla reda på om uppgiften är klar
+                startDate: date,  // Startdatum för uppgiften
+                endDate: date     // För detta exempel använder vi samma datum som slutdatum
             });
 
             loadServicePlans();
