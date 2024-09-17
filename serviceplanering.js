@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
             await saveTaskDates(id);
-            alert("Projekt uppdaterat och sparat!");
+            showConfirmationPopup("Datum uppdaterat och sparat!");
         });
 
     }
@@ -156,6 +156,25 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Ett fel uppstod vid skapandet av service-planen.");
         }
     });
+
+    // Funktion för att visa popup för bekräftelse
+    function showConfirmationPopup(message) {
+        const popup = document.createElement('div');
+        popup.classList.add('confirmation-popup');
+        popup.textContent = message;
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            popup.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.remove();
+            }, 300);
+        }, 3000);
+    }
 
     window.navigateTo = (page) => {
         window.location.href = page;
