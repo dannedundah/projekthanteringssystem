@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gantt.init("gantt-chart");
 
+        gantt.clearAll();  // Rensa gammal data
         gantt.parse({
             data: tasks,
             links: []
