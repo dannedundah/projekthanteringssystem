@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
                     await loadServiceTeam();  // Ladda service-teamet
                     await loadServicePlans(); // Ladda tidigare planeringar
-                    initializeGantt(); // Initiera Gantt-schemat
+                    initializeGantt();        // Initiera Gantt-schemat
                 } else {
                     alert("Du har inte behörighet att se denna sida.");
                     window.location.href = 'login.html';
@@ -65,21 +65,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     function initializeGantt() {
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.columns = [
-            { name: "text", label: "Task", width: "*", tree: true },
-            { name: "start_date", label: "Start Date", align: "center" },
-            { name: "duration", label: "Duration", align: "center" }
+            { name: "text", label: "Adress", width: "*", tree: true },
+            { name: "start_date", label: "Datum", align: "center", width: 80 }
         ];
+
         gantt.init("gantt-chart");
 
         const tasks = servicePlans.map(plan => ({
             id: plan.id,
-            text: `${plan.employee} - ${plan.task}`,
+            text: plan.address, // Visa adressen i Gantt-schemat
             start_date: plan.date,
-            duration: 1,  // Example: You can adjust the duration based on your data
+            duration: 1,  // Exempel: Justera varaktigheten vid behov
+            task: plan.task // Lagra uppdraget som en egenskap
         }));
 
         gantt.clearAll();
         gantt.parse({ data: tasks });
+
+        // Lägg till ett event för att visa uppdrag när användaren klickar på en uppgift
+        gantt.attachEvent("onTaskClick", function (id, e) {
+            const task = gantt.getTask(id);
+            alert(`Uppgift: ${task.task}`);  // Visa uppdraget i en popup
+            return true;
+        });
     }
 
     // Hantera formulärinlämning för att skapa en ny service-plan
