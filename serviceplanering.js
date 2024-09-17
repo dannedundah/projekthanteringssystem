@@ -3,6 +3,7 @@ import { auth, db, collection, getDocs, addDoc, doc, updateDoc, onAuthStateChang
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
     const employeeSelect = document.getElementById('employee-select');
+    const employeeFilter = document.getElementById('employee-filter'); // Filtreringsdropdown
     const servicePlanningForm = document.getElementById('service-planning-form');
     let plannings = [];
     let serviceTeam = [];
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             serviceTeam = teamsSnapshot.docs.map(doc => doc.data()).find(team => team.name === 'Team Service').members;
 
             populateEmployeeSelect();
+            populateEmployeeFilter();
             renderGanttChart();
         } catch (error) {
             console.error('Error fetching plannings or teams:', error);
@@ -47,6 +49,25 @@ document.addEventListener('DOMContentLoaded', () => {
             option.value = member;
             option.textContent = member;
             employeeSelect.appendChild(option);
+        });
+    }
+
+    function populateEmployeeFilter() {
+        employeeFilter.innerHTML = '<option value="">Visa alla</option>';
+        serviceTeam.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member;
+            option.textContent = member;
+            employeeFilter.appendChild(option);
+        });
+
+        // Filtrera projekt när användaren väljer en person
+        employeeFilter.addEventListener('change', () => {
+            const selectedEmployee = employeeFilter.value;
+            const filteredPlannings = selectedEmployee ? 
+                plannings.filter(planning => planning.employee === selectedEmployee) :
+                plannings;
+            renderGanttChart(filteredPlannings);
         });
     }
 
@@ -69,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         gantt.config.columns = [
-            { name: "checkbox", label: "", width: 30, template: checkboxTemplate },
             { name: "text", label: "Adress", width: 200, tree: true },
             { name: "person", label: "Person", align: "center", width: 150 },
             { name: "start_date", label: "Startdatum", align: "center", width: 100 },
@@ -84,8 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 person: planning.employee,
                 start_date: startDate,
                 duration: 1, // Assuming each task is one day, adjust as needed
-                taskData: planning.task,
-                completed: planning.completed || false // Lägg till flaggan completed
+                taskData: planning.task
             };
         });
 
@@ -146,8 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 employee,
                 address,
                 task,
-                date,
-                completed: false // Lägg till en flagga för att markera om projektet är klart eller inte
+                date
             });
 
             alert("Planering tillagd!");
@@ -157,42 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error adding service plan:", error);
             alert("Ett fel uppstod vid skapandet av service-planen.");
         }
-    });
-
-    // Funktion för att spara om projektet är klart eller inte i Firestore
-    async function saveCompletedStatus(taskId, isCompleted) {
-        const planningRef = doc(db, 'service-plans', taskId);
-        try {
-            await updateDoc(planningRef, {
-                completed: isCompleted
-            });
-            console.log(`Projektstatus uppdaterad: ${taskId}`);
-        } catch (error) {
-            console.error("Error updating completed status:", error);
-        }
-    }
-
-    // Template för checkbox som används för att markera projekt som klart
-    function checkboxTemplate(task) {
-        const checked = task.completed ? 'checked' : '';
-        return `<input type="checkbox" class="project-completed" ${checked} data-id="${task.id}">`;
-    }
-
-    // Lyssnare för att hantera klick på checkbox för att markera projekt som klart
-    gantt.attachEvent("onCheckboxClick", function(taskId, e) {
-        const task = gantt.getTask(taskId);
-        const isChecked = e.target.checked;
-        task.completed = isChecked;
-        saveCompletedStatus(taskId, isChecked);
-    });
-
-    // Lägg till en sökfunktion för att filtrera på personer
-    document.getElementById('employee-search').addEventListener('input', (e) => {
-        const searchValue = e.target.value.toLowerCase();
-        const filteredPlannings = plannings.filter(planning => 
-            planning.employee.toLowerCase().includes(searchValue)
-        );
-        renderGanttChart(filteredPlannings);
     });
 
     // Funktion för att visa popup för projektinformation
