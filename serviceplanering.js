@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Ladda teamet "Service" och fyll i rullgardinsmenyn med medlemmar
+    // Ladda teamet "Team Service" och fyll i rullgardinsmenyn med medlemmar
     async function loadServiceTeam() {
         try {
             const teamsSnapshot = await getDocs(collection(db, 'teams'));
