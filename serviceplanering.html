@@ -11,6 +11,7 @@
 <body>
     <div class="container">
         <h1>Serviceplanering</h1>
+
         <form id="service-planning-form">
             <label for="employee-select">Välj person:</label>
             <select id="employee-select" required>
@@ -30,10 +31,15 @@
         </form>
 
         <h2>Planerat schema</h2>
+
+        <!-- Sökfunktion för person -->
+        <label for="employee-search">Sök person:</label>
+        <input type="text" id="employee-search" placeholder="Skriv för att söka efter person">
+
         <!-- Gantt diagram container -->
         <div id="gantt-chart" style="width: 100%; height: 500px;"></div>
 
-        <button id="back-btn">Tillbaka till startsidan</button>
+        <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 
     <!-- DHTMLX Gantt JavaScript -->

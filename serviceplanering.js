@@ -2,7 +2,8 @@ import { auth, db, collection, getDocs, addDoc, doc, updateDoc, onAuthStateChang
 
 document.addEventListener('DOMContentLoaded', () => {
     const ganttChartContainer = document.getElementById('gantt-chart');
-    const employeeSelect = document.getElementById('employee-select'); 
+    const employeeSelect = document.getElementById('employee-select');
+    const servicePlanningForm = document.getElementById('service-planning-form');
     let plannings = [];
     let serviceTeam = [];
     let canEdit = false;
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function renderGanttChart() {
+    async function renderGanttChart(filteredPlannings = plannings) {
         ganttChartContainer.innerHTML = '';
 
         gantt.config.xml_date = "%Y-%m-%d";
@@ -68,13 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Adress", width: 200, tree: true }, 
+            { name: "checkbox", label: "", width: 30, template: checkboxTemplate },
+            { name: "text", label: "Adress", width: 200, tree: true },
             { name: "person", label: "Person", align: "center", width: 150 },
             { name: "start_date", label: "Startdatum", align: "center", width: 100 },
             { name: "duration", label: "Varaktighet", align: "center", width: 80 }
         ];
 
-        const tasks = plannings.map(planning => {
+        const tasks = filteredPlannings.map(planning => {
             const startDate = planning.date;
             return {
                 id: planning.id,
@@ -82,7 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 person: planning.employee,
                 start_date: startDate,
                 duration: 1, // Assuming each task is one day, adjust as needed
-                taskData: planning.task
+                taskData: planning.task,
+                completed: planning.completed || false // Lägg till flaggan completed
             };
         });
 
@@ -93,18 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
-        // Visa popup med detaljer när man klickar på ett projekt
-        gantt.attachEvent("onTaskClick", function (id) {
-            const task = gantt.getTask(id);
-            showTaskDetailsPopup(`Adress: ${task.text}<br>Uppgift: ${task.taskData}<br>Ansvarig: ${task.person}`);
-            return true;
-        });
-
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
             await saveTaskDates(id);
             showConfirmationPopup("Datum uppdaterat och sparat!");
         });
 
+        gantt.attachEvent("onTaskClick", function(id) {
+            const task = gantt.getTask(id);
+            showPopup(`Adress: ${task.text}<br>Uppgift: ${task.taskData}<br>Ansvarig: ${task.person}`);
+            return true;
+        });
     }
 
     // Funktion för att spara de uppdaterade datumen i Firestore
@@ -117,41 +118,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const planningRef = doc(db, 'service-plans', taskId);
 
         try {
-            const planningDoc = await getDoc(planningRef);
-
-            if (planningDoc.exists()) {
-                await updateDoc(planningRef, {
-                    date: formattedStartDate
-                });
-                console.log(`Date saved successfully for task: ${taskId}`);
-            } else {
-                console.error(`No planning document found for taskId: ${taskId}`);
-            }
+            await updateDoc(planningRef, {
+                date: formattedStartDate
+            });
+            console.log(`Date saved successfully for task: ${taskId}`);
         } catch (error) {
             console.error("Error updating document: ", error);
         }
     }
 
-    // Funktion för att visa popup med projektinformation
-    function showTaskDetailsPopup(details) {
-        const popup = document.createElement('div');
-        popup.classList.add('task-details-popup');
-        popup.innerHTML = `
-            <div class="popup-content">
-                <h3>Projektinformation</h3>
-                <p>${details}</p>
-                <button id="close-popup">Stäng</button>
-            </div>
-        `;
-        document.body.appendChild(popup);
-
-        document.getElementById('close-popup').addEventListener('click', () => {
-            popup.remove();
-        });
-    }
-
     // Form submit handler for adding new service plans
-    const servicePlanningForm = document.getElementById('service-planning-form');
     servicePlanningForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -170,7 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 employee,
                 address,
                 task,
-                date
+                date,
+                completed: false // Lägg till en flagga för att markera om projektet är klart eller inte
             });
 
             alert("Planering tillagd!");
@@ -181,6 +158,54 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Ett fel uppstod vid skapandet av service-planen.");
         }
     });
+
+    // Funktion för att spara om projektet är klart eller inte i Firestore
+    async function saveCompletedStatus(taskId, isCompleted) {
+        const planningRef = doc(db, 'service-plans', taskId);
+        try {
+            await updateDoc(planningRef, {
+                completed: isCompleted
+            });
+            console.log(`Projektstatus uppdaterad: ${taskId}`);
+        } catch (error) {
+            console.error("Error updating completed status:", error);
+        }
+    }
+
+    // Template för checkbox som används för att markera projekt som klart
+    function checkboxTemplate(task) {
+        const checked = task.completed ? 'checked' : '';
+        return `<input type="checkbox" class="project-completed" ${checked} data-id="${task.id}">`;
+    }
+
+    // Lyssnare för att hantera klick på checkbox för att markera projekt som klart
+    gantt.attachEvent("onCheckboxClick", function(taskId, e) {
+        const task = gantt.getTask(taskId);
+        const isChecked = e.target.checked;
+        task.completed = isChecked;
+        saveCompletedStatus(taskId, isChecked);
+    });
+
+    // Lägg till en sökfunktion för att filtrera på personer
+    document.getElementById('employee-search').addEventListener('input', (e) => {
+        const searchValue = e.target.value.toLowerCase();
+        const filteredPlannings = plannings.filter(planning => 
+            planning.employee.toLowerCase().includes(searchValue)
+        );
+        renderGanttChart(filteredPlannings);
+    });
+
+    // Funktion för att visa popup för projektinformation
+    function showPopup(message) {
+        const popup = document.createElement('div');
+        popup.classList.add('task-details-popup');
+        popup.innerHTML = `<p>${message}</p><button id="close-popup">Stäng</button>`;
+        document.body.appendChild(popup);
+
+        document.getElementById('close-popup').addEventListener('click', () => {
+            document.body.removeChild(popup);
+        });
+    }
 
     // Funktion för att visa popup för bekräftelse
     function showConfirmationPopup(message) {
