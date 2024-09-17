@@ -1,4 +1,4 @@
-import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc } from './firebase-config.js';
+import { auth, db, collection, getDocs, addDoc, doc, onAuthStateChanged, getDoc, updateDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const employeeSelect = document.getElementById('employee-select');
@@ -72,30 +72,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>${plan.task}</td>
                 <td>${plan.date}</td>
                 <td><input type="checkbox" data-id="${plan.id}" ${plan.completed ? 'checked' : ''}></td>
-                <td><button class="delete-plan-btn" data-id="${plan.id}">Ta bort</button></td>
             `;
             servicePlanTableBody.appendChild(row);
-        });
-
-        document.querySelectorAll('.delete-plan-btn').forEach(button => {
-            button.addEventListener('click', deletePlan);
         });
 
         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
             checkbox.addEventListener('change', toggleCompleted);
         });
-    }
-
-    // Hantera borttagning av en service-plan
-    async function deletePlan(event) {
-        const planId = event.target.getAttribute('data-id');
-        try {
-            await deleteDoc(doc(db, 'service-plans', planId));
-            loadServicePlans(); // Ladda om planerna efter borttagning
-        } catch (error) {
-            console.error("Error removing service plan:", error);
-            alert("Ett fel uppstod vid borttagning av service-planen.");
-        }
     }
 
     // Hantera uppdatering av en plan när den är markerad som färdig
