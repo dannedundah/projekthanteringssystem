@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             populateEmployeeSelect();
             populateEmployeeFilter();
-            renderGanttChart();
+            renderGanttChart(plannings);
         } catch (error) {
             console.error('Error fetching plannings or teams:', error);
         }
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Filtrera projekt när användaren väljer en person
         employeeFilter.addEventListener('change', () => {
             const selectedEmployee = employeeFilter.value;
-            const filteredPlannings = selectedEmployee ? 
+            const filteredPlannings = selectedEmployee ?
                 plannings.filter(planning => planning.employee === selectedEmployee) :
                 plannings;
             renderGanttChart(filteredPlannings);
