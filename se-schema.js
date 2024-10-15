@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Sortera GanttData efter startdatum, närmsta datum först
+            ganttData.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
             renderGanttChart(ganttData);
         } catch (error) {
             console.error('Error loading schedule:', error);
@@ -75,14 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderGanttChart(ganttData) {
+    async function renderGanttChart(ganttData) {
         ganttChartContainer.innerHTML = '';
-        
+
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = true;
 
         gantt.init("gantt-chart");
-        
+
         gantt.parse({
             data: ganttData.map(task => ({
                 id: task.id,
@@ -94,12 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
+        // Inaktivera klick på uppgifter i diagrammet (höger sida)
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
-            if (task && task.detailsLink) {
+            if (e.target.closest('.gantt_cell')) {  // Detta gäller vänsterdelen
                 window.location.href = task.detailsLink;
+                return true; // Klick fungerar på vänsterdelen
             }
-            return true;
+            return false; // Klick fungerar inte på högerdelen
+        });
+
+        gantt.attachEvent("onTaskDblClick", function() {
+            return false; // Förhindra dubbelklick på tidslinjen
         });
     }
 });
