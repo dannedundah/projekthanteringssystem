@@ -1,92 +1,109 @@
-import { auth, db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './firebase-config.js';
+import { db, collection, query, where, getDocs, doc, getDoc, auth, onAuthStateChanged } from './firebase-config.js';
 
-let tickets = [];
+document.addEventListener('DOMContentLoaded', () => {
+    const ganttChartContainer = document.getElementById('gantt-chart');
+    let selectedEmployeeName = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-            if (userDoc.exists() && (userDoc.data().role === 'Admin' || userDoc.data().role === 'Service')) {
-                await loadTickets();
-                renderTickets();
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                selectedEmployeeName = `${userData.firstName} ${userData.lastName}`;
+                console.log(`Logged in as: ${selectedEmployeeName}`);
+
+                await loadSchedule();
             } else {
-                alert("Du har inte behörighet att se denna sida.");
-                window.location.href = 'login.html';
+                console.error('User document not found.');
             }
         } else {
-            window.location.href = 'login.html';
+            console.error('User not logged in');
+            navigateTo('login.html');
         }
     });
+
+    async function loadSchedule() {
+        try {
+            const q = query(collection(db, 'planning'), where('employees', 'array-contains', selectedEmployeeName));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                ganttChartContainer.innerHTML = '<p>Inga schemaposter hittades.</p>';
+                return;
+            }
+
+            const ganttData = [];
+
+            for (const docSnapshot of querySnapshot.docs) {
+                const planningData = docSnapshot.data();
+                const projectDocRef = doc(db, 'projects', planningData.projectId);
+                const projectDoc = await getDoc(projectDocRef);
+
+                if (projectDoc.exists()) {
+                    const projectData = projectDoc.data();
+                    
+                    // Kontrollera om projektets status är "Driftsatt" och exkludera det
+                    if (projectData.status && projectData.status.trim().toLowerCase() !== 'driftsatt') {
+                        ganttData.push({
+                            id: docSnapshot.id,
+                            text: projectData.address || 'Ej specificerad',
+                            start_date: formatDate(planningData.startDate),
+                            end_date: formatDate(planningData.endDate),
+                            detailsLink: `projekt-detalj.html?id=${projectDoc.id}`
+                        });
+                    }
+                }
+            }
+
+            renderGanttChart(ganttData);
+        } catch (error) {
+            console.error('Error loading schedule:', error);
+        }
+    }
+
+    function formatDate(date) {
+        if (date.seconds) {
+            const d = new Date(date.seconds * 1000);
+            return d.toISOString().split('T')[0];
+        } else if (typeof date === 'string') {
+            return date;
+        } else {
+            const d = new Date(date);
+            return d.toISOString().split('T')[0];
+        }
+    }
+
+    function renderGanttChart(ganttData) {
+        ganttChartContainer.innerHTML = '';
+        
+        gantt.config.xml_date = "%Y-%m-%d";
+        gantt.config.readonly = true;
+
+        gantt.init("gantt-chart");
+        
+        gantt.parse({
+            data: ganttData.map(task => ({
+                id: task.id,
+                text: task.text,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                detailsLink: task.detailsLink
+            })),
+            links: []
+        });
+
+        gantt.attachEvent("onTaskClick", function(id, e) {
+            const task = gantt.getTask(id);
+            if (task && task.detailsLink) {
+                window.location.href = task.detailsLink;
+            }
+            return true;
+        });
+    }
 });
 
-async function loadTickets() {
-    try {
-        const querySnapshot = await getDocs(collection(db, 'service-tickets'));
-        tickets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-        console.error('Error loading tickets:', error);
-    }
-}
-
-function renderTickets() {
-    const todoList = document.getElementById('todo-list');
-    const inProgressList = document.getElementById('in-progress-list');
-    const doneList = document.getElementById('done-list');
-
-    todoList.innerHTML = '';
-    inProgressList.innerHTML = '';
-    doneList.innerHTML = '';
-
-    tickets.forEach(ticket => {
-        const ticketItem = document.createElement('div');
-        ticketItem.className = 'ticket-item';
-        ticketItem.textContent = `${ticket.title} - ${ticket.description}`;
-        ticketItem.draggable = true;
-        ticketItem.id = ticket.id;
-        ticketItem.ondragstart = drag;
-
-        if (ticket.status === 'todo') {
-            todoList.appendChild(ticketItem);
-        } else if (ticket.status === 'in-progress') {
-            inProgressList.appendChild(ticketItem);
-        } else if (ticket.status === 'done') {
-            doneList.appendChild(ticketItem);
-        }
-    });
-}
-
-function allowDrop(event) {
-    event.preventDefault();
-}
-
-function drag(event) {
-    event.dataTransfer.setData('text', event.target.id);
-}
-
-async function drop(event) {
-    event.preventDefault();
-    const ticketId = event.dataTransfer.getData('text');
-    const ticketElement = document.getElementById(ticketId);
-    const newStatus = event.target.closest('.ticket-list').id.split('-')[0];
-
-    // Flytta elementet till rätt lista
-    event.target.appendChild(ticketElement);
-
-    // Uppdatera status på biljetten och spara i Firebase
-    await updateTicketStatus(ticketId, newStatus);
-}
-
-async function updateTicketStatus(ticketId, newStatus) {
-    const ticketRef = doc(db, 'service-tickets', ticketId);
-    try {
-        await updateDoc(ticketRef, { status: newStatus });
-        console.log('Ticket status updated successfully');
-    } catch (error) {
-        console.error('Error updating ticket status:', error);
-    }
-}
-
-function navigateTo(page) {
+window.navigateTo = (page) => {
     window.location.href = page;
-}
+};
