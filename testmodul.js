@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderGanttChart(ganttData) {
+    async function renderGanttChart(ganttData) {
         ganttChartContainer.innerHTML = '';
 
         gantt.config.xml_date = "%Y-%m-%d";
@@ -99,18 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Inaktivera klick på uppgifter i diagrammet (höger sida)
         gantt.attachEvent("onTaskClick", function(id, e) {
-            const clickPosition = e.target.classList.contains('gantt_task_row');
-            if (clickPosition) {
-                // Tillåt klick på vänsterdelen
-                const task = gantt.getTask(id);
-                if (task && task.detailsLink) {
-                    window.location.href = task.detailsLink;
-                }
+            const task = gantt.getTask(id);
+            if (e.target.closest('.gantt_cell')) {  // Detta gäller vänsterdelen
+                window.location.href = task.detailsLink;
+                return true; // Klick fungerar på vänsterdelen
             }
-            return !clickPosition;  // Tillåt endast klick på vänsterdelen
+            return false; // Klick fungerar inte på högerdelen
         });
 
-        // Inaktivera klick på tidslinjen (höger sida)
         gantt.attachEvent("onTaskDblClick", function() {
             return false; // Förhindra dubbelklick på tidslinjen
         });
