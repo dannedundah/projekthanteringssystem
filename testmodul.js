@@ -99,7 +99,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Inaktivera klick på uppgifter i diagrammet (höger sida)
         gantt.attachEvent("onTaskClick", function(id, e) {
-            return false;  // Detta förhindrar att något händer när en uppgift klickas
+            const clickPosition = e.target.classList.contains('gantt_task_row');
+            if (clickPosition) {
+                // Tillåt klick på vänsterdelen
+                const task = gantt.getTask(id);
+                if (task && task.detailsLink) {
+                    window.location.href = task.detailsLink;
+                }
+            }
+            return !clickPosition;  // Tillåt endast klick på vänsterdelen
+        });
+
+        // Inaktivera klick på tidslinjen (höger sida)
+        gantt.attachEvent("onTaskDblClick", function() {
+            return false; // Förhindra dubbelklick på tidslinjen
         });
     }
 });
