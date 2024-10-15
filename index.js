@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userRole = userDoc.data().role;
 
                 // Visa testmodulen om det är Daniel
-                if (user.email === 'daniel@delidel.se') {
+                if (user.email === 'daniel@delidel.se' || user.email === 'hampus@delidel.se') {
                     testModuleBtn.style.display = 'block';
                 }
 
