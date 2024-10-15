@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderGanttChart(ganttData) {
         ganttChartContainer.innerHTML = '';
-        
+
         gantt.config.xml_date = "%Y-%m-%d";
         gantt.config.readonly = true;
 
         gantt.init("gantt-chart");
-        
+
         gantt.parse({
             data: ganttData.map(task => ({
                 id: task.id,
@@ -97,12 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
             links: []
         });
 
+        // Inaktivera klick på uppgifter i diagrammet (höger sida)
         gantt.attachEvent("onTaskClick", function(id, e) {
-            const task = gantt.getTask(id);
-            if (task && task.detailsLink) {
-                window.location.href = task.detailsLink;
-            }
-            return true;
+            return false;  // Detta förhindrar att något händer när en uppgift klickas
         });
     }
 });
