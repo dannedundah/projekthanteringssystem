@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Sortera GanttData efter startdatum, närmsta datum först
+            ganttData.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
             renderGanttChart(ganttData);
         } catch (error) {
             console.error('Error loading schedule:', error);
