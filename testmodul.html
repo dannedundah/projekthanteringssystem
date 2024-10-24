@@ -3,20 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitt Schema</title>
+    <title>Planering Total</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Länk till DHTMLX Gantt CSS -->
     <link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css">
-    <!-- Skript för DHTMLX Gantt -->
     <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="testmodul.js"></script>
+    <style>
+        .weekend {
+            background-color: #FFCCCC !important;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Mitt Schema</h1>
-        <!-- Container för Gantt-diagrammet -->
-        <div id="gantt-chart" style="width:100%; height:400px;"></div>
+        <h1>Planering Total</h1>
+        <label for="employee-select">Välj team:</label>
+        <select id="employee-select">
+            <option value="">Alla team</option>
+        </select>
+        <div id="gantt-chart" class="gantt-chart-large"></div>
         <button onclick="navigateTo('index.html')">Tillbaka</button>
     </div>
 </body>
