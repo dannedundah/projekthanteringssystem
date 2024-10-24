@@ -16,8 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let allTeams = [];
     let canEdit = false;
 
-    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1"; // Project ID to hide
 
+    // Check if user is authenticated and retrieve necessary data
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDocRef = doc(db, 'users', user.uid);
@@ -62,10 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateTeamSelect() {
         teamSelect.innerHTML = '<option value="">Alla team</option>';
-        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; 
+        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; // Manually adding Elektriker
 
         allTeams.forEach(team => {
-            if (team.name !== 'Team Admin') { 
+            if (team.name !== 'Team Admin') { // Exclude "Admin" team
                 const option = document.createElement('option');
                 option.value = team.name;
                 option.textContent = team.name;
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const projectData = projectDoc.data();
 
                 if (['driftsatt', 'fakturerad'].includes(projectData.status.trim().toLowerCase())) {
-                    return []; 
+                    return []; // Exclude projects with these statuses
                 }
 
                 const taskList = [];
@@ -167,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         taskColor = 'black';
                         break;
                     default:
-                        taskColor = 'grey'; 
+                        taskColor = 'grey'; // Default color
                 }
 
                 const teamName = planning.team || 'Ej specificerat team';
@@ -183,9 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: `${projectData.name} (${teamName})`,  
+                        text: `${projectData.name} (${teamName})`,  // Include team name in text
                         start_date: startDate,
-                        end_date: endDate, 
+                        end_date: endDate, // Use end_date for Gantt
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
                         color: taskColor,
                         checkbox: planning.electricianChecked || false
@@ -201,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id,
-                        text: `${projectData.name} (${teamName})`,  
+                        text: `${projectData.name} (${teamName})`,  // Include team name in text
                         start_date: startDate,
                         end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -298,5 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             confirmationPopup.remove();
         }, 2000);
+    }
+
+    function navigateTo(page) {
+        window.location.href = page;
     }
 });
