@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'elektriker klar':
                         taskColor = 'purple';
                         break;
-                        case 'elektriker klar men inte solceller':
+                    case 'elektriker klar men inte solceller':
                         taskColor = 'yellow';
                         break;
                     case 'driftsatt':
@@ -187,8 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: taskColor,  // ANVÄND SAMMA LOGIK FÖR FÄRG SOM ÖVRIGA PROJEKT
-                        checkbox: planning.electricianChecked || false  // Sätt initialt checkbox-värde
+                        color: taskColor,
+                        checkbox: planning.electricianChecked || false
                     });
                 } else {
                     const startDate = formatDateToString(planning.startDate);
@@ -236,10 +236,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
-            return true;
+            console.log(`Task dragged: ${id}, mode: ${mode}`);
+            return true; // Make sure this returns true to allow dragging
         });
 
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
+            console.log(`After task update: ${id}`);
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
@@ -267,98 +269,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveTaskDates(taskId) {
         const task = gantt.getTask(taskId);
-
-        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
-        const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
-
-        const formattedStartDate = startDate.toISOString().split('T')[0];
-        const formattedEndDate = endDate.toISOString().split('T')[0];
-
-        console.log(`Saving dates for task: ${taskId}`);
-        console.log(`Start Date: ${formattedStartDate}, End Date: ${formattedEndDate}`);
+        const startDate = formatDateToString(task.start_date);
+        const endDate = formatDateToString(task.end_date);
 
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
         try {
-            const planningDoc = await getDoc(planningRef);
-
-            if (planningDoc.exists()) {
-                if (taskId.endsWith('-electrician')) {
-                    await updateDoc(planningRef, {
-                        electricianStartDate: formattedStartDate,
-                        electricianEndDate: formattedEndDate
-                    });
-                } else {
-                    await updateDoc(planningRef, {
-                        startDate: formattedStartDate,
-                        endDate: formattedEndDate
-                    });
-                }
-
-                console.log(`Dates saved successfully for task: ${taskId}`);
-
-                const projectId = planningDoc.data().projectId;
-                if (!projectId) {
-                    console.error(`No projectId found in planning document for taskId: ${taskId}`);
-                    return;
-                }
-
-                const projectRef = doc(db, 'projects', projectId);
-                const projectDoc = await getDoc(projectRef);
-
-                if (projectDoc.exists()) {
-                    await updateDoc(projectRef, {
-                        status: 'Planerad'
-                    });
-                } else {
-                    console.error(`No project document found for projectId: ${projectId}`);
-                }
-            } else {
-                console.error(`No planning document found for taskId: ${taskId}`);
-            }
+            await updateDoc(planningRef, {
+                startDate,
+                endDate
+            });
+            console.log(`Dates saved successfully for task: ${taskId}`);
         } catch (error) {
-            console.error("Error updating document: ", error);
+            console.error("Error updating task dates: ", error);
         }
     }
 
     function formatDateToString(date) {
-        if (!date) {
-            console.error("Invalid date:", date);
-            return null;
-        }
-
-        if (date.seconds) {
-            const d = new Date(date.seconds * 1000);
-            return d.toISOString().split('T')[0];
-        }
-
-        if (typeof date === 'string') {
-            return date;
-        }
-
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        return d.toISOString().split('T')[0];
+        return gantt.date.date_to_str("%Y-%m-%d")(date);
     }
 
     function showConfirmationPopup(message) {
-        const popup = document.createElement('div');
-        popup.classList.add('confirmation-popup');
-        popup.textContent = message;
-        document.body.appendChild(popup);
+        const confirmationPopup = document.createElement('div');
+        confirmationPopup.classList.add('confirmation-popup');
+        confirmationPopup.innerText = message;
+        document.body.appendChild(confirmationPopup);
 
         setTimeout(() => {
-            popup.classList.add('show');
-        }, 100);
-
-        setTimeout(() => {
-            popup.classList.remove('show');
-            setTimeout(() => {
-                popup.remove();
-            }, 300);
-        }, 3000);
+            confirmationPopup.remove();
+        }, 2000);
     }
 });
-
-window.navigateTo = (page) => {
-    window.location.href = page;
-};
