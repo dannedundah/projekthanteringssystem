@@ -16,9 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let allTeams = [];
     let canEdit = false;
 
-    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1"; // Project ID to hide
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
-    // Check if user is authenticated and retrieve necessary data
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDocRef = doc(db, 'users', user.uid);
@@ -63,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateTeamSelect() {
         teamSelect.innerHTML = '<option value="">Alla team</option>';
-        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; // Manually adding Elektriker
+        teamSelect.innerHTML += '<option value="Elektriker">Elektriker</option>'; 
 
         allTeams.forEach(team => {
-            if (team.name !== 'Team Admin') { // Exclude "Admin" team
+            if (team.name !== 'Team Admin') { 
                 const option = document.createElement('option');
                 option.value = team.name;
                 option.textContent = team.name;
@@ -140,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const projectData = projectDoc.data();
 
                 if (['driftsatt', 'fakturerad'].includes(projectData.status.trim().toLowerCase())) {
-                    return []; // Exclude projects with these statuses
+                    return []; 
                 }
 
                 const taskList = [];
@@ -168,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         taskColor = 'black';
                         break;
                     default:
-                        taskColor = 'grey'; // Default color
+                        taskColor = 'grey'; 
                 }
 
                 const teamName = planning.team || 'Ej specificerat team';
@@ -184,12 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id + '-electrician',
-                        text: `${projectData.name} (${teamName})`,  // Include team name in text
+                        text: `${projectData.name} (${teamName})`,  
                         start_date: startDate,
-                        end_date: endDate, // Use end_date for Gantt
+                        end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: taskColor,
-                        checkbox: planning.electricianChecked || false
+                        color: taskColor,  
+                        checkbox: planning.electricianChecked || false  
                     });
                 } else {
                     const startDate = formatDateToString(planning.startDate);
@@ -202,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     taskList.push({
                         id: planning.id,
-                        text: `${projectData.name} (${teamName})`,  // Include team name in text
+                        text: `${projectData.name} (${teamName})`,  
                         start_date: startDate,
                         end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
@@ -237,12 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         gantt.attachEvent("onTaskDrag", function(id, mode, task, original) {
-            console.log(`Task dragged: ${id}, mode: ${mode}`);
-            return true; // Make sure this returns true to allow dragging
+            return true;
         });
 
         gantt.attachEvent("onAfterTaskUpdate", async function(id, item) {
-            console.log(`After task update: ${id}`);
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
@@ -270,38 +267,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveTaskDates(taskId) {
         const task = gantt.getTask(taskId);
-        const startDate = formatDateToString(task.start_date);
-        const endDate = formatDateToString(task.end_date);
+
+        const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
+        const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
 
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
         try {
             await updateDoc(planningRef, {
-                startDate,
-                endDate
+                startDate: startDate.toISOString().split('T')[0], 
+                endDate: endDate.toISOString().split('T')[0]
             });
-            console.log(`Dates saved successfully for task: ${taskId}`);
+            console.log('Task dates saved successfully for task:', taskId);
         } catch (error) {
-            console.error("Error updating task dates: ", error);
+            console.error('Error updating task dates:', error);
         }
     }
 
     function formatDateToString(date) {
-        return gantt.date.date_to_str("%Y-%m-%d")(date);
+        if (!(date instanceof Date)) {
+            date = new Date(date);
+        }
+
+        if (!isNaN(date.getTime())) {
+            return gantt.date.date_to_str("%Y-%m-%d")(date);
+        } else {
+            console.error("Invalid date:", date);
+            return null;
+        }
     }
 
     function showConfirmationPopup(message) {
-        const confirmationPopup = document.createElement('div');
-        confirmationPopup.classList.add('confirmation-popup');
-        confirmationPopup.innerText = message;
-        document.body.appendChild(confirmationPopup);
+        const popup = document.createElement('div');
+        popup.classList.add('confirmation-popup');
+        popup.textContent = message;
+        document.body.appendChild(popup);
 
         setTimeout(() => {
-            confirmationPopup.remove();
-        }, 2000);
-    }
-
-    function navigateTo(page) {
-        window.location.href = page;
+            popup.remove();
+        }, 3000);
     }
 });
