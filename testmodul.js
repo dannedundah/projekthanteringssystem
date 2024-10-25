@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Task name", width: 270, tree: true }, 
-            { name: "start_date", label: "Start time", align: "center", width: 80 },
+            { name: "text", label: "Task name", width: 250, tree: true }, 
+            { name: "start_date", label: "Start time", align: "center", width: 100 },
             { name: "duration", label: "Duration", align: "center", width: 60 }
         ];
 
