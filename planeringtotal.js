@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allTeams = [];
     let canEdit = false;
 
-    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1"; // Dölj projekt med detta ID
+    const hiddenProjectId = "moBgPPK2jgyZaeBnqza1";
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -109,11 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ganttChartContainer.innerHTML = '';
 
         gantt.config.xml_date = "%Y-%m-%d";
-        gantt.config.readonly = !canEdit;  // Tillåt redigering om användaren har rättigheter
+        gantt.config.readonly = !canEdit;
 
-        // Aktivera drag och storleksändring av uppgifter
-        gantt.config.drag_move = true;  // Tillåter att uppgifter flyttas
-        gantt.config.drag_resize = true;  // Tillåter ändring av start- och slutdatum genom att dra
+        gantt.config.drag_move = true;
+        gantt.config.drag_resize = true;
 
         gantt.templates.scale_cell_class = function(date){
             if(date.getDay() === 0 || date.getDay() === 6){
@@ -128,8 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         gantt.config.columns = [
-            { name: "text", label: "Task name", width: 250, tree: true }, 
-            { name: "start_date", label: "Start time", align: "center", width: 100 },
+            { name: "checkbox", label: "", width: 40, template: checkboxTemplate },  // Kryssrutekolumn
+            { name: "text", label: "Task name", width: 270, tree: true }, 
+            { name: "start_date", label: "Start time", align: "center", width: 100 },  // Öka bredden för att visa hela datumet
             { name: "duration", label: "Duration", align: "center", width: 60 }
         ];
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'elektriker klar':
                         taskColor = 'purple';
                         break;
-                        case 'elektriker klar men inte solceller':
+                    case 'elektriker klar men inte solceller':
                         taskColor = 'yellow';
                         break;
                     case 'driftsatt':
@@ -190,7 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: startDate,
                         end_date: endDate, 
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: taskColor
+                        color: taskColor,
+                        checkbox: planning.electricianChecked || false
                     });
                 } else {
                     const startDate = formatDateToString(planning.startDate);
@@ -207,7 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         start_date: startDate,
                         end_date: endDate,
                         detailsLink: `projekt-detalj.html?id=${planning.projectId}`,
-                        color: taskColor
+                        color: taskColor,
+                        checkbox: planning.checkbox || false
                     });
                 }
 
@@ -224,7 +226,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gantt.attachEvent("onTaskClick", function(id, e) {
             const task = gantt.getTask(id);
-            if (e.target.closest('.gantt_cell')) {
+            if (e.target.type === 'checkbox') {
+                const isChecked = e.target.checked;
+                task.checkbox = isChecked;
+                saveCheckboxState(task.id, isChecked);
+                e.stopPropagation();
+                return true;
+            } else if (e.target.closest('.gantt_cell')) {
                 window.location.href = task.detailsLink;
                 return false;
             }
@@ -235,6 +243,26 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveTaskDates(id);
             showConfirmationPopup("Projekt uppdaterat!");
         });
+
+        function checkboxTemplate(task) {
+            if (task.checkbox !== undefined) {
+                const checked = task.checkbox ? 'checked' : '';
+                return `<input type="checkbox" class="electrician-checkbox" ${checked}>`;
+            }
+            return '';
+        }
+    }
+
+    async function saveCheckboxState(taskId, isChecked) {
+        const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
+        try {
+            await updateDoc(planningRef, {
+                checkbox: isChecked
+            });
+            console.log(`Checkbox state saved successfully for task: ${taskId}`);
+        } catch (error) {
+            console.error("Error updating checkbox state: ", error);
+        }
     }
 
     async function saveTaskDates(taskId) {
@@ -243,24 +271,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const startDate = new Date(Date.UTC(task.start_date.getFullYear(), task.start_date.getMonth(), task.start_date.getDate()));
         const endDate = new Date(Date.UTC(task.end_date.getFullYear(), task.end_date.getMonth(), task.end_date.getDate()));
 
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+        const formattedEndDate = endDate.toISOString().split('T')[0];
+
+        console.log(`Saving dates for task: ${taskId}`);
+        console.log(`Start Date: ${formattedStartDate}, End Date: ${formattedEndDate}`);
+
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
 
         try {
             if (taskId.endsWith('-electrician')) {
                 await updateDoc(planningRef, {
-                    electricianStartDate: startDate.toISOString().split('T')[0],
-                    electricianEndDate: endDate.toISOString().split('T')[0]
+                    electricianStartDate: formattedStartDate,
+                    electricianEndDate: formattedEndDate
                 });
             } else {
                 await updateDoc(planningRef, {
-                    startDate: startDate.toISOString().split('T')[0],
-                    endDate: endDate.toISOString().split('T')[0]
+                    startDate: formattedStartDate,
+                    endDate: formattedEndDate
                 });
             }
 
-            console.log('Task dates saved successfully for task:', taskId);
+            console.log(`Dates saved successfully for task: ${taskId}`);
         } catch (error) {
-            console.error('Error updating task dates:', error);
+            console.error("Error updating document: ", error);
         }
     }
 
