@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (userDoc.exists()) {
                 const userData = userDoc.data();
-                
                 if (userData.role === 'Elektriker') {
                     alert('Du har inte behörighet att rapportera tid.');
                     window.location.href = 'index.html';
@@ -158,12 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function getTotalHoursPerProject() {
         const projects = {};
+        const projectAddresses = {};
 
         try {
             const q = query(collection(db, 'timeReports'));
             const querySnapshot = await getDocs(q);
 
-            querySnapshot.forEach(docSnapshot => {
+            for (const docSnapshot of querySnapshot.docs) {
                 const reportData = docSnapshot.data();
                 const projectId = reportData.projectId;
                 const hours = parseFloat(reportData.hours) || 0;
@@ -172,11 +172,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     projects[projectId] += hours;
                 } else {
                     projects[projectId] = hours;
+
+                    // Fetch project address only once per project
+                    const projectDoc = await getDoc(doc(db, 'projects', projectId));
+                    if (projectDoc.exists()) {
+                        projectAddresses[projectId] = projectDoc.data().address || "Ej specificerad";
+                    } else {
+                        projectAddresses[projectId] = "Ej specificerad";
+                    }
                 }
-            });
+            }
 
             const totalHoursPerProject = Object.keys(projects).map(projectId => ({
-                projectId: projectId,
+                address: projectAddresses[projectId],
                 totalHours: projects[projectId]
             }));
 
@@ -194,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         totalHoursPerProject.forEach(project => {
             const listItem = document.createElement('li');
-            listItem.textContent = `Projekt ID: ${project.projectId} - Totala timmar: ${project.totalHours}`;
+            listItem.textContent = `Adress: ${project.address} - Totala timmar: ${project.totalHours}`;
             resultsContainer.appendChild(listItem);
         });
     }
