@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const planningTotalBtn = document.getElementById('planning-total-btn');
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
+    const exportTimeReportBtn = document.getElementById('timmar_per_projekt-btn');
     const testModuleBtn = document.getElementById('test-module-btn');
     const arbetsmiljoBtn = document.getElementById('arbetsmiljo-btn');
     const servicePlanningBtn = document.getElementById('serviceplanering-btn'); // Knappen för serviceplanering
