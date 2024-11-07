@@ -95,6 +95,7 @@ function handleRoleBasedAccess(role) {
         if (timeReportingBtn) timeReportingBtn.style.display = 'block';
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
+        if (timmarperprojektBtn) timmarperprojektBtn.style.display = 'block';
         if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Admin
     } else if (role === 'Service') {
         if (servicePlanningBtn) servicePlanningBtn.style.display = 'block'; // Visa serviceplaneringsknappen för Service-rollen
