@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (testModuleBtn) testModuleBtn.addEventListener('click', () => navigateTo('testmodul.html'));
     if (arbetsmiljoBtn) arbetsmiljoBtn.addEventListener('click', () => navigateTo('arbetsmiljo.html'));
     if (servicePlanningBtn) servicePlanningBtn.addEventListener('click', () => navigateTo('serviceplanering.html')); // Navigering till serviceplanering
+    if (timmarperprojektBtn) timmarperprojektBtn.addEventListener('click', () => navigateTo('timmar_per_projekt.html'));
     if (logoutBtn) logoutBtn.addEventListener('click', logout);
 });
 
