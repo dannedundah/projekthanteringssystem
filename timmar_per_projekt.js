@@ -1,33 +1,6 @@
-import { db, auth, onAuthStateChanged, doc, getDoc, collection, query, getDocs } from './firebase-config.js';
+import { db, collection, query, getDocs, doc, getDoc } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Kontrollera användarens behörighet och ladda data endast för admin-användare
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userDocRef);
-
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                
-                // Använd samma rollkontroll som resten av systemet för att kontrollera admin-behörighet
-                if (userData.role === 'Admin') {
-                    // Ladda och visa data om användaren är admin
-                    displayTotalHoursPerProject();
-                } else {
-                    // Omdirigera eller visa ett meddelande om användaren inte är admin
-                    alert('Du har inte behörighet att se denna sida.');
-                    window.location.href = 'index.html';
-                }
-            } else {
-                console.error("Användardokumentet hittades inte.");
-            }
-        } else {
-            // Omdirigera till inloggningssidan om användaren inte är inloggad
-            window.location.href = 'login.html';
-        }
-    });
-
     // Funktion för att hämta och sammanställa totala timmar per projekt
     async function getTotalHoursPerProject() {
         const projects = {}; // Objekt för att lagra timmar per projekt
