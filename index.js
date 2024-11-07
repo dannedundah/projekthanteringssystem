@@ -84,7 +84,8 @@ function handleRoleBasedAccess(role) {
     const timeReportingBtn = document.getElementById('time-reporting-btn');
     const exportTimeReportBtn = document.getElementById('export-time-report-btn');
     const servicePlanningBtn = document.getElementById('serviceplanering-btn'); // Serviceplanering-knapp
-    const adminDashboardLink = document.getElementById('admin-dashboard'); 
+    const adminDashboardLink = document.getElementById('admin-dashboard');
+    const timmarperprojektBtn = document.getElementById('timmar_per_projekt-btn'); // Knapp för "Timmar per projekt"
 
     if (role === 'Admin') {
         if (addProjectBtn) addProjectBtn.style.display = 'block';
@@ -96,7 +97,7 @@ function handleRoleBasedAccess(role) {
         if (exportTimeReportBtn) exportTimeReportBtn.style.display = 'block';
         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
         if (servicePlanningBtn) servicePlanningBtn.style.display = 'block';
-        if (timmarperprojektBtn) timmarperprojektBtn.style.display = 'block'; // Gör "Timmar per projekt"-knappen synlig för admin
+        if (timmarperprojektBtn) timmarperprojektBtn.style.display = 'block'; // Gör knappen synlig för admin
     } else if (role === 'Service') {
         if (servicePlanningBtn) servicePlanningBtn.style.display = 'block';
         if (planningTotalBtn) planningTotalBtn.style.display = 'block';
@@ -117,6 +118,7 @@ function handleRoleBasedAccess(role) {
         window.location.href = 'login.html';
     }
 }
+
 
 // Navigeringsfunktion
 function navigateTo(page) {
