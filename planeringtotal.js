@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.type === 'checkbox') {
                 const isChecked = e.target.checked;
                 task.checkbox = isChecked;
-                saveCheckboxState(task.id, isChecked);
+                saveCheckboxState(task.id, isChecked);  // Spara kryssrutan när den ändras
                 e.stopPropagation();
                 return true;
             } else if (e.target.closest('.gantt_cell')) {
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const planningRef = doc(db, 'planning', taskId.replace('-electrician', ''));
         try {
             await updateDoc(planningRef, {
-                checkbox: isChecked
+                electricianChecked: isChecked
             });
             console.log(`Checkbox state saved successfully for task: ${taskId}`);
         } catch (error) {
