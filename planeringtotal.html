@@ -28,6 +28,17 @@
             overflow-x: auto;
         }
 
+        /* Gör så att innehållet i kolumner inte kapas med "..." */
+        .gantt_grid_head_cell,
+        .gantt_cell {
+            white-space: nowrap !important;
+        }
+
+        /* Bredda grid-tabellen för att visa full text */
+        .gantt_grid {
+            min-width: 700px;
+        }
+
         .weekend {
             background-color: #FFCCCC !important;
         }
@@ -45,6 +56,10 @@
                 font-size: 1rem;
                 width: 100%;
                 margin-bottom: 10px;
+            }
+
+            .gantt_grid {
+                min-width: 900px; /* Gör den ännu bredare för mobilen */
             }
         }
     </style>
